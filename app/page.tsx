@@ -10,8 +10,6 @@ import { BookOpen, Brain, Calendar, TrendingUp } from "lucide-react"
 export default async function HomePage() {
   const supabase = await createClient()
 
-  console.log("[v0] Starting data fetch...")
-
   // Get basic stats
   const [coursesResult, notesResult, dailyEntriesResult] = await Promise.all([
     supabase.from("courses").select("id").limit(1000),
@@ -19,9 +17,6 @@ export default async function HomePage() {
     supabase.from("daily_entries").select("study_time, date, mood").order("date", { ascending: false }).limit(30),
   ])
 
-  console.log("[v0] Courses result:", coursesResult)
-  console.log("[v0] Notes result:", notesResult)
-  console.log("[v0] Daily entries result:", dailyEntriesResult)
 
   // Get course progress data
   const { data: courseProgress } = await supabase
@@ -33,7 +28,6 @@ export default async function HomePage() {
     `)
     .limit(10)
 
-  console.log("[v0] Course progress data:", courseProgress)
 
   const totalCourses = coursesResult.data?.length || 0
   const totalNotes = notesResult.data?.length || 0
@@ -42,7 +36,6 @@ export default async function HomePage() {
     : "0"
   const totalStudyTime = dailyEntriesResult.data?.reduce((sum, entry) => sum + entry.study_time, 0) || 0
 
-  console.log("[v0] Processed stats:", { totalCourses, totalNotes, avgUnderstanding, totalStudyTime })
 
   return (
     <div className="min-h-screen bg-background">
@@ -112,10 +105,7 @@ export default async function HomePage() {
               <CardDescription>Track your comprehension levels over time</CardDescription>
             </CardHeader>
             <CardContent>
-              {(() => {
-                console.log("[v0] Rendering UnderstandingChart with data:", notesResult.data || [])
-                return <UnderstandingChart data={notesResult.data || []} />
-              })()}
+              <UnderstandingChart data={notesResult.data || []} />
             </CardContent>
           </Card>
 
@@ -126,10 +116,7 @@ export default async function HomePage() {
               <CardDescription>Your study habits over the last 30 days</CardDescription>
             </CardHeader>
             <CardContent>
-              {(() => {
-                console.log("[v0] Rendering StudyTimeChart with data:", dailyEntriesResult.data || [])
-                return <StudyTimeChart data={dailyEntriesResult.data || []} />
-              })()}
+              <StudyTimeChart data={dailyEntriesResult.data || []} />
             </CardContent>
           </Card>
 
@@ -140,10 +127,7 @@ export default async function HomePage() {
               <CardDescription>How you've been feeling during your studies</CardDescription>
             </CardHeader>
             <CardContent>
-              {(() => {
-                console.log("[v0] Rendering MoodChart with data:", dailyEntriesResult.data || [])
-                return <MoodChart data={dailyEntriesResult.data || []} />
-              })()}
+              <MoodChart data={dailyEntriesResult.data || []} />
             </CardContent>
           </Card>
 
@@ -154,10 +138,7 @@ export default async function HomePage() {
               <CardDescription>Understanding distribution across your courses</CardDescription>
             </CardHeader>
             <CardContent>
-              {(() => {
-                console.log("[v0] Rendering CourseProgressChart with data:", courseProgress || [])
-                return <CourseProgressChart data={courseProgress || []} />
-              })()}
+              <CourseProgressChart data={courseProgress || []} />
             </CardContent>
           </Card>
         </div>
