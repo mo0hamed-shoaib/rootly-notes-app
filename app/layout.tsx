@@ -87,7 +87,7 @@ html {
 }
         `}</style>
       </head>
-      <body>
+      <body suppressHydrationWarning={true}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           <header className="sticky top-0 z-50 bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b">
             <div className="container mx-auto max-w-6xl px-4 py-3 flex items-center justify-between">
