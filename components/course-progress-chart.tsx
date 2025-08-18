@@ -53,11 +53,11 @@ export function CourseProgressChart({ data }: CourseProgressChartProps) {
       config={{
         understanding: {
           label: "Avg Understanding",
-          color: "hsl(var(--chart-4))",
+          color: "var(--chart-4)",
         },
         noteCount: {
           label: "Notes Count",
-          color: "hsl(var(--chart-5))",
+          color: "var(--chart-5)",
         },
       }}
       className="min-h-[300px] w-full"
@@ -68,7 +68,7 @@ export function CourseProgressChart({ data }: CourseProgressChartProps) {
           <XAxis dataKey="course" angle={-45} textAnchor="end" height={80} fontSize={12} />
           <YAxis domain={[0, 5]} />
           <ChartTooltip content={<ChartTooltipContent />} />
-          <Bar dataKey="understanding" fill="hsl(var(--chart-4))" radius={[4, 4, 0, 0]} name="Avg Understanding" />
+          <Bar dataKey="understanding" fill="var(--chart-4)" radius={[4, 4, 0, 0]} name="Avg Understanding" />
         </BarChart>
       </ResponsiveContainer>
     </ChartContainer>

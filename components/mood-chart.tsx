@@ -47,11 +47,11 @@ export function MoodChart({ data }: MoodChartProps) {
       config={{
         mood: {
           label: "Mood Level",
-          color: "hsl(var(--chart-3))",
+          color: "var(--chart-3)",
         },
         moodLabel: {
           label: "Mood",
-          color: "hsl(var(--chart-3))",
+          color: "var(--chart-3)",
         },
       }}
       className="min-h-[200px] w-full"
@@ -68,9 +68,9 @@ export function MoodChart({ data }: MoodChartProps) {
           <Line
             type="monotone"
             dataKey="mood"
-            stroke="hsl(var(--chart-3))"
+            stroke="var(--chart-3)"
             strokeWidth={2}
-            dot={{ fill: "hsl(var(--chart-3))", strokeWidth: 2, r: 4 }}
+            dot={{ fill: "var(--chart-3)", strokeWidth: 2, r: 4 }}
           />
         </LineChart>
       </ResponsiveContainer>

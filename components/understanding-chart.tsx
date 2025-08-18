@@ -56,11 +56,11 @@ export function UnderstandingChart({ data }: UnderstandingChartProps) {
       config={{
         understanding: {
           label: "Avg Understanding",
-          color: "hsl(var(--chart-1))",
+          color: "var(--chart-1)",
         },
         notes: {
           label: "Notes Count",
-          color: "hsl(var(--chart-2))",
+          color: "var(--chart-2)",
         },
       }}
       className="min-h-[200px] w-full"
@@ -77,17 +77,17 @@ export function UnderstandingChart({ data }: UnderstandingChartProps) {
           <Area
             type="monotone"
             dataKey="understanding"
-            stroke="hsl(var(--chart-1))"
-            fill="hsl(var(--chart-1))"
-            fillOpacity={0.3}
+            stroke="var(--chart-1)"
+            fill="var(--chart-1)"
+            fillOpacity={0.4}
           />
           {/* Added Area component for notes count */}
           <Area
             type="monotone"
             dataKey="notes"
-            stroke="hsl(var(--chart-2))"
-            fill="hsl(var(--chart-2))"
-            fillOpacity={0.3}
+            stroke="var(--chart-2)"
+            fill="var(--chart-2)"
+            fillOpacity={0.35}
           />
         </AreaChart>
       </ResponsiveContainer>

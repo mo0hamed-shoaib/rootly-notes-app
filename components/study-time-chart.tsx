@@ -38,11 +38,11 @@ export function StudyTimeChart({ data }: StudyTimeChartProps) {
       config={{
         studyTime: {
           label: "Study Time (hours)",
-          color: "hsl(var(--chart-2))",
+          color: "var(--chart-2)",
         },
         studyTimeMinutes: {
           label: "Study Time (minutes)",
-          color: "hsl(var(--chart-2))",
+          color: "var(--chart-2)",
         },
       }}
       className="min-h-[200px] w-full"
@@ -56,7 +56,7 @@ export function StudyTimeChart({ data }: StudyTimeChartProps) {
           />
           <YAxis />
           <ChartTooltip content={<ChartTooltipContent />} />
-          <Bar dataKey="studyTime" fill="hsl(var(--chart-2))" radius={[2, 2, 0, 0]} />
+          <Bar dataKey="studyTime" fill="var(--chart-2)" radius={[2, 2, 0, 0]} />
         </BarChart>
       </ResponsiveContainer>
     </ChartContainer>
