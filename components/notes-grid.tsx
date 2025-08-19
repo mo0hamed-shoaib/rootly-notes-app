@@ -12,9 +12,34 @@ import type { Note } from "@/lib/types"
 
 interface NotesGridProps {
   notes: (Note & { course?: { id: string; title: string; instructor: string } })[]
+  highlight?: string
 }
 
-export function NotesGrid({ notes }: NotesGridProps) {
+function escapeRegExp(input: string) {
+  return input.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
+}
+
+function renderWithHighlight(text: string, query?: string) {
+  if (!query) return text
+  const trimmed = query.trim()
+  if (!trimmed) return text
+  const regex = new RegExp(`(${escapeRegExp(trimmed)})`, "ig")
+  const parts = text.split(regex)
+  return parts.map((part, index) =>
+    index % 2 === 1 ? (
+      <mark
+        key={index}
+        className="bg-amber-200/80 dark:bg-amber-200/80 ring-1 ring-amber-500/30 dark:ring-amber-500/30 rounded px-0.5"
+      >
+        {part}
+      </mark>
+    ) : (
+      <span key={index}>{part}</span>
+    )
+  )
+}
+
+export function NotesGrid({ notes, highlight }: NotesGridProps) {
   const [editingNote, setEditingNote] = useState<Note | null>(null)
   const [deletingNote, setDeletingNote] = useState<Note | null>(null)
 
@@ -26,8 +51,10 @@ export function NotesGrid({ notes }: NotesGridProps) {
             <CardHeader className="pb-3">
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1 min-w-0">
-                  {/* Question - Full display, no truncation */}
-                  <h3 className="text-lg font-semibold leading-tight mb-2">{note.question}</h3>
+                  {/* Question - Full display with match highlighting */}
+                  <h3 className="text-lg font-semibold leading-tight mb-2">
+                    {renderWithHighlight(note.question, highlight)}
+                  </h3>
 
                   {/* Course info */}
                   {note.course && (
@@ -76,7 +103,9 @@ export function NotesGrid({ notes }: NotesGridProps) {
               <div className="space-y-2">
                 <h4 className="text-sm font-medium text-muted-foreground">Answer:</h4>
                 <p className="text-sm leading-relaxed">
-                  {note.answer || <span className="italic text-muted-foreground">No answer yet</span>}
+                  {note.answer
+                    ? renderWithHighlight(note.answer, highlight)
+                    : <span className="italic text-muted-foreground">No answer yet</span>}
                 </p>
               </div>
             </CardContent>

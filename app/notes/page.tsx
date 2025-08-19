@@ -93,7 +93,7 @@ export default async function NotesPage({ searchParams }: NotesPageProps) {
         {/* Notes Grid */}
         {notes && notes.length > 0 ? (
           <>
-            <NotesGrid notes={notes} />
+            <NotesGrid notes={notes} highlight={resolvedSearchParams.search} />
             {typeof count === "number" && count > pageSize && (
               <div className="mt-8">
                 <Pagination>
