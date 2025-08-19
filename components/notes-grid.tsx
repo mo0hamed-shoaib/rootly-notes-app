@@ -45,9 +45,9 @@ export function NotesGrid({ notes, highlight }: NotesGridProps) {
 
   return (
     <>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="notes-grid grid grid-cols-1 lg:grid-cols-2 gap-6">
         {notes.map((note) => (
-          <Card id={`note-${note.id}`} key={note.id} className="relative">
+          <Card data-print-card id={`note-${note.id}`} key={note.id} className="relative">
             <CardHeader className="pb-3">
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1 min-w-0">
@@ -66,8 +66,8 @@ export function NotesGrid({ notes, highlight }: NotesGridProps) {
                   )}
                 </div>
 
-                {/* Actions */}
-                <div className="flex items-center gap-1">
+                {/* Actions (hidden on print) */}
+                <div className="note-actions flex items-center gap-1">
                   <Button variant="ghost" size="sm" onClick={() => setEditingNote(note)} className="h-8 w-8 p-0">
                     <Edit className="h-4 w-4" />
                   </Button>
@@ -83,7 +83,7 @@ export function NotesGrid({ notes, highlight }: NotesGridProps) {
               </div>
 
               {/* Badges */}
-              <div className="flex items-center gap-2 flex-wrap">
+              <div className="note-badges flex items-center gap-2 flex-wrap">
                 <UnderstandingBadge level={note.understanding_level} />
                 {note.flag && (
                   <Badge variant="outline" className="text-orange-600 border-orange-600">

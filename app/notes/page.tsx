@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server"
 import { NotesGrid } from "@/components/notes-grid"
 import { AddNoteDialog } from "@/components/add-note-dialog"
 import { NotesFilters } from "@/components/notes-filters"
+import { ExportNotesButton } from "@/components/export-notes"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { EmptyState } from "@/components/empty-state"
 import { FileQuestion } from "lucide-react"
@@ -15,6 +16,7 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination"
 import type React from "react"
+import { NotesPrintStyles } from "@/components/notes-print-styles"
 
 interface NotesPageProps {
   searchParams: Promise<{
@@ -71,10 +73,11 @@ export default async function NotesPage({ searchParams }: NotesPageProps) {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="notes-page min-h-screen bg-background">
+      <NotesPrintStyles />
       <div className="container mx-auto px-4 py-6 max-w-6xl">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+        <div className="notes-header flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
           <div>
             <h1 className="text-3xl font-bold tracking-tight">Notes</h1>
             <p className="text-muted-foreground">Manage your learning questions and answers</p>
@@ -83,11 +86,14 @@ export default async function NotesPage({ searchParams }: NotesPageProps) {
         </div>
 
         {/* Filters and Add Button */}
-        <div className="flex flex-col sm:flex-row gap-4 mb-6">
+        <div className="notes-controls flex flex-col sm:flex-row sm:items-start gap-4 mb-6">
           <div className="flex-1">
             <NotesFilters courses={courses || []} />
           </div>
-          <AddNoteDialog courses={courses || []} />
+          <div className="flex items-center gap-2">
+            <AddNoteDialog courses={courses || []} />
+            <ExportNotesButton notes={notes || []} />
+          </div>
         </div>
 
         {/* Notes Grid */}
