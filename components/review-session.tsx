@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { useRouter } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -8,7 +8,18 @@ import { Badge } from "@/components/ui/badge"
 import { UnderstandingBadge } from "@/components/understanding-badge"
 import { Progress } from "@/components/ui/progress"
 import { supabase } from "@/lib/supabase/client"
-import { Eye, EyeOff, RotateCcw, CheckCircle, Flag } from "lucide-react"
+import { Eye, EyeOff, RotateCcw, CheckCircle, Flag, Play, CircleStop } from "lucide-react"
+import {
+  AlertDialog,
+  AlertDialogTrigger,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from "@/components/ui/alert-dialog"
 import { toast } from "sonner"
 import type { Note } from "@/lib/types"
 
@@ -17,15 +28,98 @@ interface ReviewSessionProps {
 }
 
 export function ReviewSession({ notes }: ReviewSessionProps) {
+  const [isStarted, setIsStarted] = useState(false)
+  const [orderedNoteIds, setOrderedNoteIds] = useState<string[]>([])
   const [currentIndex, setCurrentIndex] = useState(0)
   const [showAnswer, setShowAnswer] = useState(false)
   const [isUpdating, setIsUpdating] = useState(false)
   const [completedNotes, setCompletedNotes] = useState<string[]>([])
+  const [selectedLevel, setSelectedLevel] = useState<number | null>(null)
   const router = useRouter()
+  const STORAGE_KEY = "rootly_review_session_v1"
 
-  const currentNote = notes[currentIndex]
-  const progress = ((currentIndex + 1) / notes.length) * 100
-  const isLastNote = currentIndex === notes.length - 1
+  const idToNote = useMemo(() => {
+    const map = new Map<string, Note>()
+    for (const n of notes) map.set(n.id, n)
+    return map
+  }, [notes])
+
+  const sessionNotes: Note[] = useMemo(() => {
+    if (orderedNoteIds.length === 0) return []
+    return orderedNoteIds.map((id) => idToNote.get(id)).filter(Boolean) as Note[]
+  }, [orderedNoteIds, idToNote])
+
+  const currentNote = sessionNotes[currentIndex]
+  const progress = sessionNotes.length > 0 ? ((currentIndex + 1) / sessionNotes.length) * 100 : 0
+  const isLastNote = sessionNotes.length > 0 && currentIndex === sessionNotes.length - 1
+
+  function saveSession(next: {
+    orderedIds?: string[]
+    currentIndex?: number
+    completed?: string[]
+    isStarted?: boolean
+  }) {
+    try {
+      const payload = {
+        orderedIds: next.orderedIds ?? orderedNoteIds,
+        currentIndex: next.currentIndex ?? currentIndex,
+        completed: next.completed ?? completedNotes,
+        isStarted: next.isStarted ?? isStarted,
+        savedAt: Date.now(),
+      }
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(payload))
+    } catch {}
+  }
+
+  function clearSession() {
+    try {
+      localStorage.removeItem(STORAGE_KEY)
+    } catch {}
+  }
+
+  // Restore session on mount
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY)
+      if (!raw) return
+      const parsed = JSON.parse(raw) as {
+        orderedIds: string[]
+        currentIndex: number
+        completed: string[]
+        isStarted: boolean
+      }
+      const filteredIds = (parsed.orderedIds || []).filter((id) => idToNote.has(id))
+      if (filteredIds.length > 0 && parsed.isStarted) {
+        setOrderedNoteIds(filteredIds)
+        setCurrentIndex(Math.min(parsed.currentIndex ?? 0, filteredIds.length - 1))
+        setCompletedNotes((parsed.completed || []).filter((id) => idToNote.has(id)))
+        setIsStarted(true)
+      }
+    } catch {}
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  const startSession = () => {
+    const order = notes.map((n) => n.id)
+    setOrderedNoteIds(order)
+    setCurrentIndex(0)
+    setCompletedNotes([])
+    setShowAnswer(false)
+    setSelectedLevel(null)
+    setIsStarted(true)
+    saveSession({ orderedIds: order, currentIndex: 0, completed: [], isStarted: true })
+  }
+
+  const endSession = () => {
+    clearSession()
+    setIsStarted(false)
+    setOrderedNoteIds([])
+    setCurrentIndex(0)
+    setCompletedNotes([])
+    setShowAnswer(false)
+    setSelectedLevel(null)
+    toast.success("Practice session ended", { description: "You can start a new session anytime." })
+  }
 
   const handleUpdateUnderstanding = async (newLevel: number) => {
     if (!currentNote) return
@@ -43,49 +137,114 @@ export function ReviewSession({ notes }: ReviewSessionProps) {
       if (error) throw error
 
       setCompletedNotes((prev) => [...prev, currentNote.id])
+      saveSession({ currentIndex: Math.min(currentIndex + 1, Math.max(sessionNotes.length - 1, 0)), completed: [...completedNotes, currentNote.id] })
 
       if (isLastNote) {
-        toast.success("Review session completed!", {
-          description: `You reviewed ${notes.length} notes. Great job!`,
+        toast.success("Practice session completed!", {
+          description: `You reviewed ${sessionNotes.length} notes. Great job!`,
         })
-        router.push("/")
+        endSession()
       } else {
         setCurrentIndex((prev) => prev + 1)
         setShowAnswer(false)
+        setSelectedLevel(null)
       }
     } catch (error) {
       console.error("Error updating note:", error)
-      toast.error("Error updating note", {
-        description: "Please try again.",
-      })
+      toast.error("Error updating note", { description: "Please try again." })
     } finally {
       setIsUpdating(false)
     }
   }
 
   const handleSkip = () => {
+    if (!currentNote) return
+    saveSession({ currentIndex: Math.min(currentIndex + 1, Math.max(sessionNotes.length - 1, 0)) })
     if (isLastNote) {
-      toast.success("Review session completed!", {
-        description: `You reviewed ${completedNotes.length} out of ${notes.length} notes.`,
+      toast.success("Practice session completed!", {
+        description: `You reviewed ${completedNotes.length} out of ${sessionNotes.length} notes.`,
       })
-      router.push("/")
+      endSession()
     } else {
       setCurrentIndex((prev) => prev + 1)
       setShowAnswer(false)
+      setSelectedLevel(null)
     }
   }
 
-  if (!currentNote) return null
+  // Not started state
+  if (!isStarted) {
+    return (
+      <Card className="relative overflow-hidden">
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,theme(colors.primary/10),transparent_60%)]"
+        />
+        <CardHeader>
+          <CardTitle className="text-center">Ready to practice?</CardTitle>
+        </CardHeader>
+        <CardContent className="flex flex-col items-center gap-4">
+          <p className="text-sm text-muted-foreground text-center max-w-md">
+            Start a quick quiz session with the notes selected on this page. You can leave and return to continue.
+          </p>
+          <Button onClick={startSession} className="px-6">
+            <Play className="h-4 w-4 mr-2" /> Start
+          </Button>
+        </CardContent>
+      </Card>
+    )
+  }
+
+  if (!currentNote) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center justify-between">
+            <span>Session complete</span>
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={startSession}>
+                <RotateCcw className="h-4 w-4 mr-2" /> Restart
+              </Button>
+              <Button variant="destructive" onClick={endSession}>
+                <CircleStop className="h-4 w-4 mr-2" /> End
+              </Button>
+            </div>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm text-muted-foreground">You reviewed {completedNotes.length} notes.</p>
+        </CardContent>
+      </Card>
+    )
+  }
 
   return (
     <div className="space-y-6">
-      {/* Progress */}
+      {/* Progress + End */}
       <div className="space-y-2">
-        <div className="flex justify-between text-sm">
-          <span>Progress</span>
-          <span>
-            {currentIndex + 1} of {notes.length}
+        <div className="flex items-center justify-between">
+          <span className="text-sm text-muted-foreground">
+            {currentIndex + 1} of {sessionNotes.length}
           </span>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button variant="outline" size="sm" className="px-3">
+                <CircleStop className="h-4 w-4 mr-2" /> End Session
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>End session?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  You can start again later. Your current progress in this session will be cleared.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={endSession}>End Session</AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
         <Progress value={progress} className="h-2" />
       </div>
@@ -153,7 +312,7 @@ export function ReviewSession({ notes }: ReviewSessionProps) {
             )}
           </div>
 
-          {/* Understanding Update */}
+          {/* Understanding Selection */}
           {showAnswer && (
             <div className="space-y-4">
               <h4 className="font-medium">How well do you understand this now?</h4>
@@ -161,9 +320,9 @@ export function ReviewSession({ notes }: ReviewSessionProps) {
                 {[1, 2, 3, 4, 5].map((level) => (
                   <Button
                     key={level}
-                    variant={currentNote.understanding_level === level ? "default" : "outline"}
+                    variant={(selectedLevel ?? currentNote.understanding_level) === level ? "default" : "outline"}
                     size="sm"
-                    onClick={() => handleUpdateUnderstanding(level)}
+                    onClick={() => setSelectedLevel(level)}
                     disabled={isUpdating}
                     className="flex flex-col gap-1 h-auto py-3"
                   >
@@ -193,7 +352,7 @@ export function ReviewSession({ notes }: ReviewSessionProps) {
             </Button>
 
             {showAnswer && (
-              <Button onClick={() => handleUpdateUnderstanding(currentNote.understanding_level)} disabled={isUpdating}>
+              <Button onClick={() => handleUpdateUnderstanding(selectedLevel ?? currentNote.understanding_level)} disabled={isUpdating}>
                 <CheckCircle className="h-4 w-4 mr-2" />
                 {isLastNote ? "Complete Session" : "Next Question"}
               </Button>
