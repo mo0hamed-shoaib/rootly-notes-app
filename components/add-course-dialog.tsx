@@ -12,6 +12,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogFooter,
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -81,8 +82,10 @@ export function AddCourseDialog() {
     setIsSubmitting(true)
     try {
       // Filter out empty links and topics
-      const links = data.links?.filter((link) => link.value.trim() !== "").map((link) => link.value) || []
-      const topics = data.topics?.filter((topic) => topic.value.trim() !== "").map((topic) => topic.value) || []
+      const links =
+        data.links?.filter((link) => ((link.value ?? "").trim() !== "")).map((link) => (link.value ?? "")) || []
+      const topics =
+        data.topics?.filter((topic) => topic.value.trim() !== "").map((topic) => topic.value) || []
 
       const { error } = await supabase.from("courses").insert([
         {
@@ -241,7 +244,7 @@ export function AddCourseDialog() {
               ))}
             </div>
 
-            <div className="flex justify-end gap-3">
+            <DialogFooter>
               <Button type="button" variant="outline" onClick={() => setOpen(false)}>
                 Cancel
               </Button>
@@ -249,7 +252,7 @@ export function AddCourseDialog() {
                 {isSubmitting && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
                 Add Course
               </Button>
-            </div>
+            </DialogFooter>
           </form>
         </Form>
       </DialogContent>

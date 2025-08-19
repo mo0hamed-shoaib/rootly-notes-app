@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import { useForm, useFieldArray } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
@@ -90,7 +90,8 @@ export function EditCourseDialog({ course, open, onOpenChange }: EditCourseDialo
     setIsSubmitting(true)
     try {
       // Filter out empty links and topics
-      const links = data.links?.filter((link) => link.value.trim() !== "").map((link) => link.value) || []
+      const links =
+        data.links?.filter((link) => ((link.value ?? "").trim() !== "")).map((link) => (link.value ?? "")) || []
       const topics = data.topics?.filter((topic) => topic.value.trim() !== "").map((topic) => topic.value) || []
 
       const { error } = await supabase
@@ -244,7 +245,7 @@ export function EditCourseDialog({ course, open, onOpenChange }: EditCourseDialo
               ))}
             </div>
 
-            <div className="flex justify-end gap-3">
+            <DialogFooter>
               <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
                 Cancel
               </Button>
@@ -252,7 +253,7 @@ export function EditCourseDialog({ course, open, onOpenChange }: EditCourseDialo
                 {isSubmitting && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
                 Save Changes
               </Button>
-            </div>
+            </DialogFooter>
           </form>
         </Form>
       </DialogContent>

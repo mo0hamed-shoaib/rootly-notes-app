@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -20,7 +20,7 @@ const editNoteSchema = z.object({
   question: z.string().min(1, "Question is required").max(1000, "Question must be less than 1000 characters"),
   answer: z.string().max(2000, "Answer must be less than 2000 characters").optional(),
   understanding_level: z.coerce.number().min(1).max(5),
-  flag: z.boolean().default(false),
+  flag: z.boolean(),
 })
 
 type EditNoteFormData = z.infer<typeof editNoteSchema>
@@ -174,14 +174,14 @@ export function EditNoteDialog({ note, open, onOpenChange }: EditNoteDialogProps
                     </FormControl>
                     <div className="space-y-1 leading-none">
                       <FormLabel>Flag for review</FormLabel>
-                      <p className="text-sm text-muted-foreground">Mark this note for priority review</p>
+                      <p className="text-sm text-muted-foreground">Mark for priority review</p>
                     </div>
                   </FormItem>
                 )}
               />
             </div>
 
-            <div className="flex justify-end gap-3">
+            <DialogFooter>
               <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
                 Cancel
               </Button>
@@ -189,7 +189,7 @@ export function EditNoteDialog({ note, open, onOpenChange }: EditNoteDialogProps
                 {isSubmitting && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
                 Save Changes
               </Button>
-            </div>
+            </DialogFooter>
           </form>
         </Form>
       </DialogContent>

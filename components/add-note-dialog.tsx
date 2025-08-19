@@ -12,6 +12,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogFooter,
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
@@ -27,7 +28,7 @@ const noteSchema = z.object({
   question: z.string().min(1, "Question is required").max(1000, "Question must be less than 1000 characters"),
   answer: z.string().max(2000, "Answer must be less than 2000 characters").optional(),
   understanding_level: z.coerce.number().min(1).max(5),
-  flag: z.boolean().default(false),
+  flag: z.boolean(),
 })
 
 type NoteFormData = z.infer<typeof noteSchema>
@@ -210,7 +211,7 @@ export function AddNoteDialog({ courses }: AddNoteDialogProps) {
               />
             </div>
 
-            <div className="flex justify-end gap-3">
+            <DialogFooter>
               <Button type="button" variant="outline" onClick={() => setOpen(false)}>
                 Cancel
               </Button>
@@ -218,7 +219,7 @@ export function AddNoteDialog({ courses }: AddNoteDialogProps) {
                 {isSubmitting && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
                 Add Note
               </Button>
-            </div>
+            </DialogFooter>
           </form>
         </Form>
       </DialogContent>
