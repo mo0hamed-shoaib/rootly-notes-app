@@ -20,6 +20,7 @@ export default async function ReviewPage({ searchParams }: ReviewPageProps) {
 
   const limit = Math.max(1, Math.min(100, Number.parseInt(params.limit || "20")))
   const shuffle = (params.shuffle ?? "true") === "true"
+  const SAMPLE_SIZE = Math.max(100, Math.min(500, limit * 5))
 
   // Build base query for practice
   let query = supabase
@@ -37,7 +38,9 @@ export default async function ReviewPage({ searchParams }: ReviewPageProps) {
     query = query.eq("flag", true)
   }
 
-  const { data: fetchedNotes, error } = await query
+  // Apply a server-side limit to avoid fetching all rows
+  const effectiveLimit = shuffle ? SAMPLE_SIZE : limit
+  const { data: fetchedNotes, error } = await query.limit(effectiveLimit)
   if (error) {
     console.error("Error fetching notes for practice:", error)
   }

@@ -1,6 +1,7 @@
 "use client"
 
 import { useRouter, useSearchParams } from "next/navigation"
+import { useEffect, useMemo, useState } from "react"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
@@ -14,6 +15,7 @@ interface NotesFiltersProps {
 export function NotesFilters({ courses }: NotesFiltersProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
+  const [searchDraft, setSearchDraft] = useState("")
 
   const currentSearch = searchParams.get("search") || ""
   const currentCourse = searchParams.get("course") || "all"
@@ -37,6 +39,29 @@ export function NotesFilters({ courses }: NotesFiltersProps) {
   const hasActiveFilters =
     currentSearch || currentCourse !== "all" || currentUnderstanding !== "all" || currentFlagged !== "all"
 
+  // keep local draft in sync on param changes
+  useEffect(() => {
+    setSearchDraft(currentSearch)
+  }, [currentSearch])
+
+  // debounce search param updates
+  useEffect(() => {
+    const controller = new AbortController()
+    const handle = setTimeout(() => {
+      if (searchDraft !== currentSearch) {
+        const params = new URLSearchParams(searchParams.toString())
+        if (searchDraft) params.set("search", searchDraft)
+        else params.delete("search")
+        router.replace(`/notes?${params.toString()}`)
+      }
+    }, 300)
+    return () => {
+      controller.abort()
+      clearTimeout(handle)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchDraft])
+
   return (
     <div className="space-y-4">
       {/* Search */}
@@ -44,8 +69,8 @@ export function NotesFilters({ courses }: NotesFiltersProps) {
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
           placeholder="Search questions and answers..."
-          value={currentSearch}
-          onChange={(e) => updateFilter("search", e.target.value)}
+          value={searchDraft}
+          onChange={(e) => setSearchDraft(e.target.value)}
           className="pl-10"
         />
       </div>
