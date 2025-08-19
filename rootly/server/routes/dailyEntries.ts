@@ -38,8 +38,9 @@ router.get('/', validateQuery(dateRangeSchema), asyncHandler(async (req, res) =>
     .limit(limit);
 
   res.json({
-    success: true,
     data: entries,
+    message: 'Daily entries fetched successfully',
+    error: null,
   });
 }));
 
@@ -52,8 +53,9 @@ router.get('/:id', validateParams(entryIdSchema), asyncHandler(async (req, res) 
   }
 
   res.json({
-    success: true,
     data: entry,
+    message: 'Daily entry fetched successfully',
+    error: null,
   });
 }));
 
@@ -86,9 +88,9 @@ router.post('/', validateBody(dailySchema), asyncHandler(async (req, res) => {
   await entry.save();
 
   res.status(201).json({
-    success: true,
     data: entry,
     message: 'Daily entry created successfully',
+    error: null,
   });
 }));
 
@@ -105,9 +107,9 @@ router.patch('/:id', validateParams(entryIdSchema), validateBody(updateDailyEntr
   }
 
   res.json({
-    success: true,
     data: entry,
     message: 'Daily entry updated successfully',
+    error: null,
   });
 }));
 
@@ -127,9 +129,9 @@ router.patch('/date/:date', validateBody(updateDailyEntrySchema), asyncHandler(a
   );
 
   res.json({
-    success: true,
     data: entry,
     message: 'Daily entry updated successfully',
+    error: null,
   });
 }));
 
@@ -142,8 +144,9 @@ router.delete('/:id', validateParams(entryIdSchema), asyncHandler(async (req, re
   }
 
   res.json({
-    success: true,
+    data: null,
     message: 'Daily entry deleted successfully',
+    error: null,
   });
 }));
 
@@ -196,7 +199,6 @@ router.get('/stats/summary', asyncHandler(async (req, res) => {
   ]);
 
   res.json({
-    success: true,
     data: {
       totalEntries,
       totalStudyMinutes,
@@ -206,6 +208,8 @@ router.get('/stats/summary', asyncHandler(async (req, res) => {
       topicStats,
       moodStats,
     },
+    message: 'Daily entries stats fetched successfully',
+    error: null,
   });
 }));
 
@@ -231,8 +235,9 @@ router.get('/stats/last-week', asyncHandler(async (req, res) => {
   });
 
   res.json({
-    success: true,
     data: chartData,
+    message: 'Last week stats fetched successfully',
+    error: null,
   });
 }));
 

@@ -27,7 +27,7 @@ app.use('/api/daily-entries', dailyEntriesRouter);
 
 // Health check
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'OK', timestamp: new Date().toISOString() });
+  res.json({ data: { status: 'OK', timestamp: new Date().toISOString() }, message: 'Healthy', error: null });
 });
 
 // Error handling middleware
@@ -35,7 +35,7 @@ app.use(errorHandler);
 
 // 404 handler
 app.use((req, res) => {
-  res.status(404).json({ message: 'Route not found' });
+  res.status(404).json({ data: null, message: 'Route not found', error: { code: '404' } });
 });
 
 app.listen(PORT, () => {

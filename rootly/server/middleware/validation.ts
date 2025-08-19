@@ -10,10 +10,15 @@ export const validateBody = (schema: ZodSchema) => {
       next();
     } catch (error) {
       if (error instanceof ZodError) {
-        const errorMessages = error.errors.map(
-          (err) => `${err.path.join('.')}: ${err.message}`
-        );
-        return next(createError(`Validation error: ${errorMessages.join(', ')}`, 400));
+        const details = error.errors.map((err) => ({
+          path: err.path,
+          message: err.message,
+          code: err.code,
+        }));
+        const appError = createError('Validation error', 400);
+        appError.code = 'VALIDATION_ERROR';
+        appError.details = details;
+        return next(appError);
       }
       next(error);
     }
@@ -27,10 +32,15 @@ export const validateParams = (schema: ZodSchema) => {
       next();
     } catch (error) {
       if (error instanceof ZodError) {
-        const errorMessages = error.errors.map(
-          (err) => `${err.path.join('.')}: ${err.message}`
-        );
-        return next(createError(`Parameter validation error: ${errorMessages.join(', ')}`, 400));
+        const details = error.errors.map((err) => ({
+          path: err.path,
+          message: err.message,
+          code: err.code,
+        }));
+        const appError = createError('Parameter validation error', 400);
+        appError.code = 'PARAMS_VALIDATION_ERROR';
+        appError.details = details;
+        return next(appError);
       }
       next(error);
     }
@@ -44,10 +54,15 @@ export const validateQuery = (schema: ZodSchema) => {
       next();
     } catch (error) {
       if (error instanceof ZodError) {
-        const errorMessages = error.errors.map(
-          (err) => `${err.path.join('.')}: ${err.message}`
-        );
-        return next(createError(`Query validation error: ${errorMessages.join(', ')}`, 400));
+        const details = error.errors.map((err) => ({
+          path: err.path,
+          message: err.message,
+          code: err.code,
+        }));
+        const appError = createError('Query validation error', 400);
+        appError.code = 'QUERY_VALIDATION_ERROR';
+        appError.details = details;
+        return next(appError);
       }
       next(error);
     }

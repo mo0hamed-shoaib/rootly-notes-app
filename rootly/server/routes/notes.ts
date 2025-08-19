@@ -1,5 +1,5 @@
 // server/routes/notes.ts
-import express from 'express';
+import express, { Request, Response } from 'express';
 import { z } from 'zod';
 import Note from '../../src/lib/models/Note';
 import { noteSchema } from '../../src/lib/zod/note';
@@ -26,10 +26,18 @@ const querySchema = z.object({
 const updateNoteSchema = noteSchema.partial().omit({ createdAt: true });
 
 // GET /api/notes - Get all notes with filtering and sorting
-router.get('/', validateQuery(querySchema), asyncHandler(async (req, res) => {
-  const { courseId, status, topics, search, sort = 'recent', limit = 50, offset = 0 } = req.query as any;
+router.get('/', validateQuery(querySchema), asyncHandler(async (req: Request, res: Response) => {
+  const { courseId, status, topics, search, sort = 'recent', limit = 50, offset = 0 } = req.query as unknown as {
+    courseId?: string;
+    status?: 'draft' | 'active' | 'answered';
+    topics?: string;
+    search?: string;
+    sort?: 'recent' | 'oldest' | 'understanding-low' | 'understanding-high';
+    limit?: number;
+    offset?: number;
+  };
 
-  let query: any = {};
+  const query: Record<string, unknown> = {};
 
   // Apply filters
   if (courseId) query.courseId = courseId;
@@ -43,7 +51,7 @@ router.get('/', validateQuery(querySchema), asyncHandler(async (req, res) => {
   }
 
   // Apply sorting
-  let sortOption: any = {};
+  let sortOption: Record<string, 1 | -1> = {};
   switch (sort) {
     case 'recent':
       sortOption = { updatedAt: -1 };
@@ -69,8 +77,9 @@ router.get('/', validateQuery(querySchema), asyncHandler(async (req, res) => {
   const total = await Note.countDocuments(query);
 
   res.json({
-    success: true,
     data: notes,
+    message: 'Notes fetched successfully',
+    error: null,
     pagination: {
       total,
       limit,
@@ -81,7 +90,7 @@ router.get('/', validateQuery(querySchema), asyncHandler(async (req, res) => {
 }));
 
 // GET /api/notes/:id - Get single note
-router.get('/:id', validateParams(noteIdSchema), asyncHandler(async (req, res) => {
+router.get('/:id', validateParams(noteIdSchema), asyncHandler(async (req: Request, res: Response) => {
   const note = await Note.findById(req.params.id);
   
   if (!note) {
@@ -89,13 +98,14 @@ router.get('/:id', validateParams(noteIdSchema), asyncHandler(async (req, res) =
   }
 
   res.json({
-    success: true,
     data: note,
+    message: 'Note fetched successfully',
+    error: null,
   });
 }));
 
 // POST /api/notes - Create new note
-router.post('/', validateBody(noteSchema), asyncHandler(async (req, res) => {
+router.post('/', validateBody(noteSchema), asyncHandler(async (req: Request, res: Response) => {
   const noteData = {
     ...req.body,
     createdAt: new Date().toISOString(),
@@ -106,14 +116,14 @@ router.post('/', validateBody(noteSchema), asyncHandler(async (req, res) => {
   await note.save();
 
   res.status(201).json({
-    success: true,
     data: note,
     message: 'Note created successfully',
+    error: null,
   });
 }));
 
 // PATCH /api/notes/:id - Update note
-router.patch('/:id', validateParams(noteIdSchema), validateBody(updateNoteSchema), asyncHandler(async (req, res) => {
+router.patch('/:id', validateParams(noteIdSchema), validateBody(updateNoteSchema), asyncHandler(async (req: Request, res: Response) => {
   const updateData = {
     ...req.body,
     updatedAt: new Date().toISOString(),
@@ -130,14 +140,14 @@ router.patch('/:id', validateParams(noteIdSchema), validateBody(updateNoteSchema
   }
 
   res.json({
-    success: true,
     data: note,
     message: 'Note updated successfully',
+    error: null,
   });
 }));
 
 // DELETE /api/notes/:id - Delete note
-router.delete('/:id', validateParams(noteIdSchema), asyncHandler(async (req, res) => {
+router.delete('/:id', validateParams(noteIdSchema), asyncHandler(async (req: Request, res: Response) => {
   const note = await Note.findByIdAndDelete(req.params.id);
 
   if (!note) {
@@ -145,13 +155,14 @@ router.delete('/:id', validateParams(noteIdSchema), asyncHandler(async (req, res
   }
 
   res.json({
-    success: true,
+    data: null,
     message: 'Note deleted successfully',
+    error: null,
   });
 }));
 
 // GET /api/notes/stats/summary - Get notes statistics
-router.get('/stats/summary', asyncHandler(async (req, res) => {
+router.get('/stats/summary', asyncHandler(async (req: Request, res: Response) => {
   const totalNotes = await Note.countDocuments();
   const answeredNotes = await Note.countDocuments({ status: 'answered' });
   const focusNotes = await Note.countDocuments({ 'flags.focus': true });
@@ -171,7 +182,6 @@ router.get('/stats/summary', asyncHandler(async (req, res) => {
   ]);
 
   res.json({
-    success: true,
     data: {
       totalNotes,
       answeredNotes,
@@ -181,6 +191,8 @@ router.get('/stats/summary', asyncHandler(async (req, res) => {
       answerRate: totalNotes > 0 ? Math.round((answeredNotes / totalNotes) * 100) : 0,
       topicStats,
     },
+    message: 'Notes stats fetched successfully',
+    error: null,
   });
 }));
 

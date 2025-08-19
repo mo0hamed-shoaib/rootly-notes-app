@@ -4,6 +4,8 @@ import { Request, Response, NextFunction } from 'express';
 export interface AppError extends Error {
   statusCode?: number;
   isOperational?: boolean;
+  code?: string;
+  details?: unknown;
 }
 
 export const errorHandler = (
@@ -18,9 +20,13 @@ export const errorHandler = (
   const message = error.isOperational ? error.message : 'Internal server error';
 
   res.status(statusCode).json({
-    success: false,
+    data: null,
     message,
-    ...(process.env.NODE_ENV === 'development' && { stack: error.stack }),
+    error: {
+      code: error.code || String(statusCode),
+      ...(error.details ? { details: error.details } : {}),
+      ...(process.env.NODE_ENV === 'development' && error.stack ? { stack: error.stack } : {}),
+    },
   });
 };
 

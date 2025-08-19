@@ -1,5 +1,5 @@
 // server/routes/courses.ts
-import express from 'express';
+import express, { Request, Response } from 'express';
 import { z } from 'zod';
 import Course from '../../src/lib/models/Course';
 import Note from '../../src/lib/models/Note';
@@ -17,17 +17,18 @@ const courseIdSchema = z.object({
 const updateCourseSchema = courseSchema.partial();
 
 // GET /api/courses - Get all courses
-router.get('/', asyncHandler(async (req, res) => {
+router.get('/', asyncHandler(async (req: Request, res: Response) => {
   const courses = await Course.find().sort({ startedAt: -1 });
 
   res.json({
-    success: true,
     data: courses,
+    message: 'Courses fetched successfully',
+    error: null,
   });
 }));
 
 // GET /api/courses/:id - Get single course
-router.get('/:id', validateParams(courseIdSchema), asyncHandler(async (req, res) => {
+router.get('/:id', validateParams(courseIdSchema), asyncHandler(async (req: Request, res: Response) => {
   const course = await Course.findById(req.params.id);
   
   if (!course) {
@@ -35,13 +36,14 @@ router.get('/:id', validateParams(courseIdSchema), asyncHandler(async (req, res)
   }
 
   res.json({
-    success: true,
     data: course,
+    message: 'Course fetched successfully',
+    error: null,
   });
 }));
 
 // GET /api/courses/:id/notes - Get all notes for a course
-router.get('/:id/notes', validateParams(courseIdSchema), asyncHandler(async (req, res) => {
+router.get('/:id/notes', validateParams(courseIdSchema), asyncHandler(async (req: Request, res: Response) => {
   const course = await Course.findById(req.params.id);
   
   if (!course) {
@@ -51,13 +53,14 @@ router.get('/:id/notes', validateParams(courseIdSchema), asyncHandler(async (req
   const notes = await Note.find({ courseId: req.params.id }).sort({ updatedAt: -1 });
 
   res.json({
-    success: true,
     data: notes,
+    message: 'Course notes fetched successfully',
+    error: null,
   });
 }));
 
 // GET /api/courses/:id/stats - Get course statistics
-router.get('/:id/stats', validateParams(courseIdSchema), asyncHandler(async (req, res) => {
+router.get('/:id/stats', validateParams(courseIdSchema), asyncHandler(async (req: Request, res: Response) => {
   const course = await Course.findById(req.params.id);
   
   if (!course) {
@@ -84,7 +87,6 @@ router.get('/:id/stats', validateParams(courseIdSchema), asyncHandler(async (req
   ]);
 
   res.json({
-    success: true,
     data: {
       totalNotes,
       answeredNotes,
@@ -93,23 +95,25 @@ router.get('/:id/stats', validateParams(courseIdSchema), asyncHandler(async (req
       completionRate: totalNotes > 0 ? Math.round((answeredNotes / totalNotes) * 100) : 0,
       topicStats,
     },
+    message: 'Course stats fetched successfully',
+    error: null,
   });
 }));
 
 // POST /api/courses - Create new course
-router.post('/', validateBody(courseSchema), asyncHandler(async (req, res) => {
+router.post('/', validateBody(courseSchema), asyncHandler(async (req: Request, res: Response) => {
   const course = new Course(req.body);
   await course.save();
 
   res.status(201).json({
-    success: true,
     data: course,
     message: 'Course created successfully',
+    error: null,
   });
 }));
 
 // PATCH /api/courses/:id - Update course
-router.patch('/:id', validateParams(courseIdSchema), validateBody(updateCourseSchema), asyncHandler(async (req, res) => {
+router.patch('/:id', validateParams(courseIdSchema), validateBody(updateCourseSchema), asyncHandler(async (req: Request, res: Response) => {
   const course = await Course.findByIdAndUpdate(
     req.params.id,
     req.body,
@@ -121,14 +125,14 @@ router.patch('/:id', validateParams(courseIdSchema), validateBody(updateCourseSc
   }
 
   res.json({
-    success: true,
     data: course,
     message: 'Course updated successfully',
+    error: null,
   });
 }));
 
 // DELETE /api/courses/:id - Delete course
-router.delete('/:id', validateParams(courseIdSchema), asyncHandler(async (req, res) => {
+router.delete('/:id', validateParams(courseIdSchema), asyncHandler(async (req: Request, res: Response) => {
   const course = await Course.findById(req.params.id);
 
   if (!course) {
@@ -144,8 +148,9 @@ router.delete('/:id', validateParams(courseIdSchema), asyncHandler(async (req, r
   await Course.findByIdAndDelete(req.params.id);
 
   res.json({
-    success: true,
+    data: null,
     message: 'Course deleted successfully',
+    error: null,
   });
 }));
 
