@@ -2,6 +2,8 @@ import { createClient } from "@/lib/supabase/server"
 import { DailyEntriesGrid } from "@/components/daily-entries-grid"
 import { AddDailyEntryDialog } from "@/components/add-daily-entry-dialog"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { EmptyState } from "@/components/empty-state"
+import { CalendarX } from "lucide-react"
 import {
   Pagination,
   PaginationContent,
@@ -81,15 +83,12 @@ export default async function DailyPage({ searchParams }: DailyPageProps) {
             )}
           </>
         ) : (
-          <Card>
-            <CardHeader>
-              <CardTitle>No Daily Entries Found</CardTitle>
-              <CardDescription>Start tracking your daily study progress and mood.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <AddDailyEntryDialog />
-            </CardContent>
-          </Card>
+          <EmptyState
+            title="No Daily Entries Found"
+            description="Start tracking your daily study progress and mood."
+            icon={<CalendarX className="h-6 w-6 text-muted-foreground" />}
+            actionSlot={<AddDailyEntryDialog />}
+          />
         )}
       </div>
     </div>

@@ -2,6 +2,8 @@ import { createClient } from "@/lib/supabase/server"
 import { CoursesGrid } from "@/components/courses-grid"
 import { AddCourseDialog } from "@/components/add-course-dialog"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { EmptyState } from "@/components/empty-state"
+import { GraduationCap } from "lucide-react"
 import {
   Pagination,
   PaginationContent,
@@ -94,15 +96,12 @@ export default async function CoursesPage({ searchParams }: CoursesPageProps) {
             )}
           </>
         ) : (
-          <Card>
-            <CardHeader>
-              <CardTitle>No Courses Found</CardTitle>
-              <CardDescription>Start by adding your first course to organize your learning.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <AddCourseDialog />
-            </CardContent>
-          </Card>
+          <EmptyState
+            title="No Courses Found"
+            description="Start by adding your first course to organize your learning."
+            icon={<GraduationCap className="h-6 w-6 text-muted-foreground" />}
+            actionSlot={<AddCourseDialog />}
+          />
         )}
       </div>
     </div>

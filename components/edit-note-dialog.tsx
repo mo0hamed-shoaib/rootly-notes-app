@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Checkbox } from "@/components/ui/checkbox"
+import { Switch } from "@/components/ui/switch"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { supabase } from "@/lib/supabase/client"
 import { Loader2 } from "lucide-react"
@@ -165,14 +165,14 @@ export function EditNoteDialog({ note, open, onOpenChange }: EditNoteDialogProps
                 control={form.control}
                 name="flag"
                 render={({ field }) => (
-                  <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                    <FormControl>
-                      <Checkbox checked={field.value} onCheckedChange={field.onChange} />
-                    </FormControl>
-                    <div className="space-y-1 leading-none">
+                  <FormItem className="flex flex-row items-center justify-between p-2">
+                    <div className="space-y-1">
                       <FormLabel>Flag for review</FormLabel>
-                      <p className="text-sm text-muted-foreground">Mark for priority review</p>
+                      <p className="text-sm text-muted-foreground">Adds more priority</p>
                     </div>
+                    <FormControl>
+                      <Switch checked={field.value} onCheckedChange={field.onChange} />
+                    </FormControl>
                   </FormItem>
                 )}
               />

@@ -3,6 +3,8 @@ import { NotesGrid } from "@/components/notes-grid"
 import { AddNoteDialog } from "@/components/add-note-dialog"
 import { NotesFilters } from "@/components/notes-filters"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { EmptyState } from "@/components/empty-state"
+import { FileQuestion } from "lucide-react"
 import {
   Pagination,
   PaginationContent,
@@ -113,22 +115,19 @@ export default async function NotesPage({ searchParams }: NotesPageProps) {
             )}
           </>
         ) : (
-          <Card>
-            <CardHeader>
-              <CardTitle>No Notes Found</CardTitle>
-              <CardDescription>
-                {resolvedSearchParams.search ||
-                resolvedSearchParams.course ||
-                resolvedSearchParams.understanding ||
-                resolvedSearchParams.flagged
-                  ? "Try adjusting your filters to see more notes."
-                  : "Start by adding your first learning question."}
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <AddNoteDialog courses={courses || []} />
-            </CardContent>
-          </Card>
+          <EmptyState
+            title="No Notes Found"
+            description={
+              resolvedSearchParams.search ||
+              resolvedSearchParams.course ||
+              resolvedSearchParams.understanding ||
+              resolvedSearchParams.flagged
+                ? "Try adjusting your filters to see more notes."
+                : "Start by adding your first learning question."
+            }
+            icon={<FileQuestion className="h-6 w-6 text-muted-foreground" />}
+            actionSlot={<AddNoteDialog courses={courses || []} />}
+          />
         )}
       </div>
     </div>

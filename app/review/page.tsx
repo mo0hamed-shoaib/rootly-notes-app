@@ -1,6 +1,8 @@
 import { createClient } from "@/lib/supabase/server"
 import { ReviewSession } from "@/components/review-session"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { EmptyState } from "@/components/empty-state"
+import { FileQuestion } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Brain, Flag, Shuffle } from "lucide-react"
 import Link from "next/link"
@@ -105,19 +107,12 @@ export default async function ReviewPage({ searchParams }: ReviewPageProps) {
         {sessionNotes.length > 0 ? (
           <ReviewSession notes={sessionNotes} />
         ) : (
-          <Card>
-            <CardHeader>
-              <CardTitle>No notes available</CardTitle>
-              <CardDescription>
-                Add notes first, or adjust filters to include more content for practice.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button asChild>
-                <Link href="/notes">Add Notes</Link>
-              </Button>
-            </CardContent>
-          </Card>
+          <EmptyState
+            title="No notes available"
+            description="Add notes first, or adjust filters to include more content for practice."
+            icon={<FileQuestion className="h-6 w-6 text-muted-foreground" />}
+            primaryAction={{ label: 'Add Notes', href: '/notes' }}
+          />
         )}
       </div>
     </div>
