@@ -5,6 +5,7 @@ import { GeistMono } from "geist/font/mono"
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
 import { Navigation } from "@/components/navigation"
+import { Footer } from "@/components/footer"
 import Link from "next/link"
 import Image from "next/image"
 import { Toaster } from "@/components/ui/sonner"
@@ -120,6 +121,7 @@ html {
             </div>
           </header>
           {children}
+          <Footer />
           <Toaster richColors closeButton />
         </ThemeProvider>
       </body>
