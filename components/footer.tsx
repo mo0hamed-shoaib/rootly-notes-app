@@ -32,6 +32,9 @@ export function Footer() {
           <Link href="/about" className="hover:text-foreground transition-colors">
             About
           </Link>
+          <Link href="/how-rootly-works" className="hover:text-foreground transition-colors">
+            How Rootly Works
+          </Link>
         </div>
       </div>
     </footer>
