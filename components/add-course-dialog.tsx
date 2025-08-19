@@ -189,9 +189,9 @@ export function AddCourseDialog() {
                     <Button
                       type="button"
                       variant="outline"
-                      size="sm"
+                      size="icon"
                       onClick={() => removeTopic(index)}
-                      className="px-2"
+                      className="h-9 w-9"
                     >
                       <X className="h-4 w-4" />
                     </Button>
@@ -230,9 +230,9 @@ export function AddCourseDialog() {
                     <Button
                       type="button"
                       variant="outline"
-                      size="sm"
+                      size="icon"
                       onClick={() => removeLink(index)}
-                      className="px-2"
+                      className="h-9 w-9"
                     >
                       <X className="h-4 w-4" />
                     </Button>

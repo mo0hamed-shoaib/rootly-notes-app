@@ -71,14 +71,14 @@ export function NotesFilters({ courses }: NotesFiltersProps) {
           placeholder="Search questions and answers..."
           value={searchDraft}
           onChange={(e) => setSearchDraft(e.target.value)}
-          className="pl-10"
+          className="pl-10 h-9"
         />
       </div>
 
       {/* Filters */}
       <div className="flex flex-wrap gap-3">
         <Select value={currentCourse} onValueChange={(value) => updateFilter("course", value)}>
-          <SelectTrigger className="w-[200px]">
+          <SelectTrigger className="w-[200px] h-9">
             <SelectValue placeholder="All courses" />
           </SelectTrigger>
           <SelectContent>
@@ -92,7 +92,7 @@ export function NotesFilters({ courses }: NotesFiltersProps) {
         </Select>
 
         <Select value={currentUnderstanding} onValueChange={(value) => updateFilter("understanding", value)}>
-          <SelectTrigger className="w-[180px]">
+          <SelectTrigger className="w-[180px] h-9">
             <SelectValue placeholder="Understanding level" />
           </SelectTrigger>
           <SelectContent>
@@ -106,7 +106,7 @@ export function NotesFilters({ courses }: NotesFiltersProps) {
         </Select>
 
         <Select value={currentFlagged} onValueChange={(value) => updateFilter("flagged", value)}>
-          <SelectTrigger className="w-[140px]">
+          <SelectTrigger className="w=[140px] h-9">
             <SelectValue placeholder="All notes" />
           </SelectTrigger>
           <SelectContent>
@@ -116,7 +116,7 @@ export function NotesFilters({ courses }: NotesFiltersProps) {
         </Select>
 
         {hasActiveFilters && (
-          <Button variant="outline" size="sm" onClick={clearAllFilters}>
+          <Button variant="outline" size="sm" onClick={clearAllFilters} className="h-9 px-3">
             <X className="h-4 w-4 mr-1" />
             Clear filters
           </Button>
