@@ -13,7 +13,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { supabase } from "@/lib/supabase/client"
 import { Loader2 } from "lucide-react"
-import { toast } from "@/hooks/use-toast"
+import { toast } from "sonner"
 import type { Note } from "@/lib/types"
 
 const editNoteSchema = z.object({
@@ -70,8 +70,7 @@ export function EditNoteDialog({ note, open, onOpenChange }: EditNoteDialogProps
 
       if (error) throw error
 
-      toast({
-        title: "Note updated successfully",
+      toast.success("Note updated successfully", {
         description: "Your changes have been saved.",
       })
 
@@ -79,10 +78,8 @@ export function EditNoteDialog({ note, open, onOpenChange }: EditNoteDialogProps
       router.refresh()
     } catch (error) {
       console.error("Error updating note:", error)
-      toast({
-        title: "Error updating note",
+      toast.error("Error updating note", {
         description: "Please try again.",
-        variant: "destructive",
       })
     } finally {
       setIsSubmitting(false)

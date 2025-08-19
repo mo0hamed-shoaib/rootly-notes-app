@@ -13,7 +13,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { supabase } from "@/lib/supabase/client"
 import { Loader2, AlertTriangle } from "lucide-react"
-import { toast } from "@/hooks/use-toast"
+import { toast } from "sonner"
 import type { DailyEntry } from "@/lib/types"
 
 interface DeleteDailyEntryDialogProps {
@@ -33,8 +33,7 @@ export function DeleteDailyEntryDialog({ entry, open, onOpenChange }: DeleteDail
 
       if (error) throw error
 
-      toast({
-        title: "Daily entry deleted successfully",
+      toast.success("Daily entry deleted successfully", {
         description: "The entry has been permanently removed.",
       })
 
@@ -42,10 +41,8 @@ export function DeleteDailyEntryDialog({ entry, open, onOpenChange }: DeleteDail
       router.refresh()
     } catch (error) {
       console.error("Error deleting daily entry:", error)
-      toast({
-        title: "Error deleting daily entry",
+      toast.error("Error deleting daily entry", {
         description: "Please try again.",
-        variant: "destructive",
       })
     } finally {
       setIsDeleting(false)

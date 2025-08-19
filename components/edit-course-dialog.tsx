@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { supabase } from "@/lib/supabase/client"
 import { Loader2, X, Plus, LinkIcon, Tag } from "lucide-react"
-import { toast } from "@/hooks/use-toast"
+import { toast } from "sonner"
 import type { Course } from "@/lib/types"
 
 const editCourseSchema = z.object({
@@ -106,8 +106,7 @@ export function EditCourseDialog({ course, open, onOpenChange }: EditCourseDialo
 
       if (error) throw error
 
-      toast({
-        title: "Course updated successfully",
+      toast.success("Course updated successfully", {
         description: "Your changes have been saved.",
       })
 
@@ -115,10 +114,8 @@ export function EditCourseDialog({ course, open, onOpenChange }: EditCourseDialo
       router.refresh()
     } catch (error) {
       console.error("Error updating course:", error)
-      toast({
-        title: "Error updating course",
+      toast.error("Error updating course", {
         description: "Please try again.",
-        variant: "destructive",
       })
     } finally {
       setIsSubmitting(false)

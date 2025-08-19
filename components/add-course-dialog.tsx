@@ -19,7 +19,7 @@ import { Input } from "@/components/ui/input"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { supabase } from "@/lib/supabase/client"
 import { Plus, Loader2, X, LinkIcon, Tag } from "lucide-react"
-import { toast } from "@/hooks/use-toast"
+import { toast } from "sonner"
 
 const courseSchema = z.object({
   instructor: z
@@ -98,8 +98,7 @@ export function AddCourseDialog() {
 
       if (error) throw error
 
-      toast({
-        title: "Course added successfully",
+      toast.success("Course added successfully", {
         description: "Your new course has been created.",
       })
 
@@ -108,10 +107,8 @@ export function AddCourseDialog() {
       router.refresh()
     } catch (error) {
       console.error("Error adding course:", error)
-      toast({
-        title: "Error adding course",
+      toast.error("Error adding course", {
         description: "Please try again.",
-        variant: "destructive",
       })
     } finally {
       setIsSubmitting(false)

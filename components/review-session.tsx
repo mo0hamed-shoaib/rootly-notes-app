@@ -9,7 +9,7 @@ import { UnderstandingBadge } from "@/components/understanding-badge"
 import { Progress } from "@/components/ui/progress"
 import { supabase } from "@/lib/supabase/client"
 import { Eye, EyeOff, RotateCcw, CheckCircle, Flag } from "lucide-react"
-import { toast } from "@/hooks/use-toast"
+import { toast } from "sonner"
 import type { Note } from "@/lib/types"
 
 interface ReviewSessionProps {
@@ -45,8 +45,7 @@ export function ReviewSession({ notes }: ReviewSessionProps) {
       setCompletedNotes((prev) => [...prev, currentNote.id])
 
       if (isLastNote) {
-        toast({
-          title: "Review session completed!",
+        toast.success("Review session completed!", {
           description: `You reviewed ${notes.length} notes. Great job!`,
         })
         router.push("/")
@@ -56,10 +55,8 @@ export function ReviewSession({ notes }: ReviewSessionProps) {
       }
     } catch (error) {
       console.error("Error updating note:", error)
-      toast({
-        title: "Error updating note",
+      toast.error("Error updating note", {
         description: "Please try again.",
-        variant: "destructive",
       })
     } finally {
       setIsUpdating(false)
@@ -68,8 +65,7 @@ export function ReviewSession({ notes }: ReviewSessionProps) {
 
   const handleSkip = () => {
     if (isLastNote) {
-      toast({
-        title: "Review session completed!",
+      toast.success("Review session completed!", {
         description: `You reviewed ${completedNotes.length} out of ${notes.length} notes.`,
       })
       router.push("/")

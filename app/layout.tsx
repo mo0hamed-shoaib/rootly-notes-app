@@ -7,6 +7,7 @@ import { ThemeProvider } from "@/components/theme-provider"
 import { Navigation } from "@/components/navigation"
 import Link from "next/link"
 import Image from "next/image"
+import { Toaster } from "@/components/ui/sonner"
 
 export async function generateMetadata(): Promise<Metadata> {
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"
@@ -119,6 +120,7 @@ html {
             </div>
           </header>
           {children}
+          <Toaster richColors closeButton />
         </ThemeProvider>
       </body>
     </html>

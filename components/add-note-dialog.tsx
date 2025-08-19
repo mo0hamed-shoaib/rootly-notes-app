@@ -21,7 +21,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { supabase } from "@/lib/supabase/client"
 import { Plus, Loader2 } from "lucide-react"
-import { toast } from "@/hooks/use-toast"
+import { toast } from "sonner"
 
 const noteSchema = z.object({
   course_id: z.string().min(1, "Please select a course"),
@@ -68,8 +68,7 @@ export function AddNoteDialog({ courses }: AddNoteDialogProps) {
 
       if (error) throw error
 
-      toast({
-        title: "Note added successfully",
+      toast.success("Note added successfully", {
         description: "Your learning question has been saved.",
       })
 
@@ -78,10 +77,8 @@ export function AddNoteDialog({ courses }: AddNoteDialogProps) {
       router.refresh()
     } catch (error) {
       console.error("Error adding note:", error)
-      toast({
-        title: "Error adding note",
+      toast.error("Error adding note", {
         description: "Please try again.",
-        variant: "destructive",
       })
     } finally {
       setIsSubmitting(false)

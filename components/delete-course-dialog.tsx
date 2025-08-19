@@ -13,7 +13,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { supabase } from "@/lib/supabase/client"
 import { Loader2, AlertTriangle } from "lucide-react"
-import { toast } from "@/hooks/use-toast"
+import { toast } from "sonner"
 import type { Course } from "@/lib/types"
 
 interface DeleteCourseDialogProps {
@@ -33,8 +33,7 @@ export function DeleteCourseDialog({ course, open, onOpenChange }: DeleteCourseD
 
       if (error) throw error
 
-      toast({
-        title: "Course deleted successfully",
+      toast.success("Course deleted successfully", {
         description: "The course and all associated notes have been permanently removed.",
       })
 
@@ -42,10 +41,8 @@ export function DeleteCourseDialog({ course, open, onOpenChange }: DeleteCourseD
       router.refresh()
     } catch (error) {
       console.error("Error deleting course:", error)
-      toast({
-        title: "Error deleting course",
+      toast.error("Error deleting course", {
         description: "Please try again.",
-        variant: "destructive",
       })
     } finally {
       setIsDeleting(false)

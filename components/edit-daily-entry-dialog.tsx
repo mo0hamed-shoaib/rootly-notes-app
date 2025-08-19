@@ -16,7 +16,7 @@ import { Loader2, Calendar as CalendarIcon } from "lucide-react"
 import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { format } from "date-fns"
-import { toast } from "@/hooks/use-toast"
+import { toast } from "sonner"
 import type { DailyEntry } from "@/lib/types"
 
 const editDailyEntrySchema = z.object({
@@ -73,8 +73,7 @@ export function EditDailyEntryDialog({ entry, open, onOpenChange }: EditDailyEnt
 
       if (error) throw error
 
-      toast({
-        title: "Daily entry updated successfully",
+      toast.success("Daily entry updated successfully", {
         description: "Your changes have been saved.",
       })
 
@@ -82,10 +81,8 @@ export function EditDailyEntryDialog({ entry, open, onOpenChange }: EditDailyEnt
       router.refresh()
     } catch (error) {
       console.error("Error updating daily entry:", error)
-      toast({
-        title: "Error updating daily entry",
+      toast.error("Error updating daily entry", {
         description: "Please try again.",
-        variant: "destructive",
       })
     } finally {
       setIsSubmitting(false)

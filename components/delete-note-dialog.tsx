@@ -13,7 +13,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { supabase } from "@/lib/supabase/client"
 import { Loader2, AlertTriangle } from "lucide-react"
-import { toast } from "@/hooks/use-toast"
+import { toast } from "sonner"
 import type { Note } from "@/lib/types"
 
 interface DeleteNoteDialogProps {
@@ -33,8 +33,7 @@ export function DeleteNoteDialog({ note, open, onOpenChange }: DeleteNoteDialogP
 
       if (error) throw error
 
-      toast({
-        title: "Note deleted successfully",
+      toast.success("Note deleted successfully", {
         description: "The note has been permanently removed.",
       })
 
@@ -42,10 +41,8 @@ export function DeleteNoteDialog({ note, open, onOpenChange }: DeleteNoteDialogP
       router.refresh()
     } catch (error) {
       console.error("Error deleting note:", error)
-      toast({
-        title: "Error deleting note",
+      toast.error("Error deleting note", {
         description: "Please try again.",
-        variant: "destructive",
       })
     } finally {
       setIsDeleting(false)

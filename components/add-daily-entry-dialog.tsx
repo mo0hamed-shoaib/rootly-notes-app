@@ -25,7 +25,7 @@ import { DialogFooter } from "@/components/ui/dialog"
 import { format } from "date-fns"
 import { supabase } from "@/lib/supabase/client"
 import { Plus, Loader2 } from "lucide-react"
-import { toast } from "@/hooks/use-toast"
+import { toast } from "sonner"
 
 const dailyEntrySchema = z.object({
   date: z.string().min(1, "Date is required"),
@@ -65,8 +65,7 @@ export function AddDailyEntryDialog() {
 
       if (error) throw error
 
-      toast({
-        title: "Daily entry added successfully",
+      toast.success("Daily entry added successfully", {
         description: "Your study progress has been recorded.",
       })
 
@@ -75,10 +74,8 @@ export function AddDailyEntryDialog() {
       router.refresh()
     } catch (error) {
       console.error("Error adding daily entry:", error)
-      toast({
-        title: "Error adding daily entry",
+      toast.error("Error adding daily entry", {
         description: "Please try again.",
-        variant: "destructive",
       })
     } finally {
       setIsSubmitting(false)
