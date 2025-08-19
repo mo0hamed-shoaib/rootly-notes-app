@@ -143,48 +143,7 @@ export default async function HomePage() {
           </Card>
         </div>
 
-        {/* Quick Actions */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Quick Actions</CardTitle>
-            <CardDescription>Jump into your learning activities</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              <Card className="cursor-pointer hover:bg-muted/50 transition-colors">
-                <CardContent className="p-4 text-center">
-                  <BookOpen className="h-8 w-8 mx-auto mb-2 text-primary" />
-                  <h3 className="font-medium">Add Note</h3>
-                  <p className="text-sm text-muted-foreground">Capture a new question</p>
-                </CardContent>
-              </Card>
-
-              <Card className="cursor-pointer hover:bg-muted/50 transition-colors">
-                <CardContent className="p-4 text-center">
-                  <Brain className="h-8 w-8 mx-auto mb-2 text-primary" />
-                  <h3 className="font-medium">Review Notes</h3>
-                  <p className="text-sm text-muted-foreground">Practice with spaced repetition</p>
-                </CardContent>
-              </Card>
-
-              <Card className="cursor-pointer hover:bg-muted/50 transition-colors">
-                <CardContent className="p-4 text-center">
-                  <Calendar className="h-8 w-8 mx-auto mb-2 text-primary" />
-                  <h3 className="font-medium">Daily Entry</h3>
-                  <p className="text-sm text-muted-foreground">Log today's progress</p>
-                </CardContent>
-              </Card>
-
-              <Card className="cursor-pointer hover:bg-muted/50 transition-colors">
-                <CardContent className="p-4 text-center">
-                  <TrendingUp className="h-8 w-8 mx-auto mb-2 text-primary" />
-                  <h3 className="font-medium">View Progress</h3>
-                  <p className="text-sm text-muted-foreground">Track your learning journey</p>
-                </CardContent>
-              </Card>
-            </div>
-          </CardContent>
-        </Card>
+        
       </div>
     </div>
   )
