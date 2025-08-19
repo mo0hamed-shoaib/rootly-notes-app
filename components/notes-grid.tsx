@@ -22,7 +22,7 @@ export function NotesGrid({ notes }: NotesGridProps) {
     <>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {notes.map((note) => (
-          <Card key={note.id} className="relative">
+          <Card id={`note-${note.id}`} key={note.id} className="relative">
             <CardHeader className="pb-3">
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1 min-w-0">

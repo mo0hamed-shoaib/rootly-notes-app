@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server"
 import { ReviewSession } from "@/components/review-session"
+import { ReviewControls } from "@/components/review-controls"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { EmptyState } from "@/components/empty-state"
 import { FileQuestion } from "lucide-react"
@@ -51,6 +52,12 @@ export default async function ReviewPage({ searchParams }: ReviewPageProps) {
   const sessionNotes = (shuffle ? [...notes].sort(() => Math.random() - 0.5) : notes).slice(0, limit)
   const flaggedInSession = sessionNotes.filter((n) => n.flag).length
 
+  // Fetch courses for controls
+  const { data: courses } = await supabase
+    .from("courses")
+    .select("id, title, instructor")
+    .order("title")
+
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-6 max-w-6xl">
@@ -65,6 +72,11 @@ export default async function ReviewPage({ searchParams }: ReviewPageProps) {
               <Link href="/notes">Manage Notes</Link>
             </Button>
           </div>
+        </div>
+
+        {/* Quick Controls */}
+        <div className="mb-6">
+          <ReviewControls courses={courses || []} />
         </div>
 
         {/* Session Summary */}

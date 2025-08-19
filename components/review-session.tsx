@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import { useRouter } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -35,6 +35,9 @@ export function ReviewSession({ notes }: ReviewSessionProps) {
   const [isUpdating, setIsUpdating] = useState(false)
   const [completedNotes, setCompletedNotes] = useState<string[]>([])
   const [selectedLevel, setSelectedLevel] = useState<number | null>(null)
+  const [responses, setResponses] = useState<{ noteId: string; previous: number; next: number }[]>([])
+  const [ended, setEnded] = useState(false)
+  const startedAtRef = useRef<number | null>(null)
   const router = useRouter()
   const STORAGE_KEY = "rootly_review_session_v1"
 
@@ -94,6 +97,7 @@ export function ReviewSession({ notes }: ReviewSessionProps) {
         setCurrentIndex(Math.min(parsed.currentIndex ?? 0, filteredIds.length - 1))
         setCompletedNotes((parsed.completed || []).filter((id) => idToNote.has(id)))
         setIsStarted(true)
+        startedAtRef.current = Date.now()
       }
     } catch {}
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -107,6 +111,9 @@ export function ReviewSession({ notes }: ReviewSessionProps) {
     setShowAnswer(false)
     setSelectedLevel(null)
     setIsStarted(true)
+    setResponses([])
+    setEnded(false)
+    startedAtRef.current = Date.now()
     saveSession({ orderedIds: order, currentIndex: 0, completed: [], isStarted: true })
   }
 
@@ -118,7 +125,12 @@ export function ReviewSession({ notes }: ReviewSessionProps) {
     setCompletedNotes([])
     setShowAnswer(false)
     setSelectedLevel(null)
+    setEnded(true)
     toast.success("Practice session ended", { description: "You can start a new session anytime." })
+  }
+
+  const closeSummary = () => {
+    setEnded(false)
   }
 
   const handleUpdateUnderstanding = async (newLevel: number) => {
@@ -137,13 +149,19 @@ export function ReviewSession({ notes }: ReviewSessionProps) {
       if (error) throw error
 
       setCompletedNotes((prev) => [...prev, currentNote.id])
+      setResponses((prev) => [
+        ...prev,
+        { noteId: currentNote.id, previous: currentNote.understanding_level, next: newLevel },
+      ])
       saveSession({ currentIndex: Math.min(currentIndex + 1, Math.max(sessionNotes.length - 1, 0)), completed: [...completedNotes, currentNote.id] })
 
       if (isLastNote) {
-        toast.success("Practice session completed!", {
-          description: `You reviewed ${sessionNotes.length} notes. Great job!`,
-        })
-        endSession()
+        toast.success("Practice session completed!", { description: `You reviewed ${sessionNotes.length} notes.` })
+        clearSession()
+        setIsStarted(false)
+        setEnded(true)
+        setShowAnswer(false)
+        setSelectedLevel(null)
       } else {
         setCurrentIndex((prev) => prev + 1)
         setShowAnswer(false)
@@ -173,7 +191,19 @@ export function ReviewSession({ notes }: ReviewSessionProps) {
   }
 
   // Not started state
-  if (!isStarted) {
+  if (ended) {
+    return (
+      <SessionSummary
+        notes={notes}
+        responses={responses}
+        startedAt={startedAtRef.current}
+        onRestart={startSession}
+        onClose={closeSummary}
+      />
+    )
+  }
+
+  if (!isStarted && !ended) {
     return (
       <Card className="relative overflow-hidden">
         <div
@@ -195,28 +225,7 @@ export function ReviewSession({ notes }: ReviewSessionProps) {
     )
   }
 
-  if (!currentNote) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center justify-between">
-            <span>Session complete</span>
-            <div className="flex gap-2">
-              <Button variant="outline" onClick={startSession}>
-                <RotateCcw className="h-4 w-4 mr-2" /> Restart
-              </Button>
-              <Button variant="destructive" onClick={endSession}>
-                <CircleStop className="h-4 w-4 mr-2" /> End
-              </Button>
-            </div>
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm text-muted-foreground">You reviewed {completedNotes.length} notes.</p>
-        </CardContent>
-      </Card>
-    )
-  }
+  // currentNote is guaranteed from here
 
   return (
     <div className="space-y-6">
@@ -372,5 +381,109 @@ export function ReviewSession({ notes }: ReviewSessionProps) {
         </CardContent>
       </Card>
     </div>
+  )
+}
+
+function SessionSummary({
+  notes,
+  responses,
+  startedAt,
+  onRestart,
+  onClose,
+}: {
+  notes: Note[]
+  responses: { noteId: string; previous: number; next: number }[]
+  startedAt: number | null
+  onRestart: () => void
+  onClose: () => void
+}) {
+  const durationMs = startedAt ? Date.now() - startedAt : 0
+  const minutes = Math.floor(durationMs / 60000)
+  const seconds = Math.floor((durationMs % 60000) / 1000)
+
+  const byId = useMemo(() => {
+    const m = new Map<string, Note>()
+    for (const n of notes) m.set(n.id, n)
+    return m
+  }, [notes])
+
+  const improved = responses.filter((r) => r.next > r.previous).length
+  const regressed = responses.filter((r) => r.next < r.previous).length
+  const unchanged = responses.length - improved - regressed
+  const correctCount = responses.filter((r) => r.next >= 4).length
+  const accuracyPct = responses.length > 0 ? Math.round((correctCount / responses.length) * 100) : 0
+
+  const weakest = useMemo(() => {
+    const list = [...responses]
+      .map((r) => ({ ...r, note: byId.get(r.noteId)! }))
+      .sort((a, b) => a.next - b.next)
+      .slice(0, 5)
+    return list
+  }, [responses, byId])
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center justify-between">
+          <span>Session Summary</span>
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={onRestart}>
+              <RotateCcw className="h-4 w-4 mr-2" /> Restart
+            </Button>
+            <Button variant="default" onClick={onClose}>
+              <CircleStop className="h-4 w-4 mr-2" /> Close
+            </Button>
+          </div>
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+          <div>
+            <div className="text-sm text-muted-foreground">Time spent</div>
+            <div className="text-2xl font-bold">{minutes}m {seconds}s</div>
+          </div>
+          <div>
+            <div className="text-sm text-muted-foreground">Responses</div>
+            <div className="text-2xl font-bold">{responses.length}</div>
+          </div>
+          <div>
+            <div className="text-sm text-muted-foreground">Improved</div>
+            <div className="text-2xl font-bold">{improved}</div>
+          </div>
+          <div>
+            <div className="text-sm text-muted-foreground">Accuracy</div>
+            <div className="text-2xl font-bold">{accuracyPct}%</div>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm text-muted-foreground">
+          <div>Unchanged: {unchanged}</div>
+          <div>Regressed: {regressed}</div>
+          <div>Total notes: {notes.length}</div>
+        </div>
+
+        <div className="space-y-3">
+          <h4 className="font-medium">Weakest notes</h4>
+          <ul className="space-y-2">
+            {weakest.length === 0 && (
+              <li className="text-sm text-muted-foreground">No responses recorded.</li>
+            )}
+            {weakest.map((w) => (
+              <li key={w.noteId} className="flex items-center justify-between gap-2">
+                <a
+                  className="text-sm underline underline-offset-2"
+                  href={`/notes#note-${w.noteId}`}
+                >
+                  {w.note.question}
+                </a>
+                <div className="flex items-center gap-2 text-xs">
+                  <span>Level {w.previous} → {w.next}</span>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </CardContent>
+    </Card>
   )
 }
