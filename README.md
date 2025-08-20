@@ -19,10 +19,9 @@
 </p>
 
 <p align="center">
-  <a href="#overview">Overview</a> •
-  <a href="#features">Features</a> •
-  <a href="#quick-start">Quick Start</a> •
-  <a href="#deployment">Deployment</a>
+  <a href="https://rootly-notes.vercel.app/" target="_blank" rel="noopener noreferrer">
+    <img src="https://img.shields.io/badge/Live%20Demo-View%20ROOTLY-000000?style=for-the-badge&logo=vercel&logoColor=white" alt="Live Demo">
+  </a>
 </p>
 
 ---
