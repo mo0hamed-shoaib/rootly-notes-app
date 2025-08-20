@@ -4,6 +4,7 @@ import { useState } from "react"
 import Link from "next/link"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { Badge } from "@/components/ui/badge"
 import { EditCourseDialog } from "@/components/edit-course-dialog"
 import { DeleteCourseDialog } from "@/components/delete-course-dialog"
@@ -50,17 +51,37 @@ export function CoursesGrid({ courses }: CoursesGridProps) {
 
                 {/* Actions */}
                 <div className="flex items-center gap-1">
-                  <Button variant="ghost" size="sm" onClick={() => setEditingCourse(course)} className="h-8 w-8 p-0">
-                    <Edit className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setDeletingCourse(course)}
-                    className="h-8 w-8 p-0 text-destructive hover:text-destructive"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setEditingCourse(course)}
+                          className="h-8 w-8 p-0"
+                          aria-label="Edit course"
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>Edit course</TooltipContent>
+                    </Tooltip>
+
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setDeletingCourse(course)}
+                          className="h-8 w-8 p-0 text-destructive hover:text-destructive"
+                          aria-label="Delete course"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>Delete course</TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
                 </div>
               </div>
             </CardHeader>

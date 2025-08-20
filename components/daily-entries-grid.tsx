@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { MoodIndicator } from "@/components/mood-indicator"
 import { EditDailyEntryDialog } from "@/components/edit-daily-entry-dialog"
 import { DeleteDailyEntryDialog } from "@/components/delete-daily-entry-dialog"
@@ -45,17 +46,37 @@ export function DailyEntriesGrid({ entries }: DailyEntriesGridProps) {
 
                 {/* Actions */}
                 <div className="flex items-center gap-1">
-                  <Button variant="ghost" size="sm" onClick={() => setEditingEntry(entry)} className="h-8 w-8 p-0">
-                    <Edit className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setDeletingEntry(entry)}
-                    className="h-8 w-8 p-0 text-destructive hover:text-destructive"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setEditingEntry(entry)}
+                          className="h-8 w-8 p-0"
+                          aria-label="Edit entry"
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>Edit entry</TooltipContent>
+                    </Tooltip>
+
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setDeletingEntry(entry)}
+                          className="h-8 w-8 p-0 text-destructive hover:text-destructive"
+                          aria-label="Delete entry"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>Delete entry</TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
                 </div>
               </div>
             </CardHeader>

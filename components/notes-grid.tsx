@@ -79,7 +79,7 @@ export function NotesGrid({ notes, highlight }: NotesGridProps) {
                             variant="ghost"
                             size="sm"
                             className="h-8 w-8 p-0"
-                            onClick={() => note.code_snippet ? setSnippetNote(note) : null}
+                            onClick={() => (note.code_snippet ? setSnippetNote(note) : null)}
                             disabled={!note.code_snippet}
                             aria-label={note.code_snippet ? "View code snippet" : "No code snippet"}
                           >
@@ -91,24 +91,56 @@ export function NotesGrid({ notes, highlight }: NotesGridProps) {
                         {note.code_snippet ? "View code snippet" : "No code snippet"}
                       </TooltipContent>
                     </Tooltip>
+
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setEditingNote(note)}
+                          className="h-8 w-8 p-0"
+                          aria-label="Edit note"
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>Edit note</TooltipContent>
+                    </Tooltip>
+
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setDeletingNote(note)}
+                          className="h-8 w-8 p-0 text-destructive hover:text-destructive"
+                          aria-label="Delete note"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>Delete note</TooltipContent>
+                    </Tooltip>
                   </TooltipProvider>
-                  <Button variant="ghost" size="sm" onClick={() => setEditingNote(note)} className="h-8 w-8 p-0">
-                    <Edit className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setDeletingNote(note)}
-                    className="h-8 w-8 p-0 text-destructive hover:text-destructive"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
                 </div>
               </div>
 
               {/* Badges */}
               <div className="note-badges flex items-center gap-2 flex-wrap">
                 <UnderstandingBadge level={note.understanding_level} />
+                {note.code_snippet && (
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Badge variant="outline" className="text-violet-600 border-violet-600">
+                          <CodeXml className="h-3 w-3 mr-1" />
+                          Has Snippet
+                        </Badge>
+                      </TooltipTrigger>
+                      <TooltipContent>Has code snippet</TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                )}
                 {note.flag && (
                   <Badge variant="outline" className="text-orange-600 border-orange-600">
                     <Flag className="h-3 w-3 mr-1" />

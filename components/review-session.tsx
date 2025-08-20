@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react"
 import { useRouter } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { Badge } from "@/components/ui/badge"
 import { UnderstandingBadge } from "@/components/understanding-badge"
 import { Progress } from "@/components/ui/progress"
@@ -355,10 +356,19 @@ export function ReviewSession({ notes }: ReviewSessionProps) {
 
           {/* Action Buttons */}
           <div className="flex justify-between pt-4">
-            <Button variant="outline" onClick={handleSkip} disabled={isUpdating}>
-              <RotateCcw className="h-4 w-4 mr-2" />
-              Skip for Now
-            </Button>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span>
+                    <Button variant="outline" onClick={handleSkip} disabled={isUpdating} aria-label="Skip note">
+                      <RotateCcw className="h-4 w-4 mr-2" />
+                      Skip for Now
+                    </Button>
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent>Skip this note</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
 
             {showAnswer && (
               <Button onClick={() => handleUpdateUnderstanding(selectedLevel ?? currentNote.understanding_level)} disabled={isUpdating}>
