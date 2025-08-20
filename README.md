@@ -1,9 +1,6 @@
 <p align="center">
-  <img alt="Rootly logo" src="public/android-chrome-512x512.png" width="160" />
+  <img alt="Rootly Notes - Your learning journey tracker" src="rootly-banner.png" width="100%" style="max-width: 1200px;" />
 </p>
-
-<h1 align="center">Rootly Notes</h1>
-<p align="center">Your learning journey tracker</p>
 
 <p align="center">
   <img alt="Next.js" src="https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white" />
