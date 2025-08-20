@@ -1,5 +1,5 @@
 <p align="center">
-  <img alt="Rootly Notes - Your learning journey tracker" src="rootly-banner.png" width="100%" style="max-width: 1200px;" />
+  <img alt="Rootly Notes - Your learning journey tracker" src="public/rootly-banner.png" width="1200" />
 </p>
 
 <p align="center">
@@ -13,8 +13,8 @@
 </p>
 
 <p align="center">
-  <img alt="Node >= 18.18" src="https://img.shields.io/badge/Node->=18.18-339933?style=for-the-badge&logo=nodedotjs&logoColor=white" />
-  <img alt="pnpm >= 9" src="https://img.shields.io/badge/pnpm->=9-F69220?style=for-the-badge&logo=pnpm&logoColor=white" />
+  <img alt="Node 18.18+" src="https://img.shields.io/badge/Node-18.18%2B-339933?style=for-the-badge&logo=nodedotjs&logoColor=white" />
+  <img alt="pnpm 9+" src="https://img.shields.io/badge/pnpm-9%2B-F69220?style=for-the-badge&logo=pnpm&logoColor=white" />
   <a href="https://vercel.com/new" target="_blank"><img alt="Deploy with Vercel" src="https://img.shields.io/badge/Deploy%20with-Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white" /></a>
 </p>
 
