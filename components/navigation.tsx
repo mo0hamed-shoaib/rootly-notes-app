@@ -11,7 +11,7 @@ const navigation = [
   { name: "Dashboard", href: "/", icon: BarChart3 },
   { name: "Notes", href: "/notes", icon: BookOpen },
   { name: "Courses", href: "/courses", icon: PlusCircle },
-  { name: "Daily", href: "/daily", icon: Calendar },
+  { name: "Daily Entries", href: "/daily", icon: Calendar },
   { name: "Review", href: "/review", icon: RefreshCw },
 ]
 
