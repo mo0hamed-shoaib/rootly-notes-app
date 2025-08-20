@@ -1,11 +1,11 @@
 import { createClient } from "@/lib/supabase/server"
 import { Navigation } from "@/components/navigation"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
 import { UnderstandingChart } from "@/components/understanding-chart"
 import { StudyTimeChart } from "@/components/study-time-chart"
 import { MoodChart } from "@/components/mood-chart"
 import { CourseProgressChart } from "@/components/course-progress-chart"
-import { BookOpen, Brain, Calendar, TrendingUp } from "lucide-react"
+import { BookOpen, Brain, Calendar, TrendingUp, Target, BarChart3 } from "lucide-react"
 
 export default async function HomePage() {
   const supabase = await createClient()
@@ -99,47 +99,91 @@ export default async function HomePage() {
         {/* Charts Section */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
           {/* Understanding Progress Chart */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Understanding Progress</CardTitle>
-              <CardDescription>Track your comprehension levels over time</CardDescription>
+          <Card className="flex flex-col">
+            <CardHeader className="pb-4">
+              <div className="flex items-center gap-2">
+                <TrendingUp className="h-5 w-5 text-muted-foreground" />
+                <CardTitle>Understanding Progress</CardTitle>
+              </div>
+              <CardDescription>
+                Track your comprehension levels over time and identify learning trends
+              </CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="flex-1">
               <UnderstandingChart data={notesResult.data || []} />
             </CardContent>
+            <CardFooter className="pt-4 pb-4 border-t bg-muted/50 rounded-b-lg">
+              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                <Target className="h-3 w-3" />
+                <span>Weekly averages based on note creation dates</span>
+              </div>
+            </CardFooter>
           </Card>
 
           {/* Study Time Chart */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Daily Study Time</CardTitle>
-              <CardDescription>Your study habits over the last 30 days</CardDescription>
+          <Card className="flex flex-col">
+            <CardHeader className="pb-4">
+              <div className="flex items-center gap-2">
+                <Calendar className="h-5 w-5 text-muted-foreground" />
+                <CardTitle>Daily Study Sessions</CardTitle>
+              </div>
+              <CardDescription>
+                Monitor your study consistency and time investment patterns
+              </CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="flex-1">
               <StudyTimeChart data={dailyEntriesResult.data || []} />
             </CardContent>
+            <CardFooter className="pt-4 pb-4 border-t bg-muted/50 rounded-b-lg">
+              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                <Calendar className="h-3 w-3" />
+                <span>Last 14 days • Build consistent study habits</span>
+              </div>
+            </CardFooter>
           </Card>
 
           {/* Mood Tracking Chart */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Mood Tracking</CardTitle>
-              <CardDescription>How you've been feeling during your studies</CardDescription>
+          <Card className="flex flex-col">
+            <CardHeader className="pb-4">
+              <div className="flex items-center gap-2">
+                <Brain className="h-5 w-5 text-muted-foreground" />
+                <CardTitle>Learning Mood Analysis</CardTitle>
+              </div>
+              <CardDescription>
+                Understand how your emotional state affects your learning journey
+              </CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="flex-1">
               <MoodChart data={dailyEntriesResult.data || []} />
             </CardContent>
+            <CardFooter className="pt-4 pb-4 border-t bg-muted/50 rounded-b-lg">
+              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                <Brain className="h-3 w-3" />
+                <span>Emotions impact learning • Track your wellbeing</span>
+              </div>
+            </CardFooter>
           </Card>
 
           {/* Course Progress Chart */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Course Progress</CardTitle>
-              <CardDescription>Understanding distribution across your courses</CardDescription>
+          <Card className="flex flex-col">
+            <CardHeader className="pb-4">
+              <div className="flex items-center gap-2">
+                <BarChart3 className="h-5 w-5 text-muted-foreground" />
+                <CardTitle>Course Mastery Overview</CardTitle>
+              </div>
+              <CardDescription>
+                Compare understanding levels across different courses and subjects
+              </CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="flex-1">
               <CourseProgressChart data={courseProgress || []} />
             </CardContent>
+            <CardFooter className="pt-4 pb-4 border-t bg-muted/50 rounded-b-lg">
+              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                <BookOpen className="h-3 w-3" />
+                <span>Top performing courses ranked by understanding level</span>
+              </div>
+            </CardFooter>
           </Card>
         </div>
 
