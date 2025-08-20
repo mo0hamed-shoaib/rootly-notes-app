@@ -122,6 +122,80 @@
   }
 }
 
+/* Global minimal, theme-aware scrollbars */
+html { scrollbar-gutter: stable both-edges; }
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in oklch, var(--foreground) 20%, transparent) transparent;
+}
+
+/* Chromium/WebKit */
+*::-webkit-scrollbar { width: 10px; height: 10px; }
+*::-webkit-scrollbar-track { background: transparent; }
+*::-webkit-scrollbar-thumb {
+  background-color: color-mix(in oklch, var(--foreground) 20%, transparent);
+  border-radius: 9999px;
+  border: 2px solid transparent; /* inset look */
+  background-clip: content-box;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background-color: color-mix(in oklch, var(--foreground) 35%, transparent);
+}
+*::-webkit-scrollbar-thumb:active {
+  background-color: color-mix(in oklch, var(--foreground) 50%, transparent);
+}
+
+/* Light mode: slightly higher contrast for better visibility */
+html:not(.dark) * {
+  scrollbar-color: color-mix(in oklch, var(--foreground) 35%, transparent) transparent;
+}
+html:not(.dark) *::-webkit-scrollbar-thumb {
+  background-color: color-mix(in oklch, var(--foreground) 35%, transparent);
+}
+html:not(.dark) *::-webkit-scrollbar-thumb:hover {
+  background-color: color-mix(in oklch, var(--foreground) 50%, transparent);
+}
+html:not(.dark) *::-webkit-scrollbar-thumb:active {
+  background-color: color-mix(in oklch, var(--foreground) 60%, transparent);
+}
+
+/* Ensure viewport (page) scrollbar picks up styles */
+html::-webkit-scrollbar,
+body::-webkit-scrollbar { width: 10px; height: 10px; }
+html::-webkit-scrollbar-track,
+body::-webkit-scrollbar-track { background: transparent; }
+html::-webkit-scrollbar-thumb,
+body::-webkit-scrollbar-thumb {
+  background-color: color-mix(in oklch, var(--foreground) 20%, transparent);
+  border-radius: 9999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+html:not(.dark)::-webkit-scrollbar-thumb,
+body:not(.dark)::-webkit-scrollbar-thumb { /* note: body may not have .dark; html selector covers main case */
+  background-color: color-mix(in oklch, var(--foreground) 35%, transparent);
+}
+html:is(.red, .orange, .yellow, .green, .blue, .violet)::-webkit-scrollbar-thumb,
+body:is(.red, .orange, .yellow, .green, .blue, .violet)::-webkit-scrollbar-thumb {
+  background-color: color-mix(in oklch, var(--primary) 60%, transparent);
+}
+
+/* Accent-aware scrollbar: when an accent preset class is applied on <html> */
+html:is(.red, .orange, .yellow, .green, .blue, .violet) * {
+  scrollbar-color: color-mix(in oklch, var(--primary) 60%, transparent) transparent;
+}
+html:is(.red, .orange, .yellow, .green, .blue, .violet) *::-webkit-scrollbar-thumb {
+  background-color: color-mix(in oklch, var(--primary) 60%, transparent);
+}
+html:is(.red, .orange, .yellow, .green, .blue, .violet) *::-webkit-scrollbar-thumb:hover {
+  background-color: color-mix(in oklch, var(--primary) 75%, transparent);
+}
+html:is(.red, .orange, .yellow, .green, .blue, .violet) *::-webkit-scrollbar-thumb:active {
+  background-color: color-mix(in oklch, var(--primary) 85%, transparent);
+}
+
 /* Additional shadcn theme preset: rose (light + dark) */
 .rose {
   --radius: 0.65rem;
