@@ -98,7 +98,8 @@ export function MoodChart({ data }: MoodChartProps) {
     )
   }
 
-  const MoodIcon = insights?.dominantMood >= 4 ? Smile : insights?.dominantMood <= 2 ? Frown : Meh
+  const dominantMood = insights?.dominantMood ?? 3
+  const MoodIcon = dominantMood >= 4 ? Smile : dominantMood <= 2 ? Frown : Meh
 
   return (
     <div className="space-y-4">
