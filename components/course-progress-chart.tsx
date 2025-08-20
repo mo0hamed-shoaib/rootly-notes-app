@@ -28,7 +28,7 @@ export function CourseProgressChart({ data }: CourseProgressChartProps) {
           : 0
 
         return {
-          course: course.title.length > 20 ? course.title.substring(0, 20) + "..." : course.title,
+          shortTitle: course.title.length > 12 ? course.title.substring(0, 12) + "…" : course.title,
           fullTitle: course.title,
           understanding: Number(avgUnderstanding.toFixed(1)),
           noteCount: course.notes.length,
@@ -36,7 +36,7 @@ export function CourseProgressChart({ data }: CourseProgressChartProps) {
         }
       })
       .sort((a, b) => b.understanding - a.understanding)
-      .slice(0, 8) // Top 8 courses for better visibility
+      .slice(0, 6) // Top 6 courses to avoid crowded axis
 
     // Calculate insights
     const bestCourse = processedData[0]
@@ -80,22 +80,20 @@ export function CourseProgressChart({ data }: CourseProgressChartProps) {
             color: "var(--chart-4)",
           },
         }}
-        className="min-h-[340px] w-full"
+        className="h-[280px] w-full"
       >
         <ResponsiveContainer width="100%" height="100%">
           <BarChart 
             data={chartData} 
-            margin={{ top: 20, right: 30, left: 20, bottom: 40 }}
+            margin={{ top: 20, right: 24, left: 16, bottom: 28 }}
           >
             <CartesianGrid strokeDasharray="3 3" className="stroke-muted/30" />
             <XAxis 
-              dataKey="course"
+              dataKey="shortTitle"
               className="text-xs fill-muted-foreground"
               axisLine={false}
               tickLine={false}
-              angle={-45}
-              textAnchor="end"
-              height={60}
+              tickMargin={8}
               interval={0}
               tick={{ fontSize: 10 }}
             />
@@ -105,6 +103,8 @@ export function CourseProgressChart({ data }: CourseProgressChartProps) {
               axisLine={false}
               tickLine={false}
               tick={{ fontSize: 11 }}
+              allowDecimals={false}
+              ticks={[0,1,2,3,4,5]}
               label={{ 
                 value: 'Understanding Level (1-5)', 
                 angle: -90, 
@@ -114,7 +114,7 @@ export function CourseProgressChart({ data }: CourseProgressChartProps) {
             />
             <ChartTooltip 
               content={<ChartTooltipContent 
-                labelFormatter={(value) => chartData.find(item => item.course === value)?.fullTitle || value}
+                labelFormatter={(value) => chartData.find(item => item.shortTitle === value)?.fullTitle || value}
                 formatter={(value, name) => [
                   `${value}/5 (${chartData.find(item => item.understanding === value)?.noteCount || 0} notes)`,
                   name === "understanding" ? "Understanding Level" : name

@@ -112,8 +112,8 @@ export default async function HomePage() {
             <CardContent className="flex-1">
               <UnderstandingChart data={notesResult.data || []} />
             </CardContent>
-            <CardFooter className="pt-4 pb-4 border-t bg-muted/50 rounded-b-lg">
-              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <CardFooter className="pt-3 pb-3">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Target className="h-3 w-3" />
                 <span>Weekly averages based on note creation dates</span>
               </div>
@@ -134,8 +134,8 @@ export default async function HomePage() {
             <CardContent className="flex-1">
               <StudyTimeChart data={dailyEntriesResult.data || []} />
             </CardContent>
-            <CardFooter className="pt-4 pb-4 border-t bg-muted/50 rounded-b-lg">
-              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <CardFooter className="pt-3 pb-3">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Calendar className="h-3 w-3" />
                 <span>Last 14 days • Build consistent study habits</span>
               </div>
@@ -156,8 +156,8 @@ export default async function HomePage() {
             <CardContent className="flex-1">
               <MoodChart data={dailyEntriesResult.data || []} />
             </CardContent>
-            <CardFooter className="pt-4 pb-4 border-t bg-muted/50 rounded-b-lg">
-              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <CardFooter className="pt-3 pb-3">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Brain className="h-3 w-3" />
                 <span>Emotions impact learning • Track your wellbeing</span>
               </div>
@@ -178,8 +178,8 @@ export default async function HomePage() {
             <CardContent className="flex-1">
               <CourseProgressChart data={courseProgress || []} />
             </CardContent>
-            <CardFooter className="pt-4 pb-4 border-t bg-muted/50 rounded-b-lg">
-              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <CardFooter className="pt-3 pb-3">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <BookOpen className="h-3 w-3" />
                 <span>Top performing courses ranked by understanding level</span>
               </div>

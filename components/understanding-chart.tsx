@@ -1,9 +1,9 @@
 "use client"
 
 import { useMemo } from "react"
-import { Area, AreaChart, ResponsiveContainer, XAxis, YAxis, CartesianGrid } from "recharts"
+import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, CartesianGrid } from "recharts"
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
-import { TrendingUp, TrendingDown, Minus } from "lucide-react"
+import { BookOpen, AlertTriangle, Star } from "lucide-react"
 
 interface UnderstandingChartProps {
   data: Array<{
@@ -14,57 +14,44 @@ interface UnderstandingChartProps {
 
 export function UnderstandingChart({ data }: UnderstandingChartProps) {
   const { chartData, insights } = useMemo(() => {
-    if (!data.length) return { chartData: [], insights: null }
+    if (!data.length) return { chartData: [], insights: null as null | {
+      total: number
+      atRisk: number
+      strong: number
+      avg: number
+    } }
 
-    // Group notes by week and calculate average understanding
-    const weeklyData = data.reduce(
-      (acc, note) => {
-        const date = new Date(note.created_at)
-        const weekStart = new Date(date.getFullYear(), date.getMonth(), date.getDate() - date.getDay())
-        const weekKey = weekStart.toISOString().split("T")[0]
-
-        if (!acc[weekKey]) {
-          acc[weekKey] = { total: 0, count: 0, date: weekStart }
-        }
-        acc[weekKey].total += note.understanding_level
-        acc[weekKey].count += 1
-
-        return acc
-      },
-      {} as Record<string, { total: number; count: number; date: Date }>,
-    )
-
-    const processedData = Object.entries(weeklyData)
-      .map(([key, value]) => ({
-        week: new Date(key).toLocaleDateString("en-US", { month: "short", day: "numeric" }),
-        understanding: Number((value.total / value.count).toFixed(1)),
-        noteCount: value.count,
-        date: key,
-      }))
-      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
-      .slice(-12) // Last 12 weeks
-
-    // Calculate insights
-    let trend = "stable"
-    let trendValue = 0
-    if (processedData.length >= 2) {
-      const firstHalf = processedData.slice(0, Math.floor(processedData.length / 2))
-      const secondHalf = processedData.slice(Math.floor(processedData.length / 2))
-      
-      const firstAvg = firstHalf.reduce((sum, item) => sum + item.understanding, 0) / firstHalf.length
-      const secondAvg = secondHalf.reduce((sum, item) => sum + item.understanding, 0) / secondHalf.length
-      
-      trendValue = Number(((secondAvg - firstAvg) / firstAvg * 100).toFixed(1))
-      trend = trendValue > 5 ? "improving" : trendValue < -5 ? "declining" : "stable"
+    // Distribution by level (1..5)
+    const counts: Record<number, number> = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 }
+    for (const note of data) {
+      const lvl = Math.max(1, Math.min(5, Math.round(note.understanding_level)))
+      counts[lvl] += 1
     }
 
-    const totalNotes = processedData.reduce((sum, item) => sum + item.noteCount, 0)
-    const avgUnderstanding = Number((processedData.reduce((sum, item) => sum + item.understanding, 0) / processedData.length).toFixed(1))
+    const total = Object.values(counts).reduce((s, n) => s + n, 0)
+    const chartData = [1, 2, 3, 4, 5].map((lvl) => ({
+      level: `Level ${lvl}`,
+      numeric: lvl,
+      count: counts[lvl] || 0,
+      percent: total ? Number(((counts[lvl] / total) * 100).toFixed(1)) : 0,
+    }))
 
-    return {
-      chartData: processedData,
-      insights: { trend, trendValue, totalNotes, avgUnderstanding }
-    }
+    const atRisk = (counts[1] || 0) + (counts[2] || 0)
+    const strong = (counts[4] || 0) + (counts[5] || 0)
+    const avg = total
+      ? Number(
+          (
+            (1 * (counts[1] || 0) +
+              2 * (counts[2] || 0) +
+              3 * (counts[3] || 0) +
+              4 * (counts[4] || 0) +
+              5 * (counts[5] || 0)) /
+            total
+          ).toFixed(1),
+        )
+      : 0
+
+    return { chartData, insights: { total, atRisk, strong, avg } }
   }, [data])
 
   if (!chartData.length) {
@@ -78,94 +65,70 @@ export function UnderstandingChart({ data }: UnderstandingChartProps) {
     )
   }
 
-  const TrendIcon = insights?.trend === "improving" ? TrendingUp : insights?.trend === "declining" ? TrendingDown : Minus
-
   return (
     <div className="space-y-4">
       <ChartContainer
         config={{
-          understanding: {
-            label: "Understanding Level",
+          count: {
+            label: "Notes",
             color: "var(--chart-1)",
           },
-          noteCount: {
-            label: "Notes Count",
-            color: "var(--muted)",
-          },
         }}
-        className="min-h-[240px] w-full"
+        className="h-[280px] w-full"
       >
         <ResponsiveContainer width="100%" height="100%">
-          <AreaChart accessibilityLayer data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
-            <CartesianGrid vertical={false} strokeDasharray="3 3" className="stroke-muted/30" />
-            <XAxis 
-              dataKey="week" 
+          <BarChart
+            accessibilityLayer
+            data={chartData}
+            layout="vertical"
+            margin={{ left: 0, right: 12, top: 8, bottom: 8 }}
+          >
+            <CartesianGrid horizontal strokeDasharray="3 3" className="stroke-muted/30" />
+            <XAxis type="number" dataKey="count" className="text-xs fill-muted-foreground" axisLine={false} tickLine={false} tick={{ fontSize: 11 }} />
+            <YAxis
+              dataKey="level"
+              type="category"
               className="text-xs fill-muted-foreground"
               axisLine={false}
               tickLine={false}
-              tick={{ fontSize: 11 }}
-            />
-            <YAxis 
-              domain={[1, 5]} 
-              className="text-xs fill-muted-foreground"
-              axisLine={false}
-              tickLine={false}
-              tick={{ fontSize: 11 }}
-              label={{ 
-                value: 'Understanding Level (1-5)', 
-                angle: -90, 
-                position: 'insideLeft',
-                style: { textAnchor: 'middle', fill: 'hsl(var(--muted-foreground))' }
-              }}
+              tickMargin={10}
             />
             <ChartTooltip 
               content={<ChartTooltipContent 
-                labelFormatter={(value) => `Week of ${value}`}
-                formatter={(value, name, props) => {
-                  if (name === "understanding") {
-                    return [`${value}/5 (${props.payload.noteCount} notes)`, "Understanding Level"]
-                  }
-                  return [value, name]
-                }}
+                hideLabel
+                formatter={(value, name, props) => [`${value} notes • ${props?.payload?.percent}%`, props?.payload?.level]}
               />} 
             />
-            <Area
-              type="monotone"
-              dataKey="understanding"
-              stroke="var(--color-understanding)"
-              strokeWidth={2}
-              fill="var(--color-understanding)"
-              fillOpacity={0.2}
-              className="transition-opacity"
-              dot={{ 
-                fill: "var(--color-understanding)", 
-                strokeWidth: 2, 
-                r: 4,
-                stroke: "hsl(var(--background))"
-              }}
-              activeDot={{ 
-                r: 6, 
-                stroke: "var(--color-understanding)",
-                strokeWidth: 2,
-                fill: "var(--color-understanding)"
-              }}
+            <Bar
+              dataKey="count"
+              fill="var(--color-count)"
+              radius={5}
+              className="opacity-90 hover:opacity-100 transition-opacity"
             />
-          </AreaChart>
+          </BarChart>
         </ResponsiveContainer>
       </ChartContainer>
       
       {insights && (
-        <div className="flex items-center gap-2 text-sm">
-          <TrendIcon className={`h-4 w-4 ${
-            insights.trend === "improving" ? "text-green-500" : 
-            insights.trend === "declining" ? "text-red-500" : 
-            "text-muted-foreground"
-          }`} />
-          <span className="text-muted-foreground">
-            {insights.trend === "improving" && `Understanding trending up by ${Math.abs(insights.trendValue)}% over time`}
-            {insights.trend === "declining" && `Understanding trending down by ${Math.abs(insights.trendValue)}% over time`}
-            {insights.trend === "stable" && `Understanding level remains stable at ${insights.avgUnderstanding}/5`}
-          </span>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
+          <div className="flex items-center gap-2 text-muted-foreground">
+            <BookOpen className="h-4 w-4 text-muted-foreground" />
+            <span>
+              Total notes: <span className="text-foreground font-medium">{insights.total}</span>
+            </span>
+          </div>
+          <div className="flex items-center gap-2 text-muted-foreground">
+            <AlertTriangle className="h-4 w-4 text-red-500" />
+            <span>
+              At‑risk (≤2): <span className="font-medium text-red-500">{insights.atRisk}</span>
+            </span>
+          </div>
+          <div className="flex items-center gap-2 text-muted-foreground">
+            <Star className="h-4 w-4 text-green-500" />
+            <span>
+              Strong (≥4): <span className="font-medium text-green-500">{insights.strong}</span> • Avg <span className="font-medium">{insights.avg}/5</span>
+            </span>
+          </div>
         </div>
       )}
     </div>

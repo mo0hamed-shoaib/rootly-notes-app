@@ -75,7 +75,7 @@ export function StudyTimeChart({ data, accentColor }: StudyTimeChartProps) {
             color: accentColor ?? "var(--chart-2)",
           },
         }}
-        className="min-h-[280px] w-full"
+        className="h-[280px] w-full"
       >
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 40 }}>
