@@ -76,15 +76,16 @@ export function EditCourseDialog({ course, open, onOpenChange }: EditCourseDialo
     name: "topics",
   })
 
-  // Reset form when course changes
+  // Reset form when course changes or when dialog opens (avoid stale unsaved input)
   useEffect(() => {
+    if (!open && form.formState.isDirty) return
     form.reset({
       instructor: course.instructor,
       title: course.title,
       links: course.links?.length ? course.links.map((link) => ({ value: link })) : [{ value: "" }],
       topics: course.topics?.length ? course.topics.map((topic) => ({ value: topic })) : [{ value: "" }],
     })
-  }, [course, form])
+  }, [course, open, form])
 
   const onSubmit = async (data: EditCourseFormData) => {
     setIsSubmitting(true)

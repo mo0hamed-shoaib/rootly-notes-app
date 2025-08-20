@@ -61,15 +61,16 @@ export function EditDailyEntryDialog({ entry, open, onOpenChange }: EditDailyEnt
     },
   })
 
-  // Reset form when entry changes
+  // Reset form when entry changes or when dialog opens (avoid stale unsaved input)
   useEffect(() => {
+    if (!open && form.formState.isDirty) return
     form.reset({
       date: entry.date,
       study_time: entry.study_time,
       mood: entry.mood,
       notes: entry.notes,
     })
-  }, [entry, form])
+  }, [entry, open, form])
 
   const onSubmit = async (data: EditDailyEntryFormData) => {
     setIsSubmitting(true)

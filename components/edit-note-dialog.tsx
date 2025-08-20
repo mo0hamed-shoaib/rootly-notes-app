@@ -53,8 +53,9 @@ export function EditNoteDialog({ note, open, onOpenChange }: EditNoteDialogProps
     },
   })
 
-  // Reset form when note changes
+  // Reset form when note changes or when dialog opens, so reopening always shows fresh data
   useEffect(() => {
+    if (!open && form.formState.isDirty) return
     form.reset({
       question: note.question,
       answer: note.answer,
@@ -63,7 +64,7 @@ export function EditNoteDialog({ note, open, onOpenChange }: EditNoteDialogProps
       understanding_level: note.understanding_level,
       flag: note.flag,
     })
-  }, [note, form])
+  }, [note, open, form])
 
   const onSubmit = async (data: EditNoteFormData) => {
     setIsSubmitting(true)

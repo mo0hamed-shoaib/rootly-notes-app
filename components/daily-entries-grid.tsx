@@ -17,6 +17,8 @@ interface DailyEntriesGridProps {
 export function DailyEntriesGrid({ entries }: DailyEntriesGridProps) {
   const [editingEntry, setEditingEntry] = useState<DailyEntry | null>(null)
   const [deletingEntry, setDeletingEntry] = useState<DailyEntry | null>(null)
+  const [isEditOpen, setIsEditOpen] = useState(false)
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false)
 
   return (
     <>
@@ -52,7 +54,7 @@ export function DailyEntriesGrid({ entries }: DailyEntriesGridProps) {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => setEditingEntry(entry)}
+                          onClick={() => { setEditingEntry(entry); setIsEditOpen(true) }}
                           className="h-8 w-8 p-0"
                           aria-label="Edit entry"
                         >
@@ -67,7 +69,7 @@ export function DailyEntriesGrid({ entries }: DailyEntriesGridProps) {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => setDeletingEntry(entry)}
+                          onClick={() => { setDeletingEntry(entry); setIsDeleteOpen(true) }}
                           className="h-8 w-8 p-0 text-destructive hover:text-destructive"
                           aria-label="Delete entry"
                         >
@@ -97,8 +99,8 @@ export function DailyEntriesGrid({ entries }: DailyEntriesGridProps) {
       {editingEntry && (
         <EditDailyEntryDialog
           entry={editingEntry}
-          open={!!editingEntry}
-          onOpenChange={(open) => !open && setEditingEntry(null)}
+          open={isEditOpen}
+          onOpenChange={setIsEditOpen}
         />
       )}
 
@@ -106,8 +108,8 @@ export function DailyEntriesGrid({ entries }: DailyEntriesGridProps) {
       {deletingEntry && (
         <DeleteDailyEntryDialog
           entry={deletingEntry}
-          open={!!deletingEntry}
-          onOpenChange={(open) => !open && setDeletingEntry(null)}
+          open={isDeleteOpen}
+          onOpenChange={setIsDeleteOpen}
         />
       )}
     </>

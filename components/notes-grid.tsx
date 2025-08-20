@@ -45,6 +45,9 @@ export function NotesGrid({ notes, highlight }: NotesGridProps) {
   const [editingNote, setEditingNote] = useState<Note | null>(null)
   const [deletingNote, setDeletingNote] = useState<Note | null>(null)
   const [snippetNote, setSnippetNote] = useState<Note | null>(null)
+  const [isEditOpen, setIsEditOpen] = useState(false)
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false)
+  const [isSnippetOpen, setIsSnippetOpen] = useState(false)
 
   return (
     <>
@@ -79,7 +82,12 @@ export function NotesGrid({ notes, highlight }: NotesGridProps) {
                             variant="ghost"
                             size="sm"
                             className="h-8 w-8 p-0"
-                            onClick={() => (note.code_snippet ? setSnippetNote(note) : null)}
+                            onClick={() => {
+                              if (note.code_snippet) {
+                                setSnippetNote(note)
+                                setIsSnippetOpen(true)
+                              }
+                            }}
                             disabled={!note.code_snippet}
                             aria-label={note.code_snippet ? "View code snippet" : "No code snippet"}
                           >
@@ -97,7 +105,7 @@ export function NotesGrid({ notes, highlight }: NotesGridProps) {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => setEditingNote(note)}
+                          onClick={() => { setEditingNote(note); setIsEditOpen(true) }}
                           className="h-8 w-8 p-0"
                           aria-label="Edit note"
                         >
@@ -112,7 +120,7 @@ export function NotesGrid({ notes, highlight }: NotesGridProps) {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => setDeletingNote(note)}
+                          onClick={() => { setDeletingNote(note); setIsDeleteOpen(true) }}
                           className="h-8 w-8 p-0 text-destructive hover:text-destructive"
                           aria-label="Delete note"
                         >
@@ -173,8 +181,8 @@ export function NotesGrid({ notes, highlight }: NotesGridProps) {
       {editingNote && (
         <EditNoteDialog
           note={editingNote}
-          open={!!editingNote}
-          onOpenChange={(open) => !open && setEditingNote(null)}
+          open={isEditOpen}
+          onOpenChange={setIsEditOpen}
         />
       )}
 
@@ -182,16 +190,16 @@ export function NotesGrid({ notes, highlight }: NotesGridProps) {
       {deletingNote && (
         <DeleteNoteDialog
           note={deletingNote}
-          open={!!deletingNote}
-          onOpenChange={(open) => !open && setDeletingNote(null)}
+          open={isDeleteOpen}
+          onOpenChange={setIsDeleteOpen}
         />
       )}
 
       {/* Code Snippet Dialog */}
       {snippetNote && (
         <CodeSnippetDialog
-          open={!!snippetNote}
-          onOpenChange={(open) => !open && setSnippetNote(null)}
+          open={isSnippetOpen}
+          onOpenChange={setIsSnippetOpen}
           code={snippetNote.code_snippet || ""}
           language={snippetNote.code_language || "plaintext"}
         />

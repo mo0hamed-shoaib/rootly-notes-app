@@ -18,6 +18,8 @@ interface CoursesGridProps {
 export function CoursesGrid({ courses }: CoursesGridProps) {
   const [editingCourse, setEditingCourse] = useState<Course | null>(null)
   const [deletingCourse, setDeletingCourse] = useState<Course | null>(null)
+  const [isEditOpen, setIsEditOpen] = useState(false)
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false)
 
   return (
     <>
@@ -57,7 +59,7 @@ export function CoursesGrid({ courses }: CoursesGridProps) {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => setEditingCourse(course)}
+                          onClick={() => { setEditingCourse(course); setIsEditOpen(true) }}
                           className="h-8 w-8 p-0"
                           aria-label="Edit course"
                         >
@@ -72,7 +74,7 @@ export function CoursesGrid({ courses }: CoursesGridProps) {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => setDeletingCourse(course)}
+                          onClick={() => { setDeletingCourse(course); setIsDeleteOpen(true) }}
                           className="h-8 w-8 p-0 text-destructive hover:text-destructive"
                           aria-label="Delete course"
                         >
@@ -143,8 +145,8 @@ export function CoursesGrid({ courses }: CoursesGridProps) {
       {editingCourse && (
         <EditCourseDialog
           course={editingCourse}
-          open={!!editingCourse}
-          onOpenChange={(open) => !open && setEditingCourse(null)}
+          open={isEditOpen}
+          onOpenChange={setIsEditOpen}
         />
       )}
 
@@ -152,8 +154,8 @@ export function CoursesGrid({ courses }: CoursesGridProps) {
       {deletingCourse && (
         <DeleteCourseDialog
           course={deletingCourse}
-          open={!!deletingCourse}
-          onOpenChange={(open) => !open && setDeletingCourse(null)}
+          open={isDeleteOpen}
+          onOpenChange={setIsDeleteOpen}
         />
       )}
     </>
