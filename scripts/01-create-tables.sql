@@ -15,6 +15,8 @@ CREATE TABLE IF NOT EXISTS notes (
   course_id UUID REFERENCES courses(id) ON DELETE CASCADE,
   question TEXT NOT NULL,
   answer TEXT NOT NULL DEFAULT '',
+  code_snippet TEXT NULL,
+  code_language TEXT NULL,
   understanding_level INTEGER NOT NULL DEFAULT 1 CHECK (understanding_level >= 1 AND understanding_level <= 5),
   flag BOOLEAN DEFAULT FALSE,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),

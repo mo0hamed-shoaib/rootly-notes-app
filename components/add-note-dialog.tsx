@@ -1,3 +1,4 @@
+import type { CodeLanguage } from "@/lib/types"
 "use client"
 
 import { useState } from "react"
@@ -22,11 +23,15 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { supabase } from "@/lib/supabase/client"
 import { Plus, Loader2 } from "lucide-react"
 import { toast } from "sonner"
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
+import { LanguageCombobox } from "@/components/language-combobox"
 
 const noteSchema = z.object({
   course_id: z.string().min(1, "Please select a course"),
   question: z.string().min(1, "Question is required").max(1000, "Question must be less than 1000 characters"),
   answer: z.string().max(2000, "Answer must be less than 2000 characters").optional(),
+  code_snippet: z.string().max(20000, "Snippet too long").optional(),
+  code_language: z.custom<CodeLanguage>().optional(),
   understanding_level: z.coerce.number().min(1).max(5),
   flag: z.boolean(),
 })
@@ -48,6 +53,8 @@ export function AddNoteDialog({ courses }: AddNoteDialogProps) {
       course_id: "",
       question: "",
       answer: "",
+      code_snippet: "",
+      code_language: "plaintext",
       understanding_level: 3,
       flag: false,
     },
@@ -61,6 +68,8 @@ export function AddNoteDialog({ courses }: AddNoteDialogProps) {
           course_id: data.course_id,
           question: data.question,
           answer: data.answer || "",
+          code_snippet: data.code_snippet || null,
+          code_language: data.code_language || "plaintext",
           understanding_level: data.understanding_level,
           flag: data.flag,
         },
@@ -161,6 +170,42 @@ export function AddNoteDialog({ courses }: AddNoteDialogProps) {
                 </FormItem>
               )}
             />
+
+            <Accordion type="single" collapsible>
+              <AccordionItem value="code">
+                <AccordionTrigger className="text-sm font-medium">Code snippet (Optional)</AccordionTrigger>
+                <AccordionContent className="space-y-3">
+                  <FormField
+                    control={form.control}
+                    name="code_language"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Language</FormLabel>
+                        <LanguageCombobox value={(field.value as CodeLanguage) ?? "plaintext"} onChange={field.onChange as (v: CodeLanguage) => void} />
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="code_snippet"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Code</FormLabel>
+                        <FormControl>
+                          <Textarea
+                            placeholder="Paste your code here..."
+                            className="min-h-[160px] font-mono"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
 
             <div className="grid grid-cols-2 gap-4">
               <FormField

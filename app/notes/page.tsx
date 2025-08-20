@@ -43,6 +43,8 @@ export default async function NotesPage({ searchParams }: NotesPageProps) {
     .select(
       `
       *,
+      code_snippet,
+      code_language,
       course:courses(*)
     `,
       { count: "exact" }
@@ -60,7 +62,7 @@ export default async function NotesPage({ searchParams }: NotesPageProps) {
     query = query.eq("flag", true)
   }
   if (resolvedSearchParams.search) {
-    query = query.or(`question.ilike.%${resolvedSearchParams.search}%,answer.ilike.%${resolvedSearchParams.search}%`)
+    query = query.or(`question.ilike.%${resolvedSearchParams.search}%,answer.ilike.%${resolvedSearchParams.search}%,code_snippet.ilike.%${resolvedSearchParams.search}%`)
   }
 
   const { data: notes, count, error } = await query.range(from, to)

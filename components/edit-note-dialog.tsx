@@ -8,17 +8,22 @@ import { z } from "zod"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
+import { Select as UiSelect, SelectContent as UiSelectContent, SelectItem as UiSelectItem, SelectTrigger as UiSelectTrigger, SelectValue as UiSelectValue } from "@/components/ui/select"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Switch } from "@/components/ui/switch"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { supabase } from "@/lib/supabase/client"
 import { Loader2 } from "lucide-react"
 import { toast } from "sonner"
-import type { Note } from "@/lib/types"
+import type { Note, CodeLanguage } from "@/lib/types"
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
+import { LanguageCombobox } from "@/components/language-combobox"
 
 const editNoteSchema = z.object({
   question: z.string().min(1, "Question is required").max(1000, "Question must be less than 1000 characters"),
   answer: z.string().max(2000, "Answer must be less than 2000 characters").optional(),
+  code_snippet: z.string().max(20000, "Snippet too long").optional(),
+  code_language: z.custom<CodeLanguage>().optional(),
   understanding_level: z.coerce.number().min(1).max(5),
   flag: z.boolean(),
 })
@@ -40,6 +45,8 @@ export function EditNoteDialog({ note, open, onOpenChange }: EditNoteDialogProps
     defaultValues: {
       question: note.question,
       answer: note.answer,
+      code_snippet: note.code_snippet ?? "",
+      code_language: (note.code_language as CodeLanguage | null) ?? "plaintext",
       understanding_level: note.understanding_level,
       flag: note.flag,
     },
@@ -50,6 +57,8 @@ export function EditNoteDialog({ note, open, onOpenChange }: EditNoteDialogProps
     form.reset({
       question: note.question,
       answer: note.answer,
+      code_snippet: note.code_snippet ?? "",
+      code_language: (note.code_language as CodeLanguage | null) ?? "plaintext",
       understanding_level: note.understanding_level,
       flag: note.flag,
     })
@@ -63,6 +72,8 @@ export function EditNoteDialog({ note, open, onOpenChange }: EditNoteDialogProps
         .update({
           question: data.question,
           answer: data.answer || "",
+          code_snippet: data.code_snippet || null,
+          code_language: data.code_language || "plaintext",
           understanding_level: data.understanding_level,
           flag: data.flag,
         })
@@ -131,6 +142,42 @@ export function EditNoteDialog({ note, open, onOpenChange }: EditNoteDialogProps
                 </FormItem>
               )}
             />
+
+            <Accordion type="single" collapsible>
+              <AccordionItem value="code">
+                <AccordionTrigger className="text-sm font-medium">Code snippet (Optional)</AccordionTrigger>
+                <AccordionContent className="space-y-3">
+                  <FormField
+                    control={form.control}
+                    name="code_language"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Language</FormLabel>
+                        <LanguageCombobox value={(field.value as CodeLanguage) ?? "plaintext"} onChange={field.onChange as (v: CodeLanguage) => void} />
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="code_snippet"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Code</FormLabel>
+                        <FormControl>
+                          <Textarea
+                            placeholder="Paste your code here..."
+                            className="min-h-[160px] font-mono"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
 
             <div className="grid grid-cols-2 gap-4">
               <FormField

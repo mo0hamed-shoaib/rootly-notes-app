@@ -43,6 +43,8 @@ export function ExportNotesButton({ notes }: ExportNotesButtonProps) {
       course_title: n.course?.title ?? null,
       question: n.question,
       answer: n.answer,
+      code_snippet: n.code_snippet ?? null,
+      code_language: n.code_language ?? null,
       understanding_level: n.understanding_level,
       flag: n.flag,
       created_at: n.created_at,

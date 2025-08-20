@@ -7,7 +7,9 @@ import { Badge } from "@/components/ui/badge"
 import { UnderstandingBadge } from "@/components/understanding-badge"
 import { EditNoteDialog } from "@/components/edit-note-dialog"
 import { DeleteNoteDialog } from "@/components/delete-note-dialog"
-import { Edit, Trash2, Flag, Calendar } from "lucide-react"
+import { Edit, Trash2, Flag, Calendar, CodeXml } from "lucide-react"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { CodeSnippetDialog } from "@/components/code-snippet-dialog"
 import type { Note } from "@/lib/types"
 
 interface NotesGridProps {
@@ -42,6 +44,7 @@ function renderWithHighlight(text: string, query?: string) {
 export function NotesGrid({ notes, highlight }: NotesGridProps) {
   const [editingNote, setEditingNote] = useState<Note | null>(null)
   const [deletingNote, setDeletingNote] = useState<Note | null>(null)
+  const [snippetNote, setSnippetNote] = useState<Note | null>(null)
 
   return (
     <>
@@ -68,6 +71,27 @@ export function NotesGrid({ notes, highlight }: NotesGridProps) {
 
                 {/* Actions (hidden on print) */}
                 <div className="note-actions flex items-center gap-1">
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <span>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-8 w-8 p-0"
+                            onClick={() => note.code_snippet ? setSnippetNote(note) : null}
+                            disabled={!note.code_snippet}
+                            aria-label={note.code_snippet ? "View code snippet" : "No code snippet"}
+                          >
+                            <CodeXml className="h-4 w-4" />
+                          </Button>
+                        </span>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        {note.code_snippet ? "View code snippet" : "No code snippet"}
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
                   <Button variant="ghost" size="sm" onClick={() => setEditingNote(note)} className="h-8 w-8 p-0">
                     <Edit className="h-4 w-4" />
                   </Button>
@@ -128,6 +152,16 @@ export function NotesGrid({ notes, highlight }: NotesGridProps) {
           note={deletingNote}
           open={!!deletingNote}
           onOpenChange={(open) => !open && setDeletingNote(null)}
+        />
+      )}
+
+      {/* Code Snippet Dialog */}
+      {snippetNote && (
+        <CodeSnippetDialog
+          open={!!snippetNote}
+          onOpenChange={(open) => !open && setSnippetNote(null)}
+          code={snippetNote.code_snippet || ""}
+          language={snippetNote.code_language || "plaintext"}
         />
       )}
     </>

@@ -13,6 +13,8 @@ export interface Note {
   course_id: string
   question: string
   answer: string
+  code_snippet?: string | null
+  code_language?: string | null
   understanding_level: 1 | 2 | 3 | 4 | 5
   flag: boolean
   created_at: string
@@ -32,3 +34,23 @@ export interface DailyEntry {
 
 export type UnderstandingLevel = 1 | 2 | 3 | 4 | 5
 export type MoodLevel = 1 | 2 | 3 | 4 | 5
+
+export type CodeLanguage =
+  | "plaintext"
+  | "javascript"
+  | "typescript"
+  | "jsx"
+  | "tsx"
+  | "python"
+  | "java"
+  | "csharp"
+  | "go"
+  | "ruby"
+  | "php"
+  | "sql"
+  | "bash"
+  | "json"
+  | "yaml"
+  | "html"
+  | "css"
+  | "markdown"
