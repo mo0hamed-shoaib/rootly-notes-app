@@ -81,7 +81,7 @@ export function NotesGrid({ notes, highlight }: NotesGridProps) {
                           <Button
                             variant="ghost"
                             size="sm"
-                            className="h-8 w-8 p-0"
+                            className={`h-8 w-8 p-0 ${note.code_snippet ? "text-violet-600 hover:text-violet-700 dark:text-violet-400 dark:hover:text-violet-300" : "text-muted-foreground"}`}
                             onClick={() => {
                               if (note.code_snippet) {
                                 setSnippetNote(note)
