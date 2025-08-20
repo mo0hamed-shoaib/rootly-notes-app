@@ -21,7 +21,20 @@ import type { DailyEntry } from "@/lib/types"
 
 const editDailyEntrySchema = z.object({
   date: z.string().min(1, "Date is required"),
-  study_time: z.coerce.number().min(0, "Study time must be positive").max(1440, "Study time cannot exceed 24 hours"),
+  study_time: z.preprocess(
+    (v) => {
+      if (typeof v === "string") {
+        if (v.trim() === "") return undefined
+        const n = Number(v)
+        return Number.isNaN(n) ? undefined : n
+      }
+      return v
+    },
+    z
+      .number({ required_error: "Study time is required" })
+      .min(0, "Study time must be positive")
+      .max(1440, "Study time cannot exceed 24 hours"),
+  ),
   mood: z.coerce.number().min(1).max(5),
   notes: z.string().max(500, "Notes must be less than 500 characters").optional(),
 })
@@ -38,7 +51,7 @@ export function EditDailyEntryDialog({ entry, open, onOpenChange }: EditDailyEnt
   const [isSubmitting, setIsSubmitting] = useState(false)
   const router = useRouter()
 
-  const form = useForm<EditDailyEntryFormData>({
+  const form = useForm<z.input<typeof editDailyEntrySchema>, any, EditDailyEntryFormData>({
     resolver: zodResolver(editDailyEntrySchema),
     defaultValues: {
       date: entry.date,
@@ -140,7 +153,12 @@ export function EditDailyEntryDialog({ entry, open, onOpenChange }: EditDailyEnt
                 <FormItem>
                   <FormLabel>Study Time (minutes)</FormLabel>
                   <FormControl>
-                    <Input type="number" placeholder="60" {...field} />
+                    <Input
+                      type="number"
+                      placeholder="60"
+                      value={field.value as number | string | undefined}
+                      onChange={(e) => field.onChange(e.target.value)}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

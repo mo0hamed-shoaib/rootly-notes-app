@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+ 
 import { useRouter } from "next/navigation"
 import {
   Dialog,
@@ -11,6 +12,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
+ 
 import { supabase } from "@/lib/supabase/client"
 import { Loader2, AlertTriangle } from "lucide-react"
 import { toast } from "sonner"
@@ -25,6 +27,8 @@ interface DeleteNoteDialogProps {
 export function DeleteNoteDialog({ note, open, onOpenChange }: DeleteNoteDialogProps) {
   const [isDeleting, setIsDeleting] = useState(false)
   const router = useRouter()
+
+  
 
   const handleDelete = async () => {
     setIsDeleting(true)
@@ -68,10 +72,10 @@ export function DeleteNoteDialog({ note, open, onOpenChange }: DeleteNoteDialogP
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={isDeleting}>
+          <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={isDeleting}>
             Cancel
           </Button>
-          <Button variant="destructive" onClick={handleDelete} disabled={isDeleting}>
+          <Button type="button" variant="destructive" onClick={handleDelete} disabled={isDeleting}>
             {isDeleting && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
             Delete Note
           </Button>
