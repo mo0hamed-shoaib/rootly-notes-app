@@ -112,7 +112,12 @@ pnpm install
 NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 
-# Optional (used for metadata and canonical URLs)
+# Optional
+# Social Media Links in Footer
+NEXT_PUBLIC_GITHUB_URL=www.github.com/user
+NEXT_PUBLIC_LINKEDIN_URL=www.linkedin.com/user
+
+# Deploy Link used for metadata and canonical URLs
 NEXT_PUBLIC_SITE_URL=http://localhost:3000
 ```
 
