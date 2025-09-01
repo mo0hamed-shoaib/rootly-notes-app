@@ -8,6 +8,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { Download, FileJson, Printer } from "lucide-react"
 import type { Note } from "@/lib/types"
 
@@ -61,24 +62,31 @@ export function ExportNotesButton({ notes }: ExportNotesButtonProps) {
   }
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="sm" className="h-9">
-          <Download className="h-4 w-4 mr-2" />
-          Export
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-48">
-        <DropdownMenuItem onClick={handleDownloadJSON}>
-          <FileJson className="h-4 w-4 mr-2" />
-          Download JSON
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={handlePrint}>
-          <Printer className="h-4 w-4 mr-2" />
-          Print
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <TooltipProvider>
+      <Tooltip>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <TooltipTrigger asChild>
+              <Button variant="outline" size="sm" className="h-9">
+                <Download className="h-4 w-4 mr-2" />
+                Export
+              </Button>
+            </TooltipTrigger>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-48">
+            <DropdownMenuItem onClick={handleDownloadJSON}>
+              <FileJson className="h-4 w-4 mr-2" />
+              Download JSON
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={handlePrint}>
+              <Printer className="h-4 w-4 mr-2" />
+              Print
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+        <TooltipContent>Export notes as JSON or print</TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   )
 }
 
