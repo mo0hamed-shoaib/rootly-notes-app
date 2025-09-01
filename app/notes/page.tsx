@@ -5,7 +5,9 @@ import { NotesFilters } from "@/components/notes-filters"
 import { ExportNotesButton } from "@/components/export-notes"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { EmptyState } from "@/components/empty-state"
-import { FileQuestion } from "lucide-react"
+import { FileQuestion, Eye, EyeOff } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import {
   Pagination,
   PaginationContent,
@@ -17,6 +19,7 @@ import {
 } from "@/components/ui/pagination"
 import type React from "react"
 import { NotesPrintStyles } from "@/components/notes-print-styles"
+import { ToggleAnswersButton } from "@/components/toggle-answers-button"
 
 interface NotesPageProps {
   searchParams: Promise<{
@@ -94,6 +97,7 @@ export default async function NotesPage({ searchParams }: NotesPageProps) {
           </div>
           <div className="flex items-center gap-2">
             <AddNoteDialog courses={courses || []} />
+            <ToggleAnswersButton />
             <ExportNotesButton notes={notes || []} />
           </div>
         </div>
