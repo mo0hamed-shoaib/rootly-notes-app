@@ -20,6 +20,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Switch } from "@/components/ui/switch"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { supabase } from "@/lib/supabase/client"
 import { Plus, Loader2 } from "lucide-react"
 import { toast } from "sonner"
@@ -97,12 +98,19 @@ export function AddNoteDialog({ courses }: AddNoteDialogProps) {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button size="sm" className="h-9">
-          <Plus className="h-4 w-4 mr-2" />
-          Add Note
-        </Button>
-      </DialogTrigger>
+      <TooltipProvider>
+        <Tooltip>
+          <DialogTrigger asChild>
+            <TooltipTrigger asChild>
+              <Button size="sm" className="h-9">
+                <Plus className="h-4 w-4 mr-2" />
+                Add Note
+              </Button>
+            </TooltipTrigger>
+          </DialogTrigger>
+          <TooltipContent>Add a new learning question</TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
       <DialogContent className="sm:max-w-[600px] max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Add New Note</DialogTitle>
