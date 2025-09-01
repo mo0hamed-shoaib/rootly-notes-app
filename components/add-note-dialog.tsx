@@ -26,6 +26,7 @@ import { Plus, Loader2 } from "lucide-react"
 import { toast } from "sonner"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import { LanguageCombobox } from "@/components/language-combobox"
+import { useEditingGuard } from "@/hooks/use-editing-guard"
  
 
 const noteSchema = z.object({
@@ -48,6 +49,7 @@ export function AddNoteDialog({ courses }: AddNoteDialogProps) {
   const [open, setOpen] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const router = useRouter()
+  const { guardAction } = useEditingGuard()
 
   const form = useForm<NoteFormData>({
     resolver: zodResolver(noteSchema),
@@ -102,7 +104,16 @@ export function AddNoteDialog({ courses }: AddNoteDialogProps) {
         <Tooltip>
           <DialogTrigger asChild>
             <TooltipTrigger asChild>
-              <Button size="sm" className="h-9">
+              <Button 
+                size="sm" 
+                className="h-9"
+                onClick={(e) => {
+                  if (!open) {
+                    guardAction("add note", () => setOpen(true))
+                    e.preventDefault()
+                  }
+                }}
+              >
                 <Plus className="h-4 w-4 mr-2" />
                 Add Note
               </Button>

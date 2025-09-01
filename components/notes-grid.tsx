@@ -11,6 +11,7 @@ import { Edit, Trash2, Flag, Calendar, CodeXml, Eye, EyeOff } from "lucide-react
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { CodeSnippetDialog } from "@/components/code-snippet-dialog"
 import type { Note } from "@/lib/types"
+import { useEditingGuard } from "@/hooks/use-editing-guard"
 
 interface NotesGridProps {
   notes: (Note & { course?: { id: string; title: string; instructor: string } })[]
@@ -48,6 +49,7 @@ export function NotesGrid({ notes, highlight }: NotesGridProps) {
   const [isEditOpen, setIsEditOpen] = useState(false)
   const [isDeleteOpen, setIsDeleteOpen] = useState(false)
   const [isSnippetOpen, setIsSnippetOpen] = useState(false)
+  const { guardAction } = useEditingGuard()
   
   // Answer visibility state
   const [showAnswersByDefault, setShowAnswersByDefault] = useState(false)
@@ -182,7 +184,7 @@ export function NotesGrid({ notes, highlight }: NotesGridProps) {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => { setEditingNote(note); setIsEditOpen(true) }}
+                          onClick={() => guardAction("edit note", () => { setEditingNote(note); setIsEditOpen(true) })}
                           className="h-8 w-8 p-0"
                           aria-label="Edit note"
                         >
@@ -197,7 +199,7 @@ export function NotesGrid({ notes, highlight }: NotesGridProps) {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => { setDeletingNote(note); setIsDeleteOpen(true) }}
+                          onClick={() => guardAction("delete note", () => { setDeletingNote(note); setIsDeleteOpen(true) })}
                           className="h-8 w-8 p-0 text-destructive hover:text-destructive"
                           aria-label="Delete note"
                         >

@@ -20,6 +20,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { supabase } from "@/lib/supabase/client"
 import { Plus, Loader2, X, LinkIcon, Tag } from "lucide-react"
 import { toast } from "sonner"
+import { useEditingGuard } from "@/hooks/use-editing-guard"
 
 const courseSchema = z.object({
   instructor: z
@@ -49,6 +50,7 @@ export function AddCourseDialog() {
   const [open, setOpen] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const router = useRouter()
+  const { guardAction } = useEditingGuard()
 
   const form = useForm<CourseFormData>({
     resolver: zodResolver(courseSchema),
@@ -118,7 +120,14 @@ export function AddCourseDialog() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button>
+        <Button
+          onClick={(e) => {
+            if (!open) {
+              guardAction("add course", () => setOpen(true))
+              e.preventDefault()
+            }
+          }}
+        >
           <Plus className="h-4 w-4 mr-2" />
           Add Course
         </Button>

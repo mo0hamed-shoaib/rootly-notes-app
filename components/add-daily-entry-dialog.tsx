@@ -26,6 +26,7 @@ import { format } from "date-fns"
 import { supabase } from "@/lib/supabase/client"
 import { Plus, Loader2 } from "lucide-react"
 import { toast } from "sonner"
+import { useEditingGuard } from "@/hooks/use-editing-guard"
 
 const dailyEntrySchema = z.object({
   date: z.string().min(1, "Date is required"),
@@ -53,6 +54,7 @@ export function AddDailyEntryDialog() {
   const [open, setOpen] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const router = useRouter()
+  const { guardAction } = useEditingGuard()
 
   const form = useForm<z.input<typeof dailyEntrySchema>, any, DailyEntryFormData>({
     resolver: zodResolver(dailyEntrySchema),
@@ -98,7 +100,14 @@ export function AddDailyEntryDialog() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button>
+        <Button
+          onClick={(e) => {
+            if (!open) {
+              guardAction("add daily entry", () => setOpen(true))
+              e.preventDefault()
+            }
+          }}
+        >
           <Plus className="h-4 w-4 mr-2" />
           Add Daily Entry
         </Button>

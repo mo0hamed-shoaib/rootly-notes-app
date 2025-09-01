@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/alert-dialog"
 import { toast } from "sonner"
 import type { Note } from "@/lib/types"
+import { useEditingGuard } from "@/hooks/use-editing-guard"
 
 interface ReviewSessionProps {
   notes: (Note & { course?: { title: string; instructor: string } })[]
@@ -41,6 +42,7 @@ export function ReviewSession({ notes }: ReviewSessionProps) {
   const startedAtRef = useRef<number | null>(null)
   const router = useRouter()
   const STORAGE_KEY = "rootly_review_session_v1"
+  const { guardAction } = useEditingGuard()
 
   const idToNote = useMemo(() => {
     const map = new Map<string, Note>()
@@ -218,7 +220,10 @@ export function ReviewSession({ notes }: ReviewSessionProps) {
           <p className="text-sm text-muted-foreground text-center max-w-md">
             Start a quick quiz session with the notes selected on this page. You can leave and return to continue.
           </p>
-          <Button onClick={startSession} className="px-6">
+          <Button 
+            onClick={() => guardAction("start review session", startSession)} 
+            className="px-6"
+          >
             <Play className="h-4 w-4 mr-2" /> Start
           </Button>
         </CardContent>

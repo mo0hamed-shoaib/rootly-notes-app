@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { BookOpen, PlusCircle, BarChart3, Calendar, RefreshCw } from "lucide-react"
 import { ThemeToggle } from "@/components/theme-toggle"
+import { EditingToggle } from "@/components/editing-toggle"
 
 const navigation = [
   { name: "Dashboard", href: "/", icon: BarChart3 },
@@ -39,6 +40,9 @@ export function Navigation() {
           </Button>
         )
       })}
+      <div className="ml-1">
+        <EditingToggle />
+      </div>
       <div className="ml-1">
         <ThemeToggle />
       </div>

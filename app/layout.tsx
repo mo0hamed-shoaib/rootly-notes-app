@@ -4,6 +4,7 @@ import { GeistSans } from "geist/font/sans"
 import { GeistMono } from "geist/font/mono"
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
+import { EditingProvider } from "@/components/editing-context"
 import { Navigation } from "@/components/navigation"
 import { Footer } from "@/components/footer"
 import Link from "next/link"
@@ -94,35 +95,37 @@ html {
       </head>
       <body suppressHydrationWarning={true}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-          <header className="sticky top-0 z-50 bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b">
-            <div className="container mx-auto max-w-6xl px-4 py-3 flex items-center justify-between">
-              <Link href="/" className="flex items-center gap-2 shrink-0">
-                {/* Light-on-dark logo for dark mode */}
-                <Image
-                  src="/favicon-light.svg"
-                  alt="Rootly logo"
-                  width={32}
-                  height={32}
-                  className="hidden dark:block"
-                  priority
-                />
-                {/* Dark-on-light logo for light mode */}
-                <Image
-                  src="/favicon-dark.svg"
-                  alt="Rootly logo"
-                  width={32}
-                  height={32}
-                  className="block dark:hidden"
-                  priority
-                />
-                <span className="font-semibold tracking-tight text-lg md:text-xl">Rootly</span>
-              </Link>
-              <Navigation />
-            </div>
-          </header>
-          {children}
-          <Footer />
-          <Toaster richColors closeButton />
+          <EditingProvider>
+            <header className="sticky top-0 z-50 bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b">
+              <div className="container mx-auto max-w-6xl px-4 py-3 flex items-center justify-between">
+                <Link href="/" className="flex items-center gap-2 shrink-0">
+                  {/* Light-on-dark logo for dark mode */}
+                  <Image
+                    src="/favicon-light.svg"
+                    alt="Rootly logo"
+                    width={32}
+                    height={32}
+                    className="hidden dark:block"
+                    priority
+                  />
+                  {/* Dark-on-light logo for light mode */}
+                  <Image
+                    src="/favicon-dark.svg"
+                    alt="Rootly logo"
+                    width={32}
+                    height={32}
+                    className="block dark:hidden"
+                    priority
+                  />
+                  <span className="font-semibold tracking-tight text-lg md:text-xl">Rootly</span>
+                </Link>
+                <Navigation />
+              </div>
+            </header>
+            {children}
+            <Footer />
+            <Toaster richColors closeButton />
+          </EditingProvider>
         </ThemeProvider>
       </body>
     </html>

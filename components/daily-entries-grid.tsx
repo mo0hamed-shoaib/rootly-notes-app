@@ -9,6 +9,7 @@ import { EditDailyEntryDialog } from "@/components/edit-daily-entry-dialog"
 import { DeleteDailyEntryDialog } from "@/components/delete-daily-entry-dialog"
 import { Edit, Trash2, Clock, Calendar } from "lucide-react"
 import type { DailyEntry } from "@/lib/types"
+import { useEditingGuard } from "@/hooks/use-editing-guard"
 
 interface DailyEntriesGridProps {
   entries: DailyEntry[]
@@ -19,6 +20,7 @@ export function DailyEntriesGrid({ entries }: DailyEntriesGridProps) {
   const [deletingEntry, setDeletingEntry] = useState<DailyEntry | null>(null)
   const [isEditOpen, setIsEditOpen] = useState(false)
   const [isDeleteOpen, setIsDeleteOpen] = useState(false)
+  const { guardAction } = useEditingGuard()
 
   return (
     <>
@@ -54,7 +56,7 @@ export function DailyEntriesGrid({ entries }: DailyEntriesGridProps) {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => { setEditingEntry(entry); setIsEditOpen(true) }}
+                          onClick={() => guardAction("edit daily entry", () => { setEditingEntry(entry); setIsEditOpen(true) })}
                           className="h-8 w-8 p-0"
                           aria-label="Edit entry"
                         >
@@ -69,7 +71,7 @@ export function DailyEntriesGrid({ entries }: DailyEntriesGridProps) {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => { setDeletingEntry(entry); setIsDeleteOpen(true) }}
+                          onClick={() => guardAction("delete daily entry", () => { setDeletingEntry(entry); setIsDeleteOpen(true) })}
                           className="h-8 w-8 p-0 text-destructive hover:text-destructive"
                           aria-label="Delete entry"
                         >

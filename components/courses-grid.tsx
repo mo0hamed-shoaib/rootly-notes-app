@@ -10,6 +10,7 @@ import { EditCourseDialog } from "@/components/edit-course-dialog"
 import { DeleteCourseDialog } from "@/components/delete-course-dialog"
 import { Edit, Trash2, ExternalLink, BookOpen, Calendar, User } from "lucide-react"
 import type { Course } from "@/lib/types"
+import { useEditingGuard } from "@/hooks/use-editing-guard"
 
 interface CoursesGridProps {
   courses: (Course & { note_count: number })[]
@@ -20,6 +21,7 @@ export function CoursesGrid({ courses }: CoursesGridProps) {
   const [deletingCourse, setDeletingCourse] = useState<Course | null>(null)
   const [isEditOpen, setIsEditOpen] = useState(false)
   const [isDeleteOpen, setIsDeleteOpen] = useState(false)
+  const { guardAction } = useEditingGuard()
 
   return (
     <>
@@ -59,7 +61,7 @@ export function CoursesGrid({ courses }: CoursesGridProps) {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => { setEditingCourse(course); setIsEditOpen(true) }}
+                          onClick={() => guardAction("edit course", () => { setEditingCourse(course); setIsEditOpen(true) })}
                           className="h-8 w-8 p-0"
                           aria-label="Edit course"
                         >
@@ -74,7 +76,7 @@ export function CoursesGrid({ courses }: CoursesGridProps) {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => { setDeletingCourse(course); setIsDeleteOpen(true) }}
+                          onClick={() => guardAction("delete course", () => { setDeletingCourse(course); setIsDeleteOpen(true) })}
                           className="h-8 w-8 p-0 text-destructive hover:text-destructive"
                           aria-label="Delete course"
                         >
