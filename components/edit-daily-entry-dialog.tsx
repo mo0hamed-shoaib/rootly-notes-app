@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import { TimeInput } from "@/components/ui/time-input"
 import { supabase } from "@/lib/supabase/client"
 import { Loader2, Calendar as CalendarIcon } from "lucide-react"
 import { Calendar } from "@/components/ui/calendar"
@@ -152,13 +153,10 @@ export function EditDailyEntryDialog({ entry, open, onOpenChange }: EditDailyEnt
               name="study_time"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Study Time (minutes)</FormLabel>
                   <FormControl>
-                    <Input
-                      type="number"
-                      placeholder="60"
-                      value={field.value as number | string | undefined}
-                      onChange={(e) => field.onChange(e.target.value)}
+                    <TimeInput
+                      value={field.value}
+                      onChange={field.onChange}
                     />
                   </FormControl>
                   <FormMessage />

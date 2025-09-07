@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button"
 import { supabase } from "@/lib/supabase/client"
 import { Loader2, AlertTriangle } from "lucide-react"
 import { toast } from "sonner"
+import { formatStudyTime } from "@/lib/time-utils"
 import type { DailyEntry } from "@/lib/types"
 
 interface DeleteDailyEntryDialogProps {
@@ -73,7 +74,7 @@ export function DeleteDailyEntryDialog({ entry, open, onOpenChange }: DeleteDail
             })}
           </p>
           <p className="text-sm font-medium mb-1">Study Time:</p>
-          <p className="text-sm text-muted-foreground">{Math.round((entry.study_time / 60) * 10) / 10} hours</p>
+          <p className="text-sm text-muted-foreground">{formatStudyTime(entry.study_time)}</p>
         </div>
 
         <DialogFooter>

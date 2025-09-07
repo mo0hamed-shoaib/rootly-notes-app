@@ -22,6 +22,7 @@ import { Calendar as CalendarIcon } from "lucide-react"
 import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { DialogFooter } from "@/components/ui/dialog"
+import { TimeInput } from "@/components/ui/time-input"
 import { format } from "date-fns"
 import { supabase } from "@/lib/supabase/client"
 import { Plus, Loader2 } from "lucide-react"
@@ -159,13 +160,10 @@ export function AddDailyEntryDialog() {
               name="study_time"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Study Time (minutes)</FormLabel>
                   <FormControl>
-                    <Input
-                      type="number"
-                      placeholder="60"
-                      value={field.value as number | string | undefined}
-                      onChange={(e) => field.onChange(e.target.value)}
+                    <TimeInput
+                      value={field.value}
+                      onChange={field.onChange}
                     />
                   </FormControl>
                   <FormMessage />

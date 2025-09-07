@@ -8,6 +8,7 @@ import { MoodIndicator } from "@/components/mood-indicator"
 import { EditDailyEntryDialog } from "@/components/edit-daily-entry-dialog"
 import { DeleteDailyEntryDialog } from "@/components/delete-daily-entry-dialog"
 import { Edit, Trash2, Clock, Calendar } from "lucide-react"
+import { formatStudyTime } from "@/lib/time-utils"
 import type { DailyEntry } from "@/lib/types"
 import { useEditingGuard } from "@/hooks/use-editing-guard"
 
@@ -42,7 +43,7 @@ export function DailyEntriesGrid({ entries }: DailyEntriesGridProps) {
                   <div className="flex items-center gap-4 mb-3">
                     <div className="flex items-center gap-2">
                       <Clock className="h-4 w-4 text-muted-foreground" />
-                      <span className="text-sm">{Math.round((entry.study_time / 60) * 10) / 10}h</span>
+                      <span className="text-sm">{formatStudyTime(entry.study_time)}</span>
                     </div>
                     <MoodIndicator mood={entry.mood} />
                   </div>
