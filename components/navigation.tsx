@@ -9,10 +9,10 @@ import { ThemeToggle } from "@/components/theme-toggle"
 import { EditingToggle } from "@/components/editing-toggle"
 
 const navigation = [
-  { name: "Dashboard", href: "/", icon: BarChart3 },
+  { name: "Home", href: "/", icon: BarChart3 },
   { name: "Notes", href: "/notes", icon: BookOpen },
   { name: "Courses", href: "/courses", icon: PlusCircle },
-  { name: "Daily Entries", href: "/daily", icon: Calendar },
+  { name: "Daily Entry", href: "/daily", icon: Calendar },
   { name: "Review", href: "/review", icon: RefreshCw },
 ]
 
@@ -35,7 +35,7 @@ export function Navigation() {
           >
             <Link href={item.href}>
               <Icon className="h-4 w-4" />
-              <span className="hidden sm:inline">{item.name}</span>
+              <span className="hidden [@media(min-width:745px)]:inline">{item.name}</span>
             </Link>
           </Button>
         )
