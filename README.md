@@ -51,7 +51,7 @@ Elegant, data-driven learning tracker built with Next.js and Supabase. Capture Q
 
 ## ✨ Features
 
-- **Dashboard overview**: Total courses, notes, average understanding, and study time (last 30 days) with rich charts
+- **Home overview**: Total courses, notes, average understanding, and study time (last 30 days) with rich charts
 - **Notes management**: Capture questions and answers, filter by course/understanding/flagged, full-text search, export to JSON/CSV
 - **Courses**: Track learning resources with links and topics; see per-course note counts
 - **Daily entries**: Log study time and mood per day
@@ -62,7 +62,7 @@ Routes:
 
 | Path | Description |
 |------|-------------|
-| `/` | Overview dashboard |
+| `/` | Overview Home |
 | `/notes` | Notes grid, filters, export |
 | `/courses` | Course management |
 | `/daily` | Daily study and mood tracking |
@@ -227,7 +227,7 @@ Key UI building blocks live in `components/ui/*` and are composed throughout pag
 
 ## 📈 Analytics & Exports
 
-- Dashboard charts for understanding, study time, mood, and course progress
+- Home charts for understanding, study time, mood, and course progress
 - Notes export via the "Export" action on `/notes`
 
 ---
