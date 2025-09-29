@@ -31,23 +31,25 @@ export function ReviewControls({ courses }: ReviewControlsProps) {
   }
 
   return (
-    <div className="flex flex-wrap items-center gap-3">
+    <div className="grid grid-cols-1 sm:flex sm:flex-wrap items-center gap-3">
       <Select value={course} onValueChange={(v) => updateParam("course", v)}>
-        <SelectTrigger className="w-[200px] h-9">
+        <SelectTrigger className="w-full sm:w-[200px] h-9">
           <SelectValue placeholder="All courses" />
         </SelectTrigger>
-        <SelectContent>
+        <SelectContent className="w-[calc(100vw-2rem)] max-w-[300px] sm:max-w-[300px]">
           <SelectItem value="all">All courses</SelectItem>
           {courses.map((c) => (
-            <SelectItem key={c.id} value={c.id}>
-              {c.title}
+            <SelectItem key={c.id} value={c.id} className="w-full">
+              <div className="truncate w-full text-left" title={c.title}>
+                {c.title}
+              </div>
             </SelectItem>
           ))}
         </SelectContent>
       </Select>
 
       <Select value={limit} onValueChange={(v) => updateParam("limit", v === "all" ? "100" : v)}>
-        <SelectTrigger className="w-[120px] h-9">
+        <SelectTrigger className="w-full sm:w-[120px] h-9">
           <SelectValue placeholder="Limit" />
         </SelectTrigger>
         <SelectContent>
@@ -57,12 +59,12 @@ export function ReviewControls({ courses }: ReviewControlsProps) {
         </SelectContent>
       </Select>
 
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 w-full sm:w-auto justify-start">
         <Switch checked={flagged} onCheckedChange={(v) => updateParam("flagged", v ? "true" : null)} id="flagged-only" />
         <Label htmlFor="flagged-only" className="text-sm">Flagged only</Label>
       </div>
 
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 w-full sm:w-auto justify-start">
         <Switch checked={shuffle} onCheckedChange={(v) => updateParam("shuffle", v ? "true" : "false")} id="shuffle" />
         <Label htmlFor="shuffle" className="text-sm">Shuffle</Label>
       </div>
