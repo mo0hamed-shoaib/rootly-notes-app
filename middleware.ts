@@ -25,7 +25,19 @@ export async function middleware(request: NextRequest) {
     },
   )
 
-  // Since this is a single-user learning tracker, no authentication is needed
+  const {
+    data: { session },
+  } = await supabase.auth.getSession()
+
+  const url = new URL(request.url)
+  const publicPaths = ["/", "/login", "/auth/callback", "/about", "/how-it-works", "/how-rootly-works"]
+  const isPublic = publicPaths.some((p) => url.pathname === p || url.pathname.startsWith(p + "/"))
+
+  if (!session && !isPublic) {
+    const redirect = new URL("/login", url.origin)
+    redirect.searchParams.set("next", url.pathname + url.search)
+    return NextResponse.redirect(redirect)
+  }
 
   return supabaseResponse
 }
