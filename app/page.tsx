@@ -1,194 +1,139 @@
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
+import Link from "next/link"
 import { createClient } from "@/lib/supabase/server"
-import { Navigation } from "@/components/navigation"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
-import { UnderstandingChart } from "@/components/understanding-chart"
-import { StudyTimeChart } from "@/components/study-time-chart"
-import { MoodChart } from "@/components/mood-chart"
-import { CourseProgressChart } from "@/components/course-progress-chart"
-import { BookOpen, Brain, Calendar, TrendingUp, Target, BarChart3 } from "lucide-react"
+import Image from "next/image"
+import { Quote } from "lucide-react"
+import { BackToTopButton } from "@/components/back-to-top-button"
 
 export default async function HomePage() {
   const supabase = await createClient()
-
-  // Get basic stats
-  const [coursesResult, notesResult, dailyEntriesResult] = await Promise.all([
-    supabase.from("courses").select("id").limit(1000),
-    supabase.from("notes").select("id, understanding_level, created_at").limit(1000),
-    supabase.from("daily_entries").select("study_time, date, mood").order("date", { ascending: false }).limit(30),
-  ])
-
-
-  // Get course progress data
-  const { data: courseProgress } = await supabase
-    .from("courses")
-    .select(`
-      id,
-      title,
-      notes(id, understanding_level)
-    `)
-    .limit(10)
-
-
-  const totalCourses = coursesResult.data?.length || 0
-  const totalNotes = notesResult.data?.length || 0
-  const avgUnderstanding = notesResult.data?.length
-    ? (notesResult.data.reduce((sum, note) => sum + note.understanding_level, 0) / notesResult.data.length).toFixed(1)
-    : "0"
-  const totalStudyTime = dailyEntriesResult.data?.reduce((sum, entry) => sum + entry.study_time, 0) || 0
-
-
+  const { data: { session } } = await supabase.auth.getSession()
+  const hasSession = !!session
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-6 max-w-6xl">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight">Rootly Notes</h1>
-            <p className="text-muted-foreground">Your learning journey tracker</p>
-          </div>
-          <div className="flex items-center gap-4"></div>
-        </div>
-
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Courses</CardTitle>
-              <BookOpen className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{totalCourses}</div>
-              <p className="text-xs text-muted-foreground">Active learning paths</p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Notes</CardTitle>
-              <Brain className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{totalNotes}</div>
-              <p className="text-xs text-muted-foreground">Questions captured</p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Avg Understanding</CardTitle>
-              <TrendingUp className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{avgUnderstanding}/5</div>
-              <p className="text-xs text-muted-foreground">Comprehension level</p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Study Time</CardTitle>
-              <Calendar className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{Math.round(totalStudyTime / 60)}h</div>
-              <p className="text-xs text-muted-foreground">Last 30 days</p>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Charts Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-          {/* Understanding Progress Chart */}
-          <Card className="flex flex-col">
-            <CardHeader className="pb-4">
-              <div className="flex items-center gap-2">
-                <TrendingUp className="h-5 w-5 text-muted-foreground" />
-                <CardTitle>Understanding Progress</CardTitle>
-              </div>
-              <CardDescription>
-                Track your comprehension levels over time and identify learning trends
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="flex-1">
-              <UnderstandingChart data={notesResult.data || []} />
-            </CardContent>
-            <CardFooter className="pt-3 pb-3">
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Target className="h-3 w-3" />
-                <span>Weekly averages based on note creation dates</span>
-              </div>
-            </CardFooter>
-          </Card>
-
-          {/* Study Time Chart */}
-          <Card className="flex flex-col">
-            <CardHeader className="pb-4">
-              <div className="flex items-center gap-2">
-                <Calendar className="h-5 w-5 text-muted-foreground" />
-                <CardTitle>Daily Study Sessions</CardTitle>
-              </div>
-              <CardDescription>
-                Monitor your study consistency and time investment patterns
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="flex-1">
-              <StudyTimeChart data={dailyEntriesResult.data || []} />
-            </CardContent>
-            <CardFooter className="pt-3 pb-3">
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Calendar className="h-3 w-3" />
-                <span>Last 14 days • Build consistent study habits</span>
-              </div>
-            </CardFooter>
-          </Card>
-
-          {/* Mood Tracking Chart */}
-          <Card className="flex flex-col">
-            <CardHeader className="pb-4">
-              <div className="flex items-center gap-2">
-                <Brain className="h-5 w-5 text-muted-foreground" />
-                <CardTitle>Learning Mood Analysis</CardTitle>
-              </div>
-              <CardDescription>
-                Understand how your emotional state affects your learning journey
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="flex-1">
-              <MoodChart data={dailyEntriesResult.data || []} />
-            </CardContent>
-            <CardFooter className="pt-3 pb-3">
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Brain className="h-3 w-3" />
-                <span>Emotions impact learning • Track your wellbeing</span>
-              </div>
-            </CardFooter>
-          </Card>
-
-          {/* Course Progress Chart */}
-          <Card className="flex flex-col">
-            <CardHeader className="pb-4">
-              <div className="flex items-center gap-2">
-                <BarChart3 className="h-5 w-5 text-muted-foreground" />
-                <CardTitle>Course Mastery Overview</CardTitle>
-              </div>
-              <CardDescription>
-                Compare understanding levels across different courses and subjects
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="flex-1">
-              <CourseProgressChart data={courseProgress || []} />
-            </CardContent>
-            <CardFooter className="pt-3 pb-3">
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <BookOpen className="h-3 w-3" />
-                <span>Top performing courses ranked by understanding level</span>
-              </div>
-            </CardFooter>
-          </Card>
-        </div>
-
-        
+    <div className="relative">
+      <div className="pointer-events-none absolute inset-0 -z-10  [mask-image:radial-gradient(ellipse_at_center,black,transparent_70%)]">
+        <div className="h-full w-full bg-[radial-gradient(circle_at_center,theme(colors.primary/35),transparent_50%)]" />
+        <div className="absolute inset-0 bg-[linear-gradient(0deg,rgba(0,0,0,0.16)_1px,transparent_1px),linear-gradient(90deg,rgba(0,0,0,0.16)_1px,transparent_1px)] bg-[size:60px_60px] dark:bg-[linear-gradient(0deg,rgba(255,255,255,0.18)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.18)_1px,transparent_1px)]" />
       </div>
+      <section className="container mx-auto max-w-6xl px-4 py-16 text-center">
+        <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight leading-tight">Master your learning journey</h1>
+        <p className="text-xl text-muted-foreground mt-6 max-w-2xl mx-auto">
+          Capture questions, track progress, and stay consistent — Rootly turns your study sessions into measurable growth.
+        </p>
+        <div className="mt-8 flex gap-4 justify-center">
+          {hasSession ? (
+            <Link href="/dashboard" className="bg-primary text-primary-foreground inline-flex items-center rounded-md px-6 py-3 text-sm font-medium hover:bg-primary/90">
+              Go to dashboard
+            </Link>
+          ) : (
+            <Link href="/login?next=%2Fdashboard" className="bg-primary text-primary-foreground inline-flex items-center rounded-md px-6 py-3 text-sm font-medium hover:bg-primary/90">
+              Get started
+            </Link>
+          )}
+          <Link href="/how-rootly-works" className="bg-accent text-accent-foreground inline-flex items-center rounded-md px-6 py-3 text-sm font-medium hover:bg-accent/80">
+            How it works
+          </Link>
+        </div>
+      </section>
+      
+      <section className="container mx-auto max-w-6xl px-4 py-16">
+        <h2 className="text-5xl font-bold mb-8 text-center">Philosophy Behind</h2>
+        <div className="max-w-4xl mx-auto">
+          <p className="text-lg text-muted-foreground text-center mb-12 leading-relaxed">
+            Learning is not just about consuming information—it's about building a sustainable system that grows with you. 
+            Rootly believes in the power of consistent, structured learning that transforms knowledge into lasting understanding.
+          </p>
+          <Card className="bg-muted/50 border-0 shadow-lg">
+            <CardContent className="p-8 text-center">
+              <Quote className="h-8 w-8 mx-auto mb-4 text-primary" />
+              <blockquote className="text-xl font-medium italic leading-relaxed mb-4">
+                "The expert in anything was once a beginner. The key is not to know everything, but to build a system that helps you learn consistently."
+              </blockquote>
+              <cite className="text-sm text-muted-foreground">— Rootly Learning Philosophy</cite>
+            </CardContent>
+          </Card>
+        </div>
+      </section>
+      
+      <section className="container mx-auto max-w-6xl px-4 py-16">
+        <h2 className="text-5xl font-bold mb-8 text-center">Features</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {[
+            {
+              title: "Q&A Notes",
+              desc: "Capture questions and answers per course",
+              img: "/features/notes-scrn.png",
+            },
+            {
+              title: "Daily Tracking",
+              desc: "Log study time and mood over time",
+              img: "/features/daily-scrn.png",
+            },
+            {
+              title: "Quick Review",
+              desc: "Practice with random notes",
+              img: "/features/review-scrn.png",
+            },
+            {
+              title: "Courses Tracking",
+              desc: "Organize learning paths and monitor course progress",
+              img: "/features/courses-scrn.png",
+            },
+            {
+              title: "Themes & Accents",
+              desc: "Light/Dark modes with customizable accent colors",
+              img: "/features/themes-scrn.png",
+            },
+            {
+              title: "Stats & Charts",
+              desc: "Understand trends with visual charts and summaries",
+              img: "/features/chart-scrn.png",
+            },
+          ].map((f) => (
+            <Card key={f.title} className="overflow-hidden p-0 transition-shadow hover:shadow-md">
+              <div className="aspect-[16/9] w-full overflow-hidden">
+                <Image src={f.img} alt="" width={800} height={450} className="h-full w-full object-cover" />
+              </div>
+              <CardContent className="px-5 py-4">
+                <h3 className="text-base font-semibold leading-tight">{f.title}</h3>
+                <p className="text-sm text-muted-foreground mt-1">{f.desc}</p>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </section>
+      <section className="container mx-auto max-w-6xl px-4 py-16">
+        <h2 className="text-5xl font-bold mb-8 text-center">FAQ</h2>
+        <Accordion type="single" collapsible className="border rounded-md divide-y bg-card max-w-4xl mx-auto">
+          <AccordionItem value="q1">
+            <AccordionTrigger className="px-4">Is Rootly free to use?</AccordionTrigger>
+            <AccordionContent className="px-4">
+              Yes, Rootly is free for personal use. You own your data in your Supabase project.
+            </AccordionContent>
+          </AccordionItem>
+          <AccordionItem value="q2">
+            <AccordionTrigger className="px-4">How is my data protected?</AccordionTrigger>
+            <AccordionContent className="px-4">
+              Row Level Security (RLS) ensures only you can access your data. Each table is scoped by your user id.
+            </AccordionContent>
+          </AccordionItem>
+          <AccordionItem value="q3">
+            <AccordionTrigger className="px-4">Can I export my notes?</AccordionTrigger>
+            <AccordionContent className="px-4">
+              Yes, export options are available from the Notes section to back up or migrate content.
+            </AccordionContent>
+          </AccordionItem>
+          <AccordionItem value="q4">
+            <AccordionTrigger className="px-4">Which sign-in methods are supported?</AccordionTrigger>
+            <AccordionContent className="px-4">
+              Google and GitHub OAuth. Accounts are separate unless you explicitly link identities.
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
+      </section>
+      
+      <BackToTopButton />
     </div>
   )
 }
