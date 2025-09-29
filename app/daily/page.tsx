@@ -55,7 +55,9 @@ export default async function DailyPage({ searchParams }: DailyPageProps) {
 
         {/* Add Entry Button */}
         <div className="flex justify-end mb-6">
-          <AddDailyEntryDialog />
+          <div className="w-full sm:w-auto">
+            <AddDailyEntryDialog />
+          </div>
         </div>
 
         {/* Daily Entries Grid */}
