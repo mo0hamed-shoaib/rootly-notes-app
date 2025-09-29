@@ -68,7 +68,9 @@ export default async function CoursesPage({ searchParams }: CoursesPageProps) {
 
         {/* Add Course Button */}
         <div className="flex justify-end mb-6">
-          <AddCourseDialog />
+          <div className="w-full sm:w-auto">
+            <AddCourseDialog />
+          </div>
         </div>
 
         {/* Courses Grid */}
