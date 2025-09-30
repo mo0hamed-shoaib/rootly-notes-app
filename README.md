@@ -171,8 +171,7 @@ If you encounter any issues or have questions:
 
 <p align="center">Made with ❤️ for learners everywhere</p>
 <p align="center">
-  <img src="./public/jimmy-logo.svg" alt="Jimmy logo" width="20" height="20" style="vertical-align:middle;margin-right:6px;" />
-  By Jimmy
+  <img src="./public/jimmy-logo.svg" alt="Jimmy logo" width="50" height="50" style="vertical-align:middle;margin-right:6px;" />
 </p>
 
 
