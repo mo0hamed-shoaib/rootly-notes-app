@@ -78,7 +78,15 @@ export function AuthAvatar() {
               <div className="flex items-center gap-2">
                 <div className="rounded-md overflow-hidden">
                   <Avatar className="h-6 w-6 rounded-none">
-                    <AvatarImage src={user.avatarUrl ?? undefined} alt={user.name ?? user.email ?? "User"} />
+                    <AvatarImage
+                      src={user.avatarUrl ?? undefined}
+                      alt={user.name ?? user.email ?? "User"}
+                      referrerPolicy="no-referrer"
+                      onError={(e) => {
+                        // Fallback to initials if provider image blocks referrer or is invalid
+                        try { (e.currentTarget as HTMLImageElement).src = "" } catch {}
+                      }}
+                    />
                     <AvatarFallback className="rounded-none">U</AvatarFallback>
                   </Avatar>
                 </div>
@@ -118,7 +126,14 @@ export function AuthAvatar() {
               <div className="flex items-center gap-2">
                 <div className="rounded-md overflow-hidden">
                   <Avatar className="h-6 w-6 rounded-none">
-                    <AvatarImage src={user.avatarUrl ?? undefined} alt={user.name ?? user.email ?? "User"} />
+                    <AvatarImage
+                      src={user.avatarUrl ?? undefined}
+                      alt={user.name ?? user.email ?? "User"}
+                      referrerPolicy="no-referrer"
+                      onError={(e) => {
+                        try { (e.currentTarget as HTMLImageElement).src = "" } catch {}
+                      }}
+                    />
                     <AvatarFallback className="rounded-none">U</AvatarFallback>
                   </Avatar>
                 </div>
