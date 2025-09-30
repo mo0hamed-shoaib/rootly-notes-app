@@ -1,16 +1,30 @@
 import Link from "next/link"
-import { Github, Linkedin } from "lucide-react"
+import Image from "next/image"
+import { Github, Linkedin, HelpCircle } from "lucide-react"
 
 export function Footer() {
-  const year = new Date().getFullYear()
   const githubUrl = process.env.NEXT_PUBLIC_GITHUB_URL || "#"
   const linkedinUrl = process.env.NEXT_PUBLIC_LINKEDIN_URL || "#"
+  const portfolioUrl = process.env.NEXT_PUBLIC_PORTFOLIO_URL || "#"
 
   return (
     <footer className="border-t">
       <div className="container mx-auto max-w-6xl px-4 py-6">
         <div className="flex items-center justify-center gap-6 text-sm text-muted-foreground">
-          <span>© {year} Rootly Notes</span>
+          <Link href="/how-rootly-works" className="hover:text-foreground transition-colors inline-flex items-center gap-1.5">
+            <HelpCircle className="h-4 w-4" />
+            <span>How it Works</span>
+          </Link>
+          <a
+            href={portfolioUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 hover:text-foreground"
+            aria-label="Jimmy portfolio"
+          >
+            <Image src="/jimmy-logo.svg" alt="Jimmy" width={16} height={16} />
+            Jimmy
+          </a>
           <a
             href={githubUrl}
             target="_blank"
@@ -29,12 +43,6 @@ export function Footer() {
           >
             <Linkedin className="h-4 w-4" />
           </a>
-          <Link href="/about" className="hover:text-foreground transition-colors">
-            About
-          </Link>
-          <Link href="/how-rootly-works" className="hover:text-foreground transition-colors">
-            How Rootly Works
-          </Link>
         </div>
       </div>
     </footer>
