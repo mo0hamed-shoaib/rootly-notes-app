@@ -17,45 +17,65 @@ export default async function HomePage() {
         <div className="absolute inset-0 bg-[linear-gradient(0deg,rgba(0,0,0,0.16)_1px,transparent_1px),linear-gradient(90deg,rgba(0,0,0,0.16)_1px,transparent_1px)] bg-[size:60px_60px] dark:bg-[linear-gradient(0deg,rgba(255,255,255,0.18)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.18)_1px,transparent_1px)]" />
       </div>
       <section className="container mx-auto max-w-6xl px-4 py-16 text-center">
-        <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight leading-tight">Master your learning journey</h1>
+        <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight leading-tight">
+          Master your learning journey
+        </h1>
         <p className="text-xl text-muted-foreground mt-6 max-w-2xl mx-auto">
-          Capture questions, track progress, and stay consistent — Rootly turns your study sessions into measurable growth.
+          Capture questions, track progress, and stay consistent — Rootly turns
+          your study sessions into measurable growth.
         </p>
         <div className="mt-8 flex gap-4 justify-center">
           {hasSession ? (
-            <Link href="/dashboard" className="bg-primary text-primary-foreground inline-flex items-center rounded-md px-6 py-3 text-sm font-medium hover:bg-primary/90">
-              Go to dashboard
+            <Link
+              href="/dashboard"
+              className="bg-primary text-primary-foreground inline-flex items-center rounded-md px-6 py-3 text-sm font-medium hover:bg-primary/90"
+            >
+              Dashboard
             </Link>
           ) : (
-            <Link href="/login?next=%2Fdashboard" className="bg-primary text-primary-foreground inline-flex items-center rounded-md px-6 py-3 text-sm font-medium hover:bg-primary/90">
+            <Link
+              href="/login?next=%2Fdashboard"
+              className="bg-primary text-primary-foreground inline-flex items-center rounded-md px-6 py-3 text-sm font-medium hover:bg-primary/90"
+            >
               Get started
             </Link>
           )}
-          <Link href="/how-rootly-works" className="bg-accent text-accent-foreground inline-flex items-center rounded-md px-6 py-3 text-sm font-medium hover:bg-accent/80">
+          <Link
+            href="/how-rootly-works"
+            className="bg-accent text-accent-foreground inline-flex items-center rounded-md px-6 py-3 text-sm font-medium hover:bg-accent/80"
+          >
             How it works
           </Link>
         </div>
       </section>
-      
+
       <section className="container mx-auto max-w-6xl px-4 py-16">
-        <h2 className="text-5xl font-bold mb-8 text-center">Philosophy Behind</h2>
+        <h2 className="text-5xl font-bold mb-8 text-center">
+          Philosophy Behind
+        </h2>
         <div className="max-w-4xl mx-auto">
           <p className="text-lg text-muted-foreground text-center mb-12 leading-relaxed">
-            Learning is not just about consuming information—it's about building a sustainable system that grows with you. 
-            Rootly believes in the power of consistent, structured learning that transforms knowledge into lasting understanding.
+            Learning is not just about consuming information—it's about building
+            a sustainable system that grows with you. Rootly believes in the
+            power of consistent, structured learning that transforms knowledge
+            into lasting understanding.
           </p>
           <Card className="bg-muted/50 border-0 shadow-lg">
             <CardContent className="p-8 text-center">
               <Quote className="h-8 w-8 mx-auto mb-4 text-primary" />
               <blockquote className="text-xl font-medium italic leading-relaxed mb-4">
-                "The expert in anything was once a beginner. The key is not to know everything, but to build a system that helps you learn consistently."
+                "The expert in anything was once a beginner. The key is not to
+                know everything, but to build a system that helps you learn
+                consistently."
               </blockquote>
-              <cite className="text-sm text-muted-foreground">— Rootly Learning Philosophy</cite>
+              <cite className="text-sm text-muted-foreground">
+                — Rootly Learning Philosophy
+              </cite>
             </CardContent>
           </Card>
         </div>
       </section>
-      
+
       <section className="container mx-auto max-w-6xl px-4 py-16">
         <h2 className="text-5xl font-bold mb-8 text-center">Features</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -91,12 +111,28 @@ export default async function HomePage() {
               img: "/features/chart-scrn.png",
             },
           ].map((f) => (
-            <Card key={f.title} className="overflow-hidden p-0 transition-shadow hover:shadow-md">
+            <Card
+              key={f.title}
+              className="group relative overflow-hidden p-0 ring-1 ring-border transition-all duration-200 
+              hover:ring-primary/30 
+              before:absolute before:inset-0 before:rounded-[inherit] 
+              before:bg-[radial-gradient(ellipse_at_center,theme(colors.primary/20),transparent_62%)] 
+              before:opacity-0 before:transition-opacity before:duration-500 
+              group-hover:before:opacity-100"
+            >
               <div className="aspect-[16/9] w-full overflow-hidden">
-                <Image src={f.img} alt="" width={800} height={450} className="h-full w-full object-cover" />
+                <Image
+                  src={f.img}
+                  alt=""
+                  width={800}
+                  height={450}
+                  className="h-full w-full object-cover"
+                />
               </div>
               <CardContent className="px-5 py-4">
-                <h3 className="text-base font-semibold leading-tight">{f.title}</h3>
+                <h3 className="text-base font-semibold leading-tight">
+                  {f.title}
+                </h3>
                 <p className="text-sm text-muted-foreground mt-1">{f.desc}</p>
               </CardContent>
             </Card>
@@ -105,35 +141,51 @@ export default async function HomePage() {
       </section>
       <section className="container mx-auto max-w-6xl px-4 py-16">
         <h2 className="text-5xl font-bold mb-8 text-center">FAQ</h2>
-        <Accordion type="single" collapsible className="border rounded-md divide-y bg-card max-w-4xl mx-auto">
+        <Accordion
+          type="single"
+          collapsible
+          className="border rounded-md divide-y bg-card max-w-4xl mx-auto"
+        >
           <AccordionItem value="q1">
-            <AccordionTrigger className="px-4">Is Rootly free to use?</AccordionTrigger>
+            <AccordionTrigger className="px-4">
+              Is Rootly free to use?
+            </AccordionTrigger>
             <AccordionContent className="px-4">
-              Yes, Rootly is free for personal use. You own your data in your Supabase project.
+              Yes, Rootly is free for personal use. You own your data in your
+              Supabase project.
             </AccordionContent>
           </AccordionItem>
           <AccordionItem value="q2">
-            <AccordionTrigger className="px-4">How is my data protected?</AccordionTrigger>
+            <AccordionTrigger className="px-4">
+              How is my data protected?
+            </AccordionTrigger>
             <AccordionContent className="px-4">
-              Row Level Security (RLS) ensures only you can access your data. Each table is scoped by your user id.
+              Row Level Security (RLS) ensures only you can access your data.
+              Each table is scoped by your user id.
             </AccordionContent>
           </AccordionItem>
           <AccordionItem value="q3">
-            <AccordionTrigger className="px-4">Can I export my notes?</AccordionTrigger>
+            <AccordionTrigger className="px-4">
+              Can I export my notes?
+            </AccordionTrigger>
             <AccordionContent className="px-4">
-              Yes, export options are available from the Notes section to back up or migrate content.
+              Yes, export options are available from the Notes section to back
+              up or migrate content.
             </AccordionContent>
           </AccordionItem>
           <AccordionItem value="q4">
-            <AccordionTrigger className="px-4">Which sign-in methods are supported?</AccordionTrigger>
+            <AccordionTrigger className="px-4">
+              Which sign-in methods are supported?
+            </AccordionTrigger>
             <AccordionContent className="px-4">
-              Google and GitHub OAuth. Accounts are separate unless you explicitly link identities.
+              Google and GitHub OAuth. Accounts are separate unless you
+              explicitly link identities.
             </AccordionContent>
           </AccordionItem>
         </Accordion>
       </section>
-      
+
       <BackToTopButton />
     </div>
-  )
+  );
 }
