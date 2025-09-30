@@ -67,11 +67,7 @@ export default async function ReviewPage({ searchParams }: ReviewPageProps) {
             <h1 className="text-3xl font-bold tracking-tight">Practice Session</h1>
             <p className="text-muted-foreground">Quick quiz on your notes. Start anytime.</p>
           </div>
-          <div className="flex gap-2">
-            <Button variant="outline" asChild>
-              <Link href="/notes">Manage Notes</Link>
-            </Button>
-          </div>
+          <div />
         </div>
 
         {/* Quick Controls */}

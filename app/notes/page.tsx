@@ -1,11 +1,12 @@
 import { createClient } from "@/lib/supabase/server"
 import { NotesGrid } from "@/components/notes-grid"
 import { AddNoteDialog } from "@/components/add-note-dialog"
+import { AddCourseDialog } from "@/components/add-course-dialog"
 import { NotesFilters } from "@/components/notes-filters"
 import { ExportNotesButton } from "@/components/export-notes"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { EmptyState } from "@/components/empty-state"
-import { FileQuestion, Eye, EyeOff } from "lucide-react"
+import { FileQuestion, BookOpen, Eye, EyeOff } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import {
@@ -95,10 +96,18 @@ export default async function NotesPage({ searchParams }: NotesPageProps) {
           <div className="flex-1">
             <NotesFilters courses={courses || []} />
           </div>
-          <div className="flex items-center gap-2">
-            <AddNoteDialog courses={courses || []} />
-            <ToggleAnswersButton />
-            <ExportNotesButton notes={notes || []} />
+          <div className="flex flex-col sm:flex-row items-center gap-2 justify-center sm:justify-end">
+            <div className="w-full sm:w-auto">
+              {courses && courses.length > 0 ? (
+                <AddNoteDialog courses={courses} />
+              ) : (
+                <AddCourseDialog />
+              )}
+            </div>
+            <div className="flex items-center gap-2 w-full sm:w-auto justify-start sm:justify-end">
+              <ToggleAnswersButton />
+              <ExportNotesButton notes={notes || []} />
+            </div>
           </div>
         </div>
 
@@ -128,17 +137,31 @@ export default async function NotesPage({ searchParams }: NotesPageProps) {
           </>
         ) : (
           <EmptyState
-            title="No Notes Found"
+            title={courses && courses.length > 0 ? "No Notes Found" : "No Courses Yet"}
             description={
-              resolvedSearchParams.search ||
-              resolvedSearchParams.course ||
-              resolvedSearchParams.understanding ||
-              resolvedSearchParams.flagged
-                ? "Try adjusting your filters to see more notes."
-                : "Start by adding your first learning question."
+              courses && courses.length > 0
+                ? resolvedSearchParams.search ||
+                  resolvedSearchParams.course ||
+                  resolvedSearchParams.understanding ||
+                  resolvedSearchParams.flagged
+                  ? "Try adjusting your filters to see more notes."
+                  : "Start by adding your first learning question."
+                : "You need to create a course before you can add notes. Notes are organized by courses to help you track your learning progress."
             }
-            icon={<FileQuestion className="h-6 w-6 text-muted-foreground" />}
-            actionSlot={<AddNoteDialog courses={courses || []} />}
+            icon={
+              courses && courses.length > 0 ? (
+                <FileQuestion className="h-6 w-6 text-muted-foreground" />
+              ) : (
+                <BookOpen className="h-6 w-6 text-muted-foreground" />
+              )
+            }
+            actionSlot={
+              courses && courses.length > 0 ? (
+                <AddNoteDialog courses={courses} />
+              ) : (
+                <AddCourseDialog />
+              )
+            }
           />
         )}
       </div>
