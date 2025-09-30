@@ -1,12 +1,12 @@
 "use client"
 
-import { useEffect } from "react"
+import { Suspense, useEffect } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { GalleryVerticalEnd } from "lucide-react"
 import { LoginForm } from "@/components/login-form"
 import { supabase } from "@/lib/supabase/client"
 
-export default function LoginPage() {
+function LoginPageInner() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const next = searchParams.get("next") || "/dashboard"
@@ -32,6 +32,14 @@ export default function LoginPage() {
         <LoginForm />
       </div>
     </div>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="min-h-svh" />}> 
+      <LoginPageInner />
+    </Suspense>
   )
 }
 
