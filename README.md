@@ -8,44 +8,26 @@
   <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white" />
   <img alt="Tailwind CSS" src="https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white" />
   <img alt="Supabase" src="https://img.shields.io/badge/Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white" />
-  <img alt="Radix UI" src="https://img.shields.io/badge/Radix%20UI-161618?style=for-the-badge&logo=radixui&logoColor=white" />
-  <img alt="Recharts" src="https://img.shields.io/badge/Recharts-FF6384?style=for-the-badge" />
+  <img alt="Shadcn UI" src="https://img.shields.io/badge/Shadcn%20UI-161618?style=for-the-badge&logo=shadcnui&logoColor=white" />
 </p>
 
 <p align="center">
   <img alt="Node 18.18+" src="https://img.shields.io/badge/Node-18.18%2B-339933?style=for-the-badge&logo=nodedotjs&logoColor=white" />
   <img alt="pnpm 9+" src="https://img.shields.io/badge/pnpm-9%2B-F69220?style=for-the-badge&logo=pnpm&logoColor=white" />
-  <a href="https://vercel.com/new" target="_blank"><img alt="Deploy with Vercel" src="https://img.shields.io/badge/Deploy%20with-Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white" /></a>
+  <a href="https://vercel.com/new" target="_blank"><img alt="Deploy" src="https://img.shields.io/badge/Deploy%20-Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white" /></a>
 </p>
 
 <p align="center">
   <a href="https://rootly-notes.vercel.app/" target="_blank" rel="noopener noreferrer">
-    <img src="https://img.shields.io/badge/Live%20Demo-View%20ROOTLY-000000?style=for-the-badge&logo=vercel&logoColor=white" alt="Live Demo">
+    <img src="https://img.shields.io/badge/Live%20Demo-View%20ROOTLY-389bbe?style=for-the-badge&logo=vercel&logoColor=white" alt="Live Demo">
   </a>
 </p>
 
 ---
 
-## Table of Contents
-- [Overview](#overview)
-- [Features](#features)
-- [Tech Stack](#tech-stack)
-- [Prerequisites](#prerequisites)
-- [Quick Start](#quick-start)
-- [Environment & Sessions](#environment--sessions)
-- [Data Model](#data-model)
-- [Project Structure](#project-structure)
-- [Deployment](#deployment)
-- [Troubleshooting](#troubleshooting)
-- [Contributing](#contributing)
-- [Acknowledgements](#acknowledgements)
-- [License](#license)
-
----
-
 ## Overview
 
-Elegant, data-driven learning tracker built with Next.js and Supabase. Capture Q&A notes, organize by courses, log daily study time and mood, and practice with a quick review session — all in a sleek, responsive UI.
+The Local-only version of Rootly Notes where you can unlock editing with a password stored in .env file, you will still need a Supabase integration however you will be the only user. This is the first version of Rootly, at the moment the new version that has login with GitHub and Google is live, view it [here](https://github.com/mo0hamed-shoaib/rootly-notes-app) or navigate to feature/auth-multitenant branch.
 
 ---
 
@@ -67,16 +49,20 @@ Routes:
 | `/courses` | Course management |
 | `/daily` | Daily study and mood tracking |
 | `/review` | Practice session |
-| `/about`, `/how-it-works` | Informational pages |
+| `/about`, `/how-rootly-works` | Informational pages |
 
 ---
 
 ## 🧱 Tech Stack
 
-- **Frontend**: Next.js App Router (v15), React 19, TypeScript, Tailwind CSS v4, next-themes, Radix UI primitives, Lucide icons
-- **Charts**: Recharts
-- **Backend/data**: Supabase (PostgreSQL + Row Level Cookies for session management)
-- **Styling**: Tailwind + shadcn-inspired UI components in `components/ui`
+- **Framework:** Next.js 15 (App Router)
+- **UI:** React 19, TypeScript, Tailwind CSS v4
+- **Components:** Radix UI primitives, shadcn-inspired design system
+- **Charts:** Recharts
+- **Backend:** Supabase (PostgreSQL)
+- **Icons:** Lucide React
+- **Fonts:** Geist Sans/Mono
+- **Theming:** next-themes for dark/light mode
 
 ---
 
@@ -137,22 +123,6 @@ Visit `http://localhost:3000`.
 
 ---
 
-## 🔐 Environment & Sessions
-
-This project is single-user and does not require auth. Supabase is used purely as a database with the public anon key. A middleware is included to keep Supabase SSR cookies consistent.
-
-Environment variables:
-- `NEXT_PUBLIC_SUPABASE_URL`
-- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-- `NEXT_PUBLIC_SITE_URL` (optional)
-
-See:
-- `lib/supabase/client.ts`
-- `lib/supabase/server.ts`
-- `middleware.ts`
-
----
-
 ## 🗃️ Data Model
 
 Tables created by `scripts/01-create-tables.sql`:
@@ -183,19 +153,6 @@ Tables created by `scripts/01-create-tables.sql`:
   - `created_at`, `updated_at`
 
 Indexes are included for common filters and a trigger keeps `updated_at` fresh.
-
----
-
-## 📦 Scripts
-
-From `package.json`:
-
-```bash
-pnpm dev      # Start Next.js in dev mode
-pnpm build    # Production build
-pnpm start    # Start production server (after build)
-pnpm lint     # Next.js lint
-```
 
 ---
 
@@ -239,24 +196,6 @@ Key UI building blocks live in `components/ui/*` and are composed throughout pag
 
 ---
 
-## 🧩 Troubleshooting
-
-- Blank lists or zero stats: ensure you ran both SQL scripts in `scripts/`.
-- 401/keys errors: check `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` in `.env.local`.
-- Type or lint warnings: the project ignores type/lint errors during build to ease setup; fix as desired.
-
----
-
-## 🤝 Acknowledgements
-
-- UI components inspired by shadcn/ui patterns
-- Fonts: Geist
-- Icons: Lucide
-- Charts: Recharts
-- Data layer: Supabase
-
----
-
 ## 🤝 Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request. For major changes, please open an issue first to discuss what you would like to change.
@@ -269,18 +208,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📞 Support
 
-If you encounter any issues or have questions:
-
-1. Check the [Troubleshooting](#troubleshooting) section
-2. Search existing [Issues](https://github.com/yourusername/rootly-notes-app/issues) 
-3. Create a new issue with detailed information
-
-## 🧰 Maintainer Notes
-
-- No authentication is implemented by design (single-user). If you need multi-user auth, wire up Supabase Auth and row-level security policies, then gate routes in `middleware.ts`.
-- Consider replacing the anon key with a stricter service architecture if you deploy publicly.
+1. Search existing [Issues](https://github.com/mo0hamed-shoaib/rootly-notes-app/issues) 
+2. Create a [new issue](https://github.com/mo0hamed-shoaib/rootly-notes-app/issues/new/choose) with detailed information
 
 ---
 
 <p align="center">Made with ❤️ for learners everywhere</p>
-
