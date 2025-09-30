@@ -10,10 +10,10 @@ export function Footer() {
   return (
     <footer className="border-t">
       <div className="container mx-auto max-w-6xl px-4 py-6">
-        <div className="flex items-center justify-center gap-6 text-sm text-muted-foreground">
+        <div className="flex items-center justify-center gap-5 text-sm text-muted-foreground">
           <Link href="/how-rootly-works" className="hover:text-foreground transition-colors inline-flex items-center gap-1.5">
             <HelpCircle className="h-4 w-4" />
-            <span>How it Works</span>
+            <span>How Rootly Works</span>
           </Link>
           <a
             href={portfolioUrl}
