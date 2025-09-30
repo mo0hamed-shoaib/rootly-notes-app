@@ -37,19 +37,60 @@ create unique index if not exists daily_entries_user_date_unique
   on public.daily_entries (user_id, date);
 
 -- 4) Enable RLS
+alter table public.profiles enable row level security;
 alter table public.courses enable row level security;
 alter table public.notes enable row level security;
 alter table public.daily_entries enable row level security;
 
 -- 5) Policies: owner-only CRUD
+-- profiles
+drop policy if exists "read own profile" on public.profiles;
+create policy "read own profile" on public.profiles
+  for select using (id = auth.uid());
+
+drop policy if exists "update own profile" on public.profiles;
+create policy "update own profile" on public.profiles
+  for update using (id = auth.uid()) with check (id = auth.uid());
+
+drop policy if exists "insert own profile" on public.profiles;
+create policy "insert own profile" on public.profiles
+  for insert with check (id = auth.uid());
+
+-- courses
 drop policy if exists "own courses" on public.courses;
 create policy "own courses" on public.courses
   for all using (user_id = auth.uid()) with check (user_id = auth.uid());
 
+-- notes
 drop policy if exists "own notes" on public.notes;
 create policy "own notes" on public.notes
   for all using (user_id = auth.uid()) with check (user_id = auth.uid());
 
+-- daily_entries
 drop policy if exists "own daily_entries" on public.daily_entries;
 create policy "own daily_entries" on public.daily_entries
   for all using (user_id = auth.uid()) with check (user_id = auth.uid());
+
+-- 6) Signup trigger: create profile on new user
+create or replace function public.handle_new_user()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  insert into public.profiles (id, full_name, avatar_url)
+  values (
+    new.id,
+    coalesce((new.raw_user_meta_data->>'full_name'), (new.raw_user_meta_data->>'name'), (new.raw_user_meta_data->>'user_name')),
+    coalesce((new.raw_user_meta_data->>'avatar_url'), (new.raw_user_meta_data->>'picture'))
+  )
+  on conflict (id) do nothing;
+  return new;
+end;
+$$;
+
+drop trigger if exists on_auth_user_created on auth.users;
+create trigger on_auth_user_created
+  after insert on auth.users
+  for each row execute function public.handle_new_user();

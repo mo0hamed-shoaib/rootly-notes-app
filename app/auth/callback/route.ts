@@ -28,6 +28,20 @@ export async function GET(request: Request) {
 
     // Exchange the PKCE code for a session and set auth cookies on the response
     await supabase.auth.exchangeCodeForSession(code)
+
+    // Fallback: ensure a profile row exists for the authenticated user
+    const { data: userData } = await supabase.auth.getUser()
+    const user = userData?.user
+    if (user) {
+      const meta: any = user.user_metadata || {}
+      const fullName = meta.full_name || meta.name || meta.user_name || null
+      const avatarUrl = meta.avatar_url || meta.picture || null
+      // Upsert allowed by RLS policy: insert/update only when id = auth.uid()
+      await supabase.from("profiles").upsert(
+        { id: user.id, full_name: fullName, avatar_url: avatarUrl },
+        { onConflict: "id" }
+      )
+    }
   }
 
   return response
