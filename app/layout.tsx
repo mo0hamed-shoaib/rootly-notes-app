@@ -117,7 +117,7 @@ html {
                     className="block dark:hidden"
                     priority
                   />
-                  <span className="font-semibold tracking-tight text-lg md:text-xl">Rootly</span>
+                  <span className="font-semibold tracking-tight text-lg md:text-xl hidden sm:inline">Rootly</span>
                 </Link>
                 <Navigation />
               </div>
