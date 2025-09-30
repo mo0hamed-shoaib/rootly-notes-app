@@ -76,23 +76,25 @@ export function NotesFilters({ courses }: NotesFiltersProps) {
       </div>
 
       {/* Filters */}
-      <div className="flex flex-wrap gap-3">
+      <div className="grid grid-cols-1 sm:flex sm:flex-wrap gap-3">
         <Select value={currentCourse} onValueChange={(value) => updateFilter("course", value)}>
-          <SelectTrigger className="w-[200px] h-9">
+          <SelectTrigger className="w-full sm:w-[200px] h-9">
             <SelectValue placeholder="All courses" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="w-[calc(100vw-2rem)] max-w-[300px] sm:max-w-[300px]">
             <SelectItem value="all">All courses</SelectItem>
             {courses.map((course) => (
-              <SelectItem key={course.id} value={course.id}>
-                {course.title}
+              <SelectItem key={course.id} value={course.id} className="w-full">
+                <div className="truncate w-full text-left" title={course.title}>
+                  {course.title}
+                </div>
               </SelectItem>
             ))}
           </SelectContent>
         </Select>
 
         <Select value={currentUnderstanding} onValueChange={(value) => updateFilter("understanding", value)}>
-          <SelectTrigger className="w-[180px] h-9">
+          <SelectTrigger className="w-full sm:w-[180px] h-9">
             <SelectValue placeholder="Understanding level" />
           </SelectTrigger>
           <SelectContent>
@@ -106,7 +108,7 @@ export function NotesFilters({ courses }: NotesFiltersProps) {
         </Select>
 
         <Select value={currentFlagged} onValueChange={(value) => updateFilter("flagged", value)}>
-          <SelectTrigger className="w=[140px] h-9">
+          <SelectTrigger className="w-full sm:w-[140px] h-9">
             <SelectValue placeholder="All notes" />
           </SelectTrigger>
           <SelectContent>
@@ -116,7 +118,7 @@ export function NotesFilters({ courses }: NotesFiltersProps) {
         </Select>
 
         {hasActiveFilters && (
-          <Button variant="outline" size="sm" onClick={clearAllFilters} className="h-9 px-3">
+          <Button variant="outline" size="sm" onClick={clearAllFilters} className="w-full sm:w-auto h-9 px-3">
             <X className="h-4 w-4 mr-1" />
             Clear filters
           </Button>

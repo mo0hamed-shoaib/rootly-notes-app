@@ -121,6 +121,7 @@ export function AddCourseDialog() {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button
+          className="w-full sm:w-auto"
           onClick={(e) => {
             if (!open) {
               guardAction("add course", () => setOpen(true))

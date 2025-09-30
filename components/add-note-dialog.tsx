@@ -106,7 +106,7 @@ export function AddNoteDialog({ courses }: AddNoteDialogProps) {
             <TooltipTrigger asChild>
               <Button 
                 size="sm" 
-                className="h-9"
+                className="h-9 w-full sm:w-auto"
                 onClick={(e) => {
                   if (!open) {
                     guardAction("add note", () => setOpen(true))
@@ -142,10 +142,12 @@ export function AddNoteDialog({ courses }: AddNoteDialogProps) {
                         <SelectValue placeholder="Select a course" />
                       </SelectTrigger>
                     </FormControl>
-                    <SelectContent>
+                    <SelectContent className="w-[calc(100vw-2rem)] max-w-[400px] sm:max-w-[400px]">
                       {courses.map((course) => (
-                        <SelectItem key={course.id} value={course.id}>
-                          {course.title} - {course.instructor}
+                        <SelectItem key={course.id} value={course.id} className="w-full">
+                          <div className="truncate w-full text-left" title={`${course.title} - ${course.instructor}`}>
+                            {course.title} - {course.instructor}
+                          </div>
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -230,7 +232,7 @@ export function AddNoteDialog({ courses }: AddNoteDialogProps) {
               </AccordionItem>
             </Accordion>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <FormField
                 control={form.control}
                 name="understanding_level"
