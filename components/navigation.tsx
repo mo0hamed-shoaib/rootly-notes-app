@@ -76,22 +76,11 @@ export function Navigation() {
               asChild
               variant={isActive ? "default" : "ghost"}
               size="sm"
-              className={cn(
-                "group flex items-center px-3 py-2",
-                isActive && "bg-primary text-primary-foreground"
-              )}
+              className={cn("flex items-center gap-2 px-3 py-2", isActive && "bg-primary text-primary-foreground")}
             >
               <Link href={item.href}>
                 <Icon className="h-4 w-4" />
-                <span
-                  className={cn(
-                    "ml-0 max-w-0 opacity-0 overflow-hidden whitespace-nowrap transition-all duration-500 ease-out",
-                    "group-hover:ml-2 group-hover:max-w-[140px] group-hover:opacity-100",
-                    "[@media(min-width:745px)]:ml-2 [@media(min-width:745px)]:max-w-none [@media(min-width:745px)]:opacity-100"
-                  )}
-                >
-                  {item.name}
-                </span>
+                <span className="hidden [@media(min-width:745px)]:inline">{item.name}</span>
               </Link>
             </Button>
           )
