@@ -2,9 +2,16 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import Link from "next/link"
 import { createClient } from "@/lib/supabase/server"
-import Image from "next/image"
 import { Quote } from "lucide-react"
 import { BackToTopButton } from "@/components/back-to-top-button"
+import {
+  CoursesPreview,
+  NotesPreview,
+  DailyPreview,
+  ReviewPreview,
+  ChartsPreview,
+  ThemesPreview,
+} from "@/components/feature-previews"
 
 export default async function HomePage() {
   const supabase = await createClient()
@@ -84,32 +91,32 @@ export default async function HomePage() {
             {
               title: "Q&A Notes",
               desc: "Capture questions and answers per course",
-              img: "/features/notes-scrn.png",
+              preview: <NotesPreview />,
             },
             {
               title: "Daily Tracking",
               desc: "Log study time and mood over time",
-              img: "/features/daily-scrn.png",
+              preview: <DailyPreview />,
             },
             {
               title: "Quick Review",
               desc: "Practice with random notes",
-              img: "/features/review-scrn.png",
+              preview: <ReviewPreview />,
             },
             {
               title: "Courses Tracking",
               desc: "Organize learning paths and monitor course progress",
-              img: "/features/courses-scrn.png",
+              preview: <CoursesPreview />,
             },
             {
               title: "Themes & Accents",
               desc: "Light/Dark modes with customizable accent colors",
-              img: "/features/themes-scrn.png",
+              preview: <ThemesPreview />,
             },
             {
               title: "Stats & Charts",
               desc: "Understand trends with visual charts and summaries",
-              img: "/features/chart-scrn.png",
+              preview: <ChartsPreview />,
             },
           ].map((f) => (
             <Card
@@ -121,14 +128,10 @@ export default async function HomePage() {
               before:opacity-0 before:transition-opacity before:duration-500 
               group-hover:before:opacity-100"
             >
-              <div className="aspect-[16/9] w-full overflow-hidden">
-                <Image
-                  src={f.img}
-                  alt=""
-                  width={800}
-                  height={450}
-                  className="h-full w-full object-cover"
-                />
+              <div className="aspect-[16/9] w-full overflow-hidden bg-muted/30 flex items-center [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+                <div className="w-full h-full overflow-hidden [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+                  {f.preview}
+                </div>
               </div>
               <CardContent className="px-5 py-4">
                 <h3 className="text-base font-semibold leading-tight">
