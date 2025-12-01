@@ -55,31 +55,19 @@ export function StorageModeProvider({ children }: { children: ReactNode }) {
     async function initialize() {
       // Add a delay to ensure session cookies are available after OAuth redirect
       // This helps with the race condition where session might not be immediately available
-      await new Promise((resolve) => setTimeout(resolve, 500))
+      await new Promise((resolve) => setTimeout(resolve, 300))
       
-      // Check session multiple times to ensure it's established
-      let attempts = 0
-      let currentMode: StorageMode | null = null
-      while (attempts < 3 && !currentMode) {
-        currentMode = await getStorageMode()
-        if (!currentMode || currentMode === "localStorage") {
-          // Double-check authentication status
-          const { supabase } = await import("@/lib/supabase/client")
-          const { data: { user } } = await supabase.auth.getUser()
-          if (user) {
-            currentMode = "supabase"
-            break
-          }
-        }
-        if (!currentMode || currentMode === "localStorage") {
-          attempts++
-          if (attempts < 3) {
-            await new Promise((resolve) => setTimeout(resolve, 200))
-          }
-        }
-      }
+      // Check authentication status directly first
+      const { supabase } = await import("@/lib/supabase/client")
+      const { data: { user }, error: userError } = await supabase.auth.getUser()
       
-      if (!currentMode) {
+      let currentMode: StorageMode
+      
+      // If we have a user and no error, we're authenticated
+      if (user && !userError) {
+        currentMode = "supabase"
+      } else {
+        // Not authenticated, check storage mode (will default to localStorage)
         currentMode = await getStorageMode()
       }
       

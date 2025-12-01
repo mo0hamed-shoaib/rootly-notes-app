@@ -23,11 +23,14 @@ export function useCourses() {
     try {
       setIsLoading(true)
       // Wait for storage mode to be determined
-      if (storageModeLoading || !storageMode) {
+      if (storageModeLoading) {
         return
       }
+      
+      // If storage mode is not set yet, try to determine it
+      const mode = storageMode || await getStorageMode()
 
-      if (storageMode === "localStorage") {
+      if (mode === "localStorage") {
         const data = localStorage.getCourses()
         setCourses(data)
       } else {
@@ -48,7 +51,7 @@ export function useCourses() {
 
   useEffect(() => {
     // Don't fetch if storage mode is still loading
-    if (storageModeLoading || !storageMode) {
+    if (storageModeLoading) {
       return
     }
 
@@ -98,11 +101,14 @@ export function useNotes(filters?: NoteFilters) {
     try {
       setIsLoading(true)
       // Wait for storage mode to be determined
-      if (storageModeLoading || !storageMode) {
+      if (storageModeLoading) {
         return
       }
+      
+      // If storage mode is not set yet, try to determine it
+      const mode = storageMode || await getStorageMode()
 
-      if (storageMode === "localStorage") {
+      if (mode === "localStorage") {
         let data = localStorage.getNotes()
 
         // Apply filters
@@ -133,7 +139,7 @@ export function useNotes(filters?: NoteFilters) {
         }))
 
         setNotes(data)
-      } else if (storageMode === "supabase") {
+      } else {
         let query = supabase
           .from("notes")
           .select(
@@ -176,7 +182,7 @@ export function useNotes(filters?: NoteFilters) {
 
   useEffect(() => {
     // Don't fetch if storage mode is still loading
-    if (storageModeLoading || !storageMode) {
+    if (storageModeLoading) {
       return
     }
 
@@ -219,14 +225,17 @@ export function useDailyEntries() {
     try {
       setIsLoading(true)
       // Wait for storage mode to be determined
-      if (storageModeLoading || !storageMode) {
+      if (storageModeLoading) {
         return
       }
+      
+      // If storage mode is not set yet, try to determine it
+      const mode = storageMode || await getStorageMode()
 
-      if (storageMode === "localStorage") {
+      if (mode === "localStorage") {
         const data = localStorage.getDailyEntries()
         setEntries(data)
-      } else if (storageMode === "supabase") {
+      } else {
         const { data, error: supabaseError } = await supabase
           .from("daily_entries")
           .select("*")
@@ -247,7 +256,7 @@ export function useDailyEntries() {
 
   useEffect(() => {
     // Don't fetch if storage mode is still loading
-    if (storageModeLoading || !storageMode) {
+    if (storageModeLoading) {
       return
     }
 
