@@ -688,3 +688,15 @@ html:is(.red, .orange, .yellow, .green, .blue, .violet)
 .animate-marquee-right:hover {
   animation-play-state: paused;
 }
+
+/* Fade in up animation for answer reveal */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

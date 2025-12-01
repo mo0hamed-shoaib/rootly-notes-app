@@ -231,7 +231,7 @@ export function ReviewPreview() {
       {/* Question */}
       <div className="flex-shrink-0">
         <h3 
-          className={`text-sm font-semibold leading-tight transition-opacity duration-300 ${
+          className={`text-sm font-semibold leading-tight transition-opacity duration-500 ease-in-out ${
             isTransitioning ? "opacity-0" : "opacity-100"
           }`}
         >
@@ -244,8 +244,8 @@ export function ReviewPreview() {
         <Button 
           variant={showAnswer ? "secondary" : "outline"} 
           size="sm" 
-          className={`h-7 px-3 text-[10px] pointer-events-none transition-all duration-300 ${
-            showAnswer ? "opacity-70" : ""
+          className={`h-7 px-3 text-[10px] pointer-events-none transition-all duration-500 ease-in-out ${
+            isTransitioning ? "opacity-0" : showAnswer ? "opacity-70" : "opacity-100"
           }`}
         >
           {showAnswer ? (
@@ -265,11 +265,22 @@ export function ReviewPreview() {
       {/* Answer */}
       <div className="flex-1 min-h-0 overflow-hidden">
         {!showAnswer ? (
-          <div className="bg-muted/30 p-3 rounded-md text-center text-[10px] text-muted-foreground flex items-center justify-center h-full">
+          <div 
+            className={`bg-muted/30 p-3 rounded-md text-center text-[10px] text-muted-foreground flex items-center justify-center h-full transition-all duration-500 ease-in-out ${
+              isTransitioning ? "opacity-0" : "opacity-100"
+            }`}
+          >
             Click "Show Answer" to reveal
           </div>
         ) : (
-          <div className="bg-muted/50 p-3 rounded-md text-[10px] text-foreground leading-relaxed overflow-y-auto break-words whitespace-normal h-full">
+          <div 
+            className={`bg-muted/50 p-3 rounded-md text-[10px] text-foreground leading-relaxed overflow-y-auto break-words whitespace-normal h-full transition-all duration-500 ease-in-out ${
+              isTransitioning ? "opacity-0 scale-95" : "opacity-100 scale-100"
+            }`}
+            style={{
+              animation: showAnswer && !isTransitioning ? "fadeInUp 0.5s ease-out" : "none"
+            }}
+          >
             {note.answer}
           </div>
         )}
