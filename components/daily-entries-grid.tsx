@@ -57,7 +57,7 @@ export function DailyEntriesGrid({ entries }: DailyEntriesGridProps) {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => guardAction("edit daily entry", () => { setEditingEntry(entry); setIsEditOpen(true) })}
+                          onClick={() => guardAction("edit daily tracking", () => { setEditingEntry(entry); setIsEditOpen(true) })}
                           className="h-8 w-8 p-0"
                           aria-label="Edit entry"
                         >
@@ -72,7 +72,7 @@ export function DailyEntriesGrid({ entries }: DailyEntriesGridProps) {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => guardAction("delete daily entry", () => { setDeletingEntry(entry); setIsDeleteOpen(true) })}
+                          onClick={() => guardAction("delete daily tracking", () => { setDeletingEntry(entry); setIsDeleteOpen(true) })}
                           className="h-8 w-8 p-0 text-destructive hover:text-destructive"
                           aria-label="Delete entry"
                         >

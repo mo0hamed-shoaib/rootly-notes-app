@@ -33,7 +33,7 @@ export function DeleteDailyEntryDialog({ entry, open, onOpenChange }: DeleteDail
       onOpenChange(false)
     } catch (error) {
       // Error is handled by the mutation hook
-      console.error("Error deleting daily entry:", error)
+      console.error("Error deleting daily tracking:", error)
     } finally {
       setIsDeleting(false)
     }
@@ -45,10 +45,10 @@ export function DeleteDailyEntryDialog({ entry, open, onOpenChange }: DeleteDail
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <AlertTriangle className="h-5 w-5 text-destructive" />
-            Delete Daily Entry
+            Delete Daily Tracking
           </DialogTitle>
           <DialogDescription>
-            Are you sure you want to delete this daily entry? This action cannot be undone.
+            Are you sure you want to delete this daily tracking? This action cannot be undone.
           </DialogDescription>
         </DialogHeader>
 

@@ -78,7 +78,7 @@ function DailyPageContent() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">Daily Entries</h1>
+            <h1 className="text-3xl font-bold tracking-tight">Daily Tracking</h1>
             <p className="text-muted-foreground">Track your daily study progress and mood</p>
           </div>
           <div />
@@ -91,7 +91,7 @@ function DailyPageContent() {
           </div>
         </div>
 
-        {/* Daily Entries Grid */}
+        {/* Daily Tracking Grid */}
         {paginatedEntries.length > 0 ? (
           <>
             <DailyEntriesGrid entries={paginatedEntries} />
@@ -117,7 +117,7 @@ function DailyPageContent() {
           </>
         ) : (
           <EmptyState
-            title="No Daily Entries Found"
+            title="No Daily Tracking Found"
             description="Start tracking your daily study progress and mood."
             icon={<CalendarX className="h-6 w-6 text-muted-foreground" />}
             actionSlot={<AddDailyEntryDialog />}

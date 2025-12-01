@@ -105,10 +105,10 @@ export async function migrateLocalStorageToSupabase(): Promise<{ success: boolea
             .eq("date", entry.date)
 
           if (updateError) {
-            console.error("Error updating daily entry:", updateError)
+            console.error("Error updating daily tracking:", updateError)
           }
         } else {
-          console.error("Error migrating daily entry:", error)
+          console.error("Error migrating daily tracking:", error)
         }
       }
     }

@@ -53,7 +53,7 @@ Rootly Notes is a multi-tenant learning tracker that helps you capture knowledge
 | `/overview` | Authenticated overview with charts |
 | `/notes` | Notes grid, filters, export |
 | `/courses` | Course management |
-| `/daily` | Daily study and mood tracking |
+| `/daily-tracking` | Daily study and mood tracking |
 | `/review` | Practice session |
 | `/about`, `/how-it-works` | Informational pages |
 

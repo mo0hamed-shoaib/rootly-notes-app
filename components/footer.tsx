@@ -11,7 +11,7 @@ export function Footer() {
     { name: "Overview", href: "/overview" },
     { name: "Notes", href: "/notes" },
     { name: "Courses", href: "/courses" },
-    { name: "Daily Entry", href: "/daily" },
+    { name: "Daily Tracking", href: "/daily-tracking" },
     { name: "Review", href: "/review" },
   ]
 

@@ -15,7 +15,7 @@ import { AlertTriangle } from "lucide-react"
 import { useStorageMode } from "./storage-mode-provider"
 
 const WARNING_DISMISSED_KEY = "rootly_local_storage_warning_dismissed"
-const PAGES_TO_SHOW_WARNING = ["/notes", "/courses", "/daily", "/review", "/overview"]
+const PAGES_TO_SHOW_WARNING = ["/notes", "/courses", "/daily-tracking", "/review", "/overview"]
 
 export function LocalStorageWarning() {
   const pathname = usePathname()

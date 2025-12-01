@@ -85,7 +85,7 @@ export function EditDailyEntryDialog({ entry, open, onOpenChange }: EditDailyEnt
       onOpenChange(false)
     } catch (error) {
       // Error is handled by the mutation hook
-      console.error("Error updating daily entry:", error)
+      console.error("Error updating daily tracking:", error)
     } finally {
       setIsSubmitting(false)
     }
@@ -95,7 +95,7 @@ export function EditDailyEntryDialog({ entry, open, onOpenChange }: EditDailyEnt
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>Edit Daily Entry</DialogTitle>
+          <DialogTitle>Edit Daily Tracking</DialogTitle>
           <DialogDescription>Update your daily study progress and mood.</DialogDescription>
         </DialogHeader>
 

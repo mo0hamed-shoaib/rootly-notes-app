@@ -176,16 +176,16 @@ export function useDailyEntryMutations() {
 
         if (mode === "localStorage") {
           localStorage.saveDailyEntry(entry)
-          toast.success("Daily entry saved")
+          toast.success("Daily tracking saved")
           router.refresh()
           return
         }
 
         await serverActions.createDailyEntryServer(entry)
-        toast.success("Daily entry saved")
+        toast.success("Daily tracking saved")
         router.refresh()
       } catch (error) {
-        toast.error(error instanceof Error ? error.message : "Failed to save daily entry")
+        toast.error(error instanceof Error ? error.message : "Failed to save daily tracking")
         throw error
       }
     },
@@ -199,16 +199,16 @@ export function useDailyEntryMutations() {
 
         if (mode === "localStorage") {
           localStorage.updateDailyEntry(id, updates)
-          toast.success("Daily entry updated")
+          toast.success("Daily tracking updated")
           router.refresh()
           return
         }
 
         await serverActions.updateDailyEntryServer(id, updates)
-        toast.success("Daily entry updated")
+        toast.success("Daily tracking updated")
         router.refresh()
       } catch (error) {
-        toast.error(error instanceof Error ? error.message : "Failed to update daily entry")
+        toast.error(error instanceof Error ? error.message : "Failed to update daily tracking")
         throw error
       }
     },
@@ -222,16 +222,16 @@ export function useDailyEntryMutations() {
 
         if (mode === "localStorage") {
           localStorage.deleteDailyEntry(id)
-          toast.success("Daily entry deleted")
+          toast.success("Daily tracking deleted")
           router.refresh()
           return
         }
 
         await serverActions.deleteDailyEntryServer(id)
-        toast.success("Daily entry deleted")
+        toast.success("Daily tracking deleted")
         router.refresh()
       } catch (error) {
-        toast.error(error instanceof Error ? error.message : "Failed to delete daily entry")
+        toast.error(error instanceof Error ? error.message : "Failed to delete daily tracking")
         throw error
       }
     },

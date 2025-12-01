@@ -80,7 +80,7 @@ export function AddDailyEntryDialog() {
       setOpen(false)
     } catch (error) {
       // Error is handled by the mutation hook
-      console.error("Error adding daily entry:", error)
+      console.error("Error adding daily tracking:", error)
     } finally {
       setIsSubmitting(false)
     }
@@ -93,18 +93,18 @@ export function AddDailyEntryDialog() {
           className="w-full sm:w-auto"
           onClick={(e) => {
             if (!open) {
-              guardAction("add daily entry", () => setOpen(true))
+              guardAction("add daily tracking", () => setOpen(true))
               e.preventDefault()
             }
           }}
         >
           <Plus className="h-4 w-4 mr-2" />
-          Add Daily Entry
+          Add Daily Tracking
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>Add Daily Entry</DialogTitle>
+          <DialogTitle>Add Daily Tracking</DialogTitle>
           <DialogDescription>Record your daily study progress and mood.</DialogDescription>
         </DialogHeader>
 
