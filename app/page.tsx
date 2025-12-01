@@ -21,7 +21,7 @@ export default async function HomePage() {
           Master your learning journey
         </h1>
         <p className="text-xl text-muted-foreground mt-6 max-w-2xl mx-auto">
-          Capture questions, track progress, and stay consistent — Rootly turns
+          Add notes as question-answer pairs, add daily study sessions and mood, and stay consistent with charts that helps you move forward. Rootly turns
           your study sessions into measurable growth.
         </p>
         <div className="mt-8 flex gap-4 justify-center">
@@ -55,22 +55,23 @@ export default async function HomePage() {
         </h2>
         <div className="max-w-4xl mx-auto">
           <p className="text-lg text-muted-foreground text-center mb-12 leading-relaxed">
-            Learning is not just about consuming information—it's about building
-            a sustainable system that grows with you. Rootly believes in the
-            power of consistent, structured learning that transforms knowledge
-            into lasting understanding.
+            Learning is about building a sustainable system that grows with you. It's much more than just consuming information. Rootly believes in the power of consistent, structured learning that transforms knowledge into lasting understanding.
           </p>
           <Card className="bg-muted/50 border-0 shadow-lg">
-            <CardContent className="p-8 text-center">
-              <Quote className="h-8 w-8 mx-auto mb-4 text-primary" />
-              <blockquote className="text-xl font-medium italic leading-relaxed mb-4">
-                "The expert in anything was once a beginner. The key is not to
-                know everything, but to build a system that helps you learn
-                consistently."
-              </blockquote>
-              <cite className="text-sm text-muted-foreground">
-                — Rootly Learning Philosophy
-              </cite>
+            <CardContent className="p-6">
+              <div className="flex gap-4">
+                <Quote className="h-6 w-6 text-primary flex-shrink-0 mt-1" />
+                <div className="flex-1">
+                  <blockquote className="text-lg font-medium italic leading-relaxed mb-2">
+                    "The expert in anything was once a beginner. The key is not to
+                    know everything, but to build a system that helps you learn
+                    consistently."
+                  </blockquote>
+                  <cite className="text-sm text-muted-foreground">
+                    Rootly Learning Philosophy
+                  </cite>
+                </div>
+              </div>
             </CardContent>
           </Card>
         </div>
