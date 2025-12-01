@@ -5,7 +5,7 @@ import { cookies as nextCookies } from "next/headers"
 export async function GET(request: Request) {
   const url = new URL(request.url)
   const code = url.searchParams.get("code")
-  const next = url.searchParams.get("next") || "/dashboard"
+  const next = url.searchParams.get("next") || "/overview"
 
   let response = NextResponse.redirect(new URL(next, url.origin))
 

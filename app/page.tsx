@@ -27,14 +27,14 @@ export default async function HomePage() {
         <div className="mt-8 flex gap-4 justify-center">
           {hasSession ? (
             <Link
-              href="/dashboard"
+              href="/overview"
               className="bg-primary text-primary-foreground inline-flex items-center rounded-md px-6 py-3 text-sm font-medium hover:bg-primary/90"
             >
-              Dashboard
+              Overview
             </Link>
           ) : (
             <Link
-              href="/login?next=%2Fdashboard"
+              href="/login?next=%2Foverview"
               className="bg-primary text-primary-foreground inline-flex items-center rounded-md px-6 py-3 text-sm font-medium hover:bg-primary/90"
             >
               Get started

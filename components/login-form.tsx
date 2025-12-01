@@ -12,7 +12,7 @@ import { useState } from "react"
 
 export function LoginForm({ className, ...props }: React.ComponentProps<"div">) {
   const searchParams = useSearchParams()
-  const next = searchParams.get("next") || "/dashboard"
+  const next = searchParams.get("next") || "/overview"
   const [loadingProvider, setLoadingProvider] = useState<"github" | "google" | null>(null)
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>

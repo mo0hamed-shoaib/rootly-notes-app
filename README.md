@@ -36,7 +36,7 @@ Rootly Notes is a multi-tenant learning tracker that helps you capture knowledge
 - **Public Landing Page** – SaaS-style hero with features, FAQ, and subtle geometric background
 - **OAuth Authentication** – Sign in with Google or GitHub via Supabase
 - **Protected Routes** – All app routes secured with middleware; redirects to login if unauthenticated
-- **Dashboard** – Visual charts for understanding levels, study time, mood, and course progress (last 30 days)
+- **Overview** – Visual charts for understanding levels, study time, mood, and course progress (last 30 days)
 - **Notes Management** – Create Q&A notes with code snippets, filter by course/understanding, flag important items, export to JSON/CSV
 - **Course Tracking** – Organize courses with instructors, links, and topics; view note counts per course
 - **Daily Logging** – Track study time and mood with optional notes
@@ -50,7 +50,7 @@ Rootly Notes is a multi-tenant learning tracker that helps you capture knowledge
 | `/` | Public landing page |
 | `/login` | Sign-in with Google/GitHub |
 | `/auth/callback` | Supabase OAuth callback (server) |
-| `/dashboard` | Authenticated overview with charts |
+| `/overview` | Authenticated overview with charts |
 | `/notes` | Notes grid, filters, export |
 | `/courses` | Course management |
 | `/daily` | Daily study and mood tracking |

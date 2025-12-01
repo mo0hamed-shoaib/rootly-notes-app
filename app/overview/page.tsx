@@ -6,7 +6,7 @@ import { MoodChart } from "@/components/mood-chart"
 import { CourseProgressChart } from "@/components/course-progress-chart"
 import { BookOpen, Brain, Calendar, TrendingUp, Target, BarChart3 } from "lucide-react"
 
-export default async function DashboardPage() {
+export default async function OverviewPage() {
   const supabase = await createClient()
 
   // Get basic stats
@@ -186,3 +186,4 @@ export default async function DashboardPage() {
     </div>
   )
 }
+

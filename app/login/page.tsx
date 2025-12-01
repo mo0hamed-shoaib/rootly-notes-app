@@ -9,7 +9,7 @@ import { supabase } from "@/lib/supabase/client"
 function LoginPageInner() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const next = searchParams.get("next") || "/dashboard"
+  const next = searchParams.get("next") || "/overview"
 
   useEffect(() => {
     let mounted = true

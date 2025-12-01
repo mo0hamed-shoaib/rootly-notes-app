@@ -10,7 +10,7 @@ import { AuthAvatar } from "@/components/auth-avatar"
 import { Drawer, DrawerContent, DrawerTrigger, DrawerHeader, DrawerTitle } from "@/components/ui/drawer"
 
 const navigation = [
-  { name: "Dashboard", href: "/dashboard", icon: BarChart3 },
+  { name: "Overview", href: "/overview", icon: BarChart3 },
   { name: "Notes", href: "/notes", icon: BookOpen },
   { name: "Courses", href: "/courses", icon: PlusCircle },
   { name: "Daily Entry", href: "/daily", icon: Calendar },
