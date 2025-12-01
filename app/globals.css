@@ -667,6 +667,15 @@ html:is(.red, .orange, .yellow, .green, .blue, .violet)
   }
 }
 
+@keyframes marquee-down {
+  0% {
+    transform: translateY(-33.333%);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
 @keyframes marquee-right {
   0% {
     transform: translateX(0);
@@ -680,11 +689,16 @@ html:is(.red, .orange, .yellow, .green, .blue, .violet)
   animation: marquee-up 25s linear infinite;
 }
 
+.animate-marquee-down {
+  animation: marquee-down 25s linear infinite;
+}
+
 .animate-marquee-right {
   animation: marquee-right 10s linear infinite;
 }
 
 .animate-marquee-up:hover,
+.animate-marquee-down:hover,
 .animate-marquee-right:hover {
   animation-play-state: paused;
 }
@@ -713,4 +727,95 @@ html:is(.red, .orange, .yellow, .green, .blue, .violet)
 
 .animate-fade-in {
   animation: fadeIn 1s ease-out;
+}
+
+/* Bounce in animations from different directions */
+@keyframes bounceInFromTop {
+  0% {
+    opacity: 0;
+    transform: translateY(-30px) scale(0.8);
+  }
+  60% {
+    opacity: 1;
+    transform: translateY(5px) scale(1.05);
+  }
+  100% {
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes bounceInFromRight {
+  0% {
+    opacity: 0;
+    transform: translateX(30px) scale(0.8);
+  }
+  60% {
+    opacity: 1;
+    transform: translateX(-5px) scale(1.05);
+  }
+  100% {
+    transform: translateX(0) scale(1);
+  }
+}
+
+@keyframes bounceInFromBottom {
+  0% {
+    opacity: 0;
+    transform: translateY(30px) scale(0.8);
+  }
+  60% {
+    opacity: 1;
+    transform: translateY(-5px) scale(1.05);
+  }
+  100% {
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes bounceInFromLeft {
+  0% {
+    opacity: 0;
+    transform: translateX(-30px) scale(0.8);
+  }
+  60% {
+    opacity: 1;
+    transform: translateX(5px) scale(1.05);
+  }
+  100% {
+    transform: translateX(0) scale(1);
+  }
+}
+
+.animate-bounce-in-top {
+  animation: bounceInFromTop 0.6s ease-out;
+}
+
+.animate-bounce-in-right {
+  animation: bounceInFromRight 0.6s ease-out;
+}
+
+.animate-bounce-in-bottom {
+  animation: bounceInFromBottom 0.6s ease-out;
+}
+
+.animate-bounce-in-left {
+  animation: bounceInFromLeft 0.6s ease-out;
+}
+
+/* Slide along animation for timeline */
+@keyframes slideAlong {
+  0% {
+    transform: translateX(0) translateY(-50%);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(24px) translateY(-50%);
+    opacity: 0;
+  }
 }

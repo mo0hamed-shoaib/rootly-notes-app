@@ -142,44 +142,117 @@ export function NotesPreview() {
 }
 
 export function DailyPreview() {
-  // Get all daily entries for better marquee effect
-  const allEntries = getSeedDailyEntries().map((entry, idx) => ({
+  const [highlightedIndex, setHighlightedIndex] = useState(0)
+
+  const moodEmojis: Record<number, string> = {
+    1: "😢",
+    2: "😕",
+    3: "😐",
+    4: "😊",
+    5: "😄",
+  }
+
+  const allEntries = getSeedDailyEntries().slice(0, 4).map((entry, idx) => ({
     ...entry,
     id: `preview-entry-${idx}`,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
+    emoji: moodEmojis[entry.mood] || "😐",
   }))
-  // Duplicate for seamless loop
-  const duplicatedEntries = [...allEntries, ...allEntries, ...allEntries]
-  
+
+  // Highlight entries in sequence
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setHighlightedIndex((prev) => (prev + 1) % allEntries.length)
+    }, 2000) // Change every 2 seconds
+
+    return () => clearInterval(interval)
+  }, [allEntries.length])
+
   return (
-    <div className="px-3 py-0.5 pointer-events-none h-full overflow-hidden relative [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-      <div className="animate-marquee-up space-y-1.5">
-        {duplicatedEntries.map((entry, idx) => (
-          <Card key={`${entry.id}-${idx}`} className="border shadow-sm">
-            <CardHeader className="pb-1 pt-1.5 px-2.5">
-              <div className="flex items-start justify-between gap-4">
-                <div className="flex-1">
-                  <h2 className="flex items-center gap-1.5 text-xs font-semibold mb-0.5">
-                    <Calendar className="h-3 w-3" />
-                    {new Date(entry.date).toLocaleDateString("en-US", {
-                      month: "short",
-                      day: "numeric",
-                    })}
-                  </h2>
-                  <div className="flex items-center gap-2 mb-0.5">
-                    <div className="flex items-center gap-1 text-[10px]">
-                      <Clock className="h-3 w-3 text-muted-foreground" />
-                      <span>{formatStudyTime(entry.study_time)}</span>
-                    </div>
-                    <MoodIndicator mood={entry.mood} />
+    <div className="px-4 py-3 pointer-events-none h-full w-full flex items-center justify-center overflow-hidden [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+      <div className="relative w-full h-full flex items-center justify-center">
+        {/* Timeline with connected mood emojis */}
+        <div className="flex items-center gap-2 relative">
+          {allEntries.map((entry, idx) => {
+            const isHighlighted = idx === highlightedIndex
+            const date = new Date(entry.date)
+            const day = date.getDate()
+            const month = date.toLocaleDateString("en-US", { month: "short" })
+            
+            return (
+              <div key={entry.id} className="flex items-center">
+                {/* Entry node */}
+                <div className="flex flex-col items-center gap-1.5 relative z-10">
+                  {/* Date */}
+                  <div 
+                    className={`text-xs font-semibold text-muted-foreground transition-all duration-500 ${
+                      isHighlighted ? "scale-110 text-foreground" : ""
+                    }`}
+                  >
+                    {day}
                   </div>
-                  <p className="text-[10px] text-muted-foreground line-clamp-1 leading-relaxed">{entry.notes}</p>
+                  {/* Mood emoji */}
+                  <div 
+                    className={`text-2xl transition-all duration-500 ${
+                      isHighlighted 
+                        ? "scale-125 drop-shadow-lg" 
+                        : "scale-100 opacity-70"
+                    }`}
+                    style={{
+                      filter: isHighlighted ? "brightness(1.2)" : "brightness(1)",
+                    }}
+                  >
+                    {entry.emoji}
+                  </div>
+                  {/* Study time indicator */}
+                  <div 
+                    className={`text-[10px] font-medium text-muted-foreground transition-all duration-500 ${
+                      isHighlighted ? "opacity-100 text-foreground" : "opacity-60"
+                    }`}
+                  >
+                    {formatStudyTime(entry.study_time)}
+                  </div>
                 </div>
+                
+                {/* Connecting line */}
+                {idx < allEntries.length - 1 && (
+                  <div className="relative mx-1">
+                    <svg 
+                      width="24" 
+                      height="2" 
+                      className="overflow-visible"
+                    >
+                      <line
+                        x1="0"
+                        y1="1"
+                        x2="24"
+                        y2="1"
+                        stroke="currentColor"
+                        strokeWidth="1.5"
+                        strokeDasharray="3 2"
+                        className={`text-muted-foreground transition-all duration-500 ${
+                          isHighlighted && (idx === highlightedIndex || idx === highlightedIndex - 1)
+                            ? "opacity-100 animate-pulse"
+                            : "opacity-40"
+                        }`}
+                      />
+                    </svg>
+                    {/* Animated dot moving along the line */}
+                    {isHighlighted && idx === highlightedIndex - 1 && (
+                      <div 
+                        className="absolute top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-primary animate-slide-along"
+                        style={{
+                          animation: "slideAlong 2s ease-in-out infinite",
+                        }}
+                      />
+                    )}
+                  </div>
+                )}
               </div>
-            </CardHeader>
-          </Card>
-        ))}
+            )
+          })}
+        </div>
       </div>
     </div>
   )
