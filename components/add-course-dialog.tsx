@@ -17,10 +17,9 @@ import {
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
-import { supabase } from "@/lib/supabase/client"
 import { Plus, Loader2, X, LinkIcon, Tag } from "lucide-react"
-import { toast } from "sonner"
 import { useEditingGuard } from "@/hooks/use-editing-guard"
+import { useCourseMutations } from "@/hooks/use-mutations"
 
 const courseSchema = z.object({
   instructor: z
@@ -49,8 +48,8 @@ type CourseFormData = z.infer<typeof courseSchema>
 export function AddCourseDialog() {
   const [open, setOpen] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const router = useRouter()
   const { guardAction } = useEditingGuard()
+  const { createCourse } = useCourseMutations()
 
   const form = useForm<CourseFormData>({
     resolver: zodResolver(courseSchema),
@@ -89,29 +88,18 @@ export function AddCourseDialog() {
       const topics =
         data.topics?.filter((topic) => topic.value.trim() !== "").map((topic) => topic.value) || []
 
-      const { error } = await supabase.from("courses").insert([
-        {
-          instructor: data.instructor,
-          title: data.title,
-          links,
-          topics,
-        },
-      ])
-
-      if (error) throw error
-
-      toast.success("Course added successfully", {
-        description: "Your new course has been created.",
+      await createCourse({
+        instructor: data.instructor,
+        title: data.title,
+        links,
+        topics,
       })
 
       form.reset()
       setOpen(false)
-      router.refresh()
     } catch (error) {
+      // Error is handled by the mutation hook
       console.error("Error adding course:", error)
-      toast.error("Error adding course", {
-        description: "Please try again.",
-      })
     } finally {
       setIsSubmitting(false)
     }

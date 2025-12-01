@@ -33,11 +33,8 @@ export async function middleware(request: NextRequest) {
   const publicPaths = ["/", "/login", "/auth/callback", "/about", "/how-it-works", "/learn-rootly"]
   const isPublic = publicPaths.some((p) => url.pathname === p || url.pathname.startsWith(p + "/"))
 
-  if (!session && !isPublic) {
-    const redirect = new URL("/login", url.origin)
-    redirect.searchParams.set("next", url.pathname + url.search)
-    return NextResponse.redirect(redirect)
-  }
+  // Allow unauthenticated access - users can use localStorage
+  // No redirect needed
 
   return supabaseResponse
 }

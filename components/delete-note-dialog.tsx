@@ -13,10 +13,9 @@ import {
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
  
-import { supabase } from "@/lib/supabase/client"
 import { Loader2, AlertTriangle } from "lucide-react"
-import { toast } from "sonner"
 import type { Note } from "@/lib/types"
+import { useNoteMutations } from "@/hooks/use-mutations"
 
 interface DeleteNoteDialogProps {
   note: Note
@@ -26,28 +25,16 @@ interface DeleteNoteDialogProps {
 
 export function DeleteNoteDialog({ note, open, onOpenChange }: DeleteNoteDialogProps) {
   const [isDeleting, setIsDeleting] = useState(false)
-  const router = useRouter()
-
-  
+  const { deleteNote } = useNoteMutations()
 
   const handleDelete = async () => {
     setIsDeleting(true)
     try {
-      const { error } = await supabase.from("notes").delete().eq("id", note.id)
-
-      if (error) throw error
-
-      toast.success("Note deleted successfully", {
-        description: "The note has been permanently removed.",
-      })
-
+      await deleteNote(note.id)
       onOpenChange(false)
-      router.refresh()
     } catch (error) {
+      // Error is handled by the mutation hook
       console.error("Error deleting note:", error)
-      toast.error("Error deleting note", {
-        description: "Please try again.",
-      })
     } finally {
       setIsDeleting(false)
     }

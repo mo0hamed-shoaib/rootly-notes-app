@@ -11,10 +11,9 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
-import { supabase } from "@/lib/supabase/client"
 import { Loader2, AlertTriangle } from "lucide-react"
-import { toast } from "sonner"
 import type { Course } from "@/lib/types"
+import { useCourseMutations } from "@/hooks/use-mutations"
 
 interface DeleteCourseDialogProps {
   course: Course
@@ -24,26 +23,16 @@ interface DeleteCourseDialogProps {
 
 export function DeleteCourseDialog({ course, open, onOpenChange }: DeleteCourseDialogProps) {
   const [isDeleting, setIsDeleting] = useState(false)
-  const router = useRouter()
+  const { deleteCourse } = useCourseMutations()
 
   const handleDelete = async () => {
     setIsDeleting(true)
     try {
-      const { error } = await supabase.from("courses").delete().eq("id", course.id)
-
-      if (error) throw error
-
-      toast.success("Course deleted successfully", {
-        description: "The course and all associated notes have been permanently removed.",
-      })
-
+      await deleteCourse(course.id)
       onOpenChange(false)
-      router.refresh()
     } catch (error) {
+      // Error is handled by the mutation hook
       console.error("Error deleting course:", error)
-      toast.error("Error deleting course", {
-        description: "Please try again.",
-      })
     } finally {
       setIsDeleting(false)
     }

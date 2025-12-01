@@ -1,37 +1,96 @@
-import { createClient } from "@/lib/supabase/server"
+"use client"
+
+import { useMemo, Suspense } from "react"
+import dynamic from "next/dynamic"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
-import { UnderstandingChart } from "@/components/understanding-chart"
-import { StudyTimeChart } from "@/components/study-time-chart"
-import { MoodChart } from "@/components/mood-chart"
-import { CourseProgressChart } from "@/components/course-progress-chart"
 import { BookOpen, Brain, Calendar, TrendingUp, Target, BarChart3 } from "lucide-react"
+import { useCourses } from "@/hooks/use-data"
+import { useNotes } from "@/hooks/use-data"
+import { useDailyEntries } from "@/hooks/use-data"
 
-export default async function OverviewPage() {
-  const supabase = await createClient()
+// Lazy load chart components - they're heavy and not needed for initial render
+const UnderstandingChart = dynamic(() => import("@/components/understanding-chart").then((mod) => ({ default: mod.UnderstandingChart })), {
+  ssr: false,
+  loading: () => <div className="h-[300px] flex items-center justify-center text-muted-foreground">Loading chart...</div>,
+})
 
-  // Get basic stats
-  const [coursesResult, notesResult, dailyEntriesResult] = await Promise.all([
-    supabase.from("courses").select("id").limit(1000),
-    supabase.from("notes").select("id, understanding_level, created_at").limit(1000),
-    supabase.from("daily_entries").select("study_time, date, mood").order("date", { ascending: false }).limit(30),
-  ])
+const StudyTimeChart = dynamic(() => import("@/components/study-time-chart").then((mod) => ({ default: mod.StudyTimeChart })), {
+  ssr: false,
+  loading: () => <div className="h-[300px] flex items-center justify-center text-muted-foreground">Loading chart...</div>,
+})
 
-  // Get course progress data
-  const { data: courseProgress } = await supabase
-    .from("courses")
-    .select(`
-      id,
-      title,
-      notes(id, understanding_level)
-    `)
-    .limit(10)
+const MoodChart = dynamic(() => import("@/components/mood-chart").then((mod) => ({ default: mod.MoodChart })), {
+  ssr: false,
+  loading: () => <div className="h-[300px] flex items-center justify-center text-muted-foreground">Loading chart...</div>,
+})
 
-  const totalCourses = coursesResult.data?.length || 0
-  const totalNotes = notesResult.data?.length || 0
-  const avgUnderstanding = notesResult.data?.length
-    ? (notesResult.data.reduce((sum, note) => sum + note.understanding_level, 0) / notesResult.data.length).toFixed(1)
-    : "0"
-  const totalStudyTime = dailyEntriesResult.data?.reduce((sum, entry) => sum + entry.study_time, 0) || 0
+const CourseProgressChart = dynamic(() => import("@/components/course-progress-chart").then((mod) => ({ default: mod.CourseProgressChart })), {
+  ssr: false,
+  loading: () => <div className="h-[300px] flex items-center justify-center text-muted-foreground">Loading chart...</div>,
+})
+
+export default function OverviewPage() {
+  const { courses, isLoading: coursesLoading } = useCourses()
+  const { notes, isLoading: notesLoading } = useNotes()
+  const { entries, isLoading: entriesLoading } = useDailyEntries()
+
+  const isLoading = coursesLoading || notesLoading || entriesLoading
+
+  // Calculate stats
+  const stats = useMemo(() => {
+    const totalCourses = courses.length
+    const totalNotes = notes.length
+    const avgUnderstanding =
+      notes.length > 0
+        ? (notes.reduce((sum, note) => sum + note.understanding_level, 0) / notes.length).toFixed(1)
+        : "0"
+    const totalStudyTime = entries
+      .filter((e) => {
+        const entryDate = new Date(e.date)
+        const thirtyDaysAgo = new Date()
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
+        return entryDate >= thirtyDaysAgo
+      })
+      .reduce((sum, entry) => sum + entry.study_time, 0)
+
+    return { totalCourses, totalNotes, avgUnderstanding, totalStudyTime }
+  }, [courses, notes, entries])
+
+  // Prepare course progress data
+  const courseProgress = useMemo(() => {
+    return courses.slice(0, 10).map((course) => ({
+      id: course.id,
+      title: course.title,
+      notes: notes.filter((note) => note.course_id === course.id).map((note) => ({
+        id: note.id,
+        understanding_level: note.understanding_level,
+      })),
+    }))
+  }, [courses, notes])
+
+  // Get last 30 days of entries for charts
+  const recentEntries = useMemo(() => {
+    return entries
+      .filter((e) => {
+        const entryDate = new Date(e.date)
+        const thirtyDaysAgo = new Date()
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
+        return entryDate >= thirtyDaysAgo
+      })
+      .slice(0, 30)
+  }, [entries])
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <div className="container mx-auto px-4 py-6 max-w-6xl">
+          <div className="flex items-center justify-center min-h-[400px]">
+            <p className="text-muted-foreground">Loading...</p>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -53,7 +112,7 @@ export default async function OverviewPage() {
               <BookOpen className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{totalCourses}</div>
+              <div className="text-2xl font-bold">{stats.totalCourses}</div>
               <p className="text-xs text-muted-foreground">Active learning paths</p>
             </CardContent>
           </Card>
@@ -64,7 +123,7 @@ export default async function OverviewPage() {
               <Brain className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{totalNotes}</div>
+              <div className="text-2xl font-bold">{stats.totalNotes}</div>
               <p className="text-xs text-muted-foreground">Questions captured</p>
             </CardContent>
           </Card>
@@ -75,7 +134,7 @@ export default async function OverviewPage() {
               <TrendingUp className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{avgUnderstanding}/5</div>
+              <div className="text-2xl font-bold">{stats.avgUnderstanding}/5</div>
               <p className="text-xs text-muted-foreground">Comprehension level</p>
             </CardContent>
           </Card>
@@ -86,7 +145,7 @@ export default async function OverviewPage() {
               <Calendar className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{Math.round(totalStudyTime / 60)}h</div>
+              <div className="text-2xl font-bold">{Math.round(stats.totalStudyTime / 60)}h</div>
               <p className="text-xs text-muted-foreground">Last 30 days</p>
             </CardContent>
           </Card>
@@ -101,12 +160,10 @@ export default async function OverviewPage() {
                 <TrendingUp className="h-5 w-5 text-muted-foreground" />
                 <CardTitle>Understanding Progress</CardTitle>
               </div>
-              <CardDescription>
-                Track your comprehension levels over time and identify learning trends
-              </CardDescription>
+              <CardDescription>Track your comprehension levels over time and identify learning trends</CardDescription>
             </CardHeader>
             <CardContent className="flex-1">
-              <UnderstandingChart data={notesResult.data || []} />
+              <UnderstandingChart data={notes} />
             </CardContent>
             <CardFooter className="pt-3 pb-3">
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -123,12 +180,10 @@ export default async function OverviewPage() {
                 <Calendar className="h-5 w-5 text-muted-foreground" />
                 <CardTitle>Daily Study Sessions</CardTitle>
               </div>
-              <CardDescription>
-                Monitor your study consistency and time investment patterns
-              </CardDescription>
+              <CardDescription>Monitor your study consistency and time investment patterns</CardDescription>
             </CardHeader>
             <CardContent className="flex-1">
-              <StudyTimeChart data={dailyEntriesResult.data || []} />
+              <StudyTimeChart data={recentEntries} />
             </CardContent>
             <CardFooter className="pt-3 pb-3">
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -145,12 +200,10 @@ export default async function OverviewPage() {
                 <Brain className="h-5 w-5 text-muted-foreground" />
                 <CardTitle>Learning Mood Analysis</CardTitle>
               </div>
-              <CardDescription>
-                Understand how your emotional state affects your learning journey
-              </CardDescription>
+              <CardDescription>Understand how your emotional state affects your learning journey</CardDescription>
             </CardHeader>
             <CardContent className="flex-1">
-              <MoodChart data={dailyEntriesResult.data || []} />
+              <MoodChart data={recentEntries} />
             </CardContent>
             <CardFooter className="pt-3 pb-3">
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -167,12 +220,10 @@ export default async function OverviewPage() {
                 <BarChart3 className="h-5 w-5 text-muted-foreground" />
                 <CardTitle>Course Mastery Overview</CardTitle>
               </div>
-              <CardDescription>
-                Compare understanding levels across different courses and subjects
-              </CardDescription>
+              <CardDescription>Compare understanding levels across different courses and subjects</CardDescription>
             </CardHeader>
             <CardContent className="flex-1">
-              <CourseProgressChart data={courseProgress || []} />
+              <CourseProgressChart data={courseProgress} />
             </CardContent>
             <CardFooter className="pt-3 pb-3">
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -186,4 +237,3 @@ export default async function OverviewPage() {
     </div>
   )
 }
-

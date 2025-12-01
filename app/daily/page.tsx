@@ -1,7 +1,10 @@
-import { createClient } from "@/lib/supabase/server"
+"use client"
+
+import { Suspense } from "react"
+import { useSearchParams } from "next/navigation"
+import { useMemo } from "react"
 import { DailyEntriesGrid } from "@/components/daily-entries-grid"
 import { AddDailyEntryDialog } from "@/components/add-daily-entry-dialog"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { EmptyState } from "@/components/empty-state"
 import { CalendarX } from "lucide-react"
 import {
@@ -13,32 +16,67 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination"
+import { useDailyEntries } from "@/hooks/use-data"
 import type React from "react"
 
-interface DailyPageProps {
-  searchParams: Promise<{
-    page?: string
-    pageSize?: string
-  }>
-}
+const PAGE_SIZE = 12
 
-export default async function DailyPage({ searchParams }: DailyPageProps) {
-  const supabase = await createClient()
-  const resolvedSearchParams = await searchParams
-  const page = Math.max(1, Number.parseInt(resolvedSearchParams.page || "1"))
-  const pageSize = Math.max(1, Math.min(48, Number.parseInt(resolvedSearchParams.pageSize || "12")))
-  const from = (page - 1) * pageSize
-  const to = from + pageSize - 1
+function DailyPageContent() {
+  const searchParams = useSearchParams()
+  const page = Math.max(1, Number.parseInt(searchParams.get("page") || "1"))
 
-  // Get daily entries
-  const { data: dailyEntries, count, error } = await supabase
-    .from("daily_entries")
-    .select("*", { count: "exact" })
-    .order("date", { ascending: false })
-    .range(from, to)
+  const { entries, isLoading } = useDailyEntries()
 
-  if (error) {
-    console.error("Error fetching daily entries:", error)
+  // Client-side pagination
+  const paginatedEntries = useMemo(() => {
+    const start = (page - 1) * PAGE_SIZE
+    const end = start + PAGE_SIZE
+    return entries.slice(start, end)
+  }, [entries, page])
+
+  const totalPages = Math.ceil(entries.length / PAGE_SIZE)
+
+  const buildPageHref = (targetPage: number) => {
+    const sp = new URLSearchParams()
+    sp.set("page", String(targetPage))
+    return `?${sp.toString()}`
+  }
+
+  const renderPageItems = () => {
+    const items: React.ReactNode[] = []
+    const pushPage = (p: number) => {
+      items.push(
+        <PaginationItem key={p}>
+          <PaginationLink href={buildPageHref(p)} isActive={p === page}>
+            {p}
+          </PaginationLink>
+        </PaginationItem>
+      )
+    }
+    if (totalPages <= 7) {
+      for (let p = 1; p <= totalPages; p++) pushPage(p)
+    } else {
+      pushPage(1)
+      if (page > 3) items.push(<PaginationEllipsis key="start-ellipsis" />)
+      const start = Math.max(2, page - 1)
+      const end = Math.min(totalPages - 1, page + 1)
+      for (let p = start; p <= end; p++) pushPage(p)
+      if (page < totalPages - 2) items.push(<PaginationEllipsis key="end-ellipsis" />)
+      pushPage(totalPages)
+    }
+    return items
+  }
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <div className="container mx-auto px-4 py-6 max-w-6xl">
+          <div className="flex items-center justify-center min-h-[400px]">
+            <p className="text-muted-foreground">Loading...</p>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -61,22 +99,22 @@ export default async function DailyPage({ searchParams }: DailyPageProps) {
         </div>
 
         {/* Daily Entries Grid */}
-        {dailyEntries && dailyEntries.length > 0 ? (
+        {paginatedEntries.length > 0 ? (
           <>
-            <DailyEntriesGrid entries={dailyEntries} />
-            {typeof count === "number" && count > pageSize && (
+            <DailyEntriesGrid entries={paginatedEntries} />
+            {totalPages > 1 && (
               <div className="mt-8">
                 <Pagination>
                   <PaginationContent>
                     {page > 1 && (
                       <PaginationItem>
-                        <PaginationPrevious href={`?${buildPageHref(resolvedSearchParams, page - 1, pageSize)}`} />
+                        <PaginationPrevious href={buildPageHref(page - 1)} />
                       </PaginationItem>
                     )}
-                    {renderPageItems(count, page, pageSize, resolvedSearchParams)}
-                    {page < Math.ceil(count / pageSize) && (
+                    {renderPageItems()}
+                    {page < totalPages && (
                       <PaginationItem>
-                        <PaginationNext href={`?${buildPageHref(resolvedSearchParams, page + 1, pageSize)}`} />
+                        <PaginationNext href={buildPageHref(page + 1)} />
                       </PaginationItem>
                     )}
                   </PaginationContent>
@@ -97,49 +135,20 @@ export default async function DailyPage({ searchParams }: DailyPageProps) {
   )
 }
 
-function buildPageHref(
-  params: Record<string, string | undefined>,
-  targetPage: number,
-  pageSize: number
-) {
-  const sp = new URLSearchParams()
-  for (const [key, value] of Object.entries(params)) {
-    if (!value) continue
-    if (key === "page" || key === "pageSize") continue
-    sp.set(key, value)
-  }
-  sp.set("page", String(targetPage))
-  sp.set("pageSize", String(pageSize))
-  return sp.toString()
-}
-
-function renderPageItems(
-  totalCount: number,
-  page: number,
-  pageSize: number,
-  params: Record<string, string | undefined>
-) {
-  const totalPages = Math.max(1, Math.ceil(totalCount / pageSize))
-  const items: React.ReactNode[] = []
-  const pushPage = (p: number) => {
-    items.push(
-      <PaginationItem key={p}>
-        <PaginationLink href={`?${buildPageHref(params, p, pageSize)}`} isActive={p === page}>
-          {p}
-        </PaginationLink>
-      </PaginationItem>
-    )
-  }
-  if (totalPages <= 7) {
-    for (let p = 1; p <= totalPages; p++) pushPage(p)
-  } else {
-    pushPage(1)
-    if (page > 3) items.push(<PaginationEllipsis key="start-ellipsis" />)
-    const start = Math.max(2, page - 1)
-    const end = Math.min(totalPages - 1, page + 1)
-    for (let p = start; p <= end; p++) pushPage(p)
-    if (page < totalPages - 2) items.push(<PaginationEllipsis key="end-ellipsis" />)
-    pushPage(totalPages)
-  }
-  return items
+export default function DailyPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-background">
+          <div className="container mx-auto px-4 py-6 max-w-6xl">
+            <div className="flex items-center justify-center min-h-[400px]">
+              <p className="text-muted-foreground">Loading...</p>
+            </div>
+          </div>
+        </div>
+      }
+    >
+      <DailyPageContent />
+    </Suspense>
+  )
 }

@@ -9,10 +9,9 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
-import { supabase } from "@/lib/supabase/client"
 import { Loader2, X, Plus, LinkIcon, Tag } from "lucide-react"
-import { toast } from "sonner"
 import type { Course } from "@/lib/types"
+import { useCourseMutations } from "@/hooks/use-mutations"
 
 const editCourseSchema = z.object({
   instructor: z
@@ -46,7 +45,7 @@ interface EditCourseDialogProps {
 
 export function EditCourseDialog({ course, open, onOpenChange }: EditCourseDialogProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const router = useRouter()
+  const { updateCourse } = useCourseMutations()
 
   const form = useForm<EditCourseFormData>({
     resolver: zodResolver(editCourseSchema),
@@ -95,29 +94,17 @@ export function EditCourseDialog({ course, open, onOpenChange }: EditCourseDialo
         data.links?.filter((link) => ((link.value ?? "").trim() !== "")).map((link) => (link.value ?? "")) || []
       const topics = data.topics?.filter((topic) => topic.value.trim() !== "").map((topic) => topic.value) || []
 
-      const { error } = await supabase
-        .from("courses")
-        .update({
-          instructor: data.instructor,
-          title: data.title,
-          links,
-          topics,
-        })
-        .eq("id", course.id)
-
-      if (error) throw error
-
-      toast.success("Course updated successfully", {
-        description: "Your changes have been saved.",
+      await updateCourse(course.id, {
+        instructor: data.instructor,
+        title: data.title,
+        links,
+        topics,
       })
 
       onOpenChange(false)
-      router.refresh()
     } catch (error) {
+      // Error is handled by the mutation hook
       console.error("Error updating course:", error)
-      toast.error("Error updating course", {
-        description: "Please try again.",
-      })
     } finally {
       setIsSubmitting(false)
     }

@@ -11,11 +11,10 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
-import { supabase } from "@/lib/supabase/client"
 import { Loader2, AlertTriangle } from "lucide-react"
-import { toast } from "sonner"
 import { formatStudyTime } from "@/lib/time-utils"
 import type { DailyEntry } from "@/lib/types"
+import { useDailyEntryMutations } from "@/hooks/use-mutations"
 
 interface DeleteDailyEntryDialogProps {
   entry: DailyEntry
@@ -25,26 +24,16 @@ interface DeleteDailyEntryDialogProps {
 
 export function DeleteDailyEntryDialog({ entry, open, onOpenChange }: DeleteDailyEntryDialogProps) {
   const [isDeleting, setIsDeleting] = useState(false)
-  const router = useRouter()
+  const { deleteDailyEntry } = useDailyEntryMutations()
 
   const handleDelete = async () => {
     setIsDeleting(true)
     try {
-      const { error } = await supabase.from("daily_entries").delete().eq("id", entry.id)
-
-      if (error) throw error
-
-      toast.success("Daily entry deleted successfully", {
-        description: "The entry has been permanently removed.",
-      })
-
+      await deleteDailyEntry(entry.id)
       onOpenChange(false)
-      router.refresh()
     } catch (error) {
+      // Error is handled by the mutation hook
       console.error("Error deleting daily entry:", error)
-      toast.error("Error deleting daily entry", {
-        description: "Please try again.",
-      })
     } finally {
       setIsDeleting(false)
     }

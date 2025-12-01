@@ -1,62 +1,55 @@
-import { createClient } from "@/lib/supabase/server"
+"use client"
+
+import { Suspense } from "react"
+import { useSearchParams } from "next/navigation"
+import { useMemo } from "react"
 import { ReviewSession } from "@/components/review-session"
 import { ReviewControls } from "@/components/review-controls"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { EmptyState } from "@/components/empty-state"
 import { FileQuestion } from "lucide-react"
-import { Button } from "@/components/ui/button"
 import { Brain, Flag, Shuffle } from "lucide-react"
-import Link from "next/link"
+import { useNotes } from "@/hooks/use-data"
+import { useCourses } from "@/hooks/use-data"
 
-interface ReviewPageProps {
-  searchParams: Promise<{
-    course?: string
-    flagged?: string
-    shuffle?: string
-    limit?: string
-  }>
-}
+function ReviewPageContent() {
+  const searchParams = useSearchParams()
+  const course = searchParams.get("course") || undefined
+  const flagged = searchParams.get("flagged")
+  const shuffle = (searchParams.get("shuffle") ?? "true") === "true"
+  const limit = Math.max(1, Math.min(100, Number.parseInt(searchParams.get("limit") || "20")))
 
-export default async function ReviewPage({ searchParams }: ReviewPageProps) {
-  const supabase = await createClient()
-  const params = await searchParams
+  const filters = useMemo(
+    () => ({
+      courseId: course,
+      flagged: flagged === "true" ? true : undefined,
+    }),
+    [course, flagged]
+  )
 
-  const limit = Math.max(1, Math.min(100, Number.parseInt(params.limit || "20")))
-  const shuffle = (params.shuffle ?? "true") === "true"
-  const SAMPLE_SIZE = Math.max(100, Math.min(500, limit * 5))
+  const { notes, isLoading } = useNotes(filters)
+  const { courses } = useCourses()
 
-  // Build base query for practice
-  let query = supabase
-    .from("notes")
-    .select(`
-      *,
-      course:courses(title, instructor)
-    `)
-    .order("updated_at", { ascending: false })
+  // Prepare session notes
+  const sessionNotes = useMemo(() => {
+    if (isLoading) return []
+    const filtered = shuffle ? [...notes].sort(() => Math.random() - 0.5) : notes
+    return filtered.slice(0, limit)
+  }, [notes, shuffle, limit, isLoading])
 
-  if (params.course) {
-    query = query.eq("course_id", params.course)
-  }
-  if (params.flagged === "true") {
-    query = query.eq("flag", true)
-  }
-
-  // Apply a server-side limit to avoid fetching all rows
-  const effectiveLimit = shuffle ? SAMPLE_SIZE : limit
-  const { data: fetchedNotes, error } = await query.limit(effectiveLimit)
-  if (error) {
-    console.error("Error fetching notes for practice:", error)
-  }
-
-  const notes = fetchedNotes || []
-  const sessionNotes = (shuffle ? [...notes].sort(() => Math.random() - 0.5) : notes).slice(0, limit)
   const flaggedInSession = sessionNotes.filter((n) => n.flag).length
 
-  // Fetch courses for controls
-  const { data: courses } = await supabase
-    .from("courses")
-    .select("id, title, instructor")
-    .order("title")
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <div className="container mx-auto px-4 py-6 max-w-6xl">
+          <div className="flex items-center justify-center min-h-[400px]">
+            <p className="text-muted-foreground">Loading...</p>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -72,7 +65,7 @@ export default async function ReviewPage({ searchParams }: ReviewPageProps) {
 
         {/* Quick Controls */}
         <div className="mb-6">
-          <ReviewControls courses={courses || []} />
+          <ReviewControls courses={courses} />
         </div>
 
         {/* Session Summary */}
@@ -119,10 +112,28 @@ export default async function ReviewPage({ searchParams }: ReviewPageProps) {
             title="No notes available"
             description="Add notes first, or adjust filters to include more content for practice."
             icon={<FileQuestion className="h-6 w-6 text-muted-foreground" />}
-            primaryAction={{ label: 'Add Notes', href: '/notes' }}
+            primaryAction={{ label: "Add Notes", href: "/notes" }}
           />
         )}
       </div>
     </div>
+  )
+}
+
+export default function ReviewPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-background">
+          <div className="container mx-auto px-4 py-6 max-w-6xl">
+            <div className="flex items-center justify-center min-h-[400px]">
+              <p className="text-muted-foreground">Loading...</p>
+            </div>
+          </div>
+        </div>
+      }
+    >
+      <ReviewPageContent />
+    </Suspense>
   )
 }
