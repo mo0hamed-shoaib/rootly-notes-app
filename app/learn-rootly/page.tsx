@@ -15,7 +15,7 @@ export default function LearnRootlyPage() {
       id: 1,
       title: "Capture notes fast",
       description:
-        "Jot ideas, summaries, and flash‑points without friction. Tag notes, filter them, and keep everything searchable.",
+        "Write ideas, summaries, and key points easily. Tag notes, filter them, and keep everything searchable.",
       icon: BookOpen,
     },
     {
@@ -29,14 +29,14 @@ export default function LearnRootlyPage() {
       id: 3,
       title: "Log your day",
       description:
-        "Record daily study time and mood. Spot trends, keep momentum, and maintain a healthy learning rhythm.",
+        "Record daily study time and mood. See patterns, keep making progress, and maintain a healthy learning pace.",
       icon: Calendar,
     },
     {
       id: 4,
       title: "Review to remember",
       description:
-        "Use spaced review to reinforce what matters. Turn knowledge into long‑term memory with smart repetition.",
+        "Use regular review to strengthen what matters. Turn knowledge into long-term memory with smart repetition.",
       icon: RefreshCw,
     },
   ]
@@ -50,11 +50,11 @@ export default function LearnRootlyPage() {
             <span>Quick visual guide</span>
           </div>
           <h1 className="mt-4 text-balance text-3xl font-semibold tracking-tight md:text-4xl">
-            Learn Rootly — in 4 clear steps
+            Learn Rootly in 4 clear steps
           </h1>
           <p className="mt-3 text-muted-foreground">
             Learn the flow, stay in control, and make steady progress. Everything is designed to be simple,
-            symmetrical, and delightful to use.
+            balanced, and easy to use.
           </p>
         </div>
 
@@ -112,7 +112,7 @@ export default function LearnRootlyPage() {
                   <ul className="list-inside list-disc text-sm text-muted-foreground">
                     {step.id === 1 && (
                       <>
-                        <li>Use filters to surface exactly what you need.</li>
+                        <li>Use filters to find exactly what you need.</li>
                         <li>Keep notes short; link out when needed.</li>
                         <li>Tag consistently to stay organized.</li>
                       </>
@@ -120,7 +120,7 @@ export default function LearnRootlyPage() {
                     {step.id === 2 && (
                       <>
                         <li>Break big topics into focused courses.</li>
-                        <li>Track progress to maintain momentum.</li>
+                        <li>Track progress to keep moving forward.</li>
                         <li>Keep related notes close.</li>
                       </>
                     )}
@@ -128,13 +128,13 @@ export default function LearnRootlyPage() {
                       <>
                         <li>Log study time and mood in seconds.</li>
                         <li>Spot your best study windows.</li>
-                        <li>Aim for sustainable streaks—consistency wins.</li>
+                        <li>Aim for sustainable streaks. Consistency wins.</li>
                       </>
                     )}
                     {step.id === 4 && (
                       <>
                         <li>Focus on high‑value notes during review.</li>
-                        <li>Revisit at increasing intervals (spaced effect).</li>
+                        <li>Revisit at increasing time periods (spaced effect).</li>
                         <li>Keep sessions short and frequent.</li>
                       </>
                     )}
@@ -153,9 +153,9 @@ export default function LearnRootlyPage() {
             </CardHeader>
             <CardContent>
               <ul className="list-inside list-disc text-sm text-muted-foreground">
-                <li>Keep layouts symmetrical for effortless scanning.</li>
-                <li>Write atomic notes: one idea per note for sharper recall.</li>
-                <li>Prefer short, frequent sessions to maintain momentum.</li>
+                <li>Keep layouts balanced for easy reading.</li>
+                <li>Write simple notes: one idea per note for better memory.</li>
+                <li>Prefer short, frequent sessions to keep making progress.</li>
               </ul>
             </CardContent>
           </Card>
@@ -163,13 +163,13 @@ export default function LearnRootlyPage() {
           <Card>
             <CardHeader>
               <CardTitle>Learning rhythm</CardTitle>
-              <CardDescription>A calm cadence that compounds</CardDescription>
+              <CardDescription>A calm pace that builds up</CardDescription>
             </CardHeader>
             <CardContent>
               <ul className="list-inside list-disc text-sm text-muted-foreground">
-                <li>Daily: 15–25 minutes capturing and tidying notes.</li>
+                <li>Daily: 15 - 25 minutes capturing and organizing notes.</li>
                 <li>Weekly: organize courses and reflect on progress.</li>
-                <li>Review: 2–4 short sessions per week, spaced out.</li>
+                <li>Review: 2 - 4 short sessions per week, spread out.</li>
               </ul>
             </CardContent>
           </Card>

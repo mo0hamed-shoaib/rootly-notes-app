@@ -55,7 +55,7 @@ export default async function HomePage() {
         </h2>
         <div className="max-w-4xl mx-auto">
           <p className="text-lg text-muted-foreground text-center mb-12 leading-relaxed">
-            Learning is about building a sustainable system that grows with you. It's much more than just consuming information. Rootly believes in the power of consistent, structured learning that transforms knowledge into lasting understanding.
+            Learning is about building a sustainable system that grows with you. It goes beyond consuming information. Rootly believes in the power of consistent, structured learning that transforms knowledge into lasting understanding.
           </p>
           <Card className="bg-muted/50 border-0 shadow-lg">
             <CardContent className="p-6">

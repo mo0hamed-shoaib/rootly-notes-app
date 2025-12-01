@@ -33,7 +33,7 @@ export default function AboutPage() {
 						</div>
 						<h1 className="text-3xl md:text-4xl font-bold tracking-tight">About Rootly Notes</h1>
 						<p className="max-w-2xl text-muted-foreground">
-							A minimalist learning companion to capture questions, review them with intention, and visualize your
+							A simple learning tool to capture questions, review them carefully, and see your
 							progress over time.
 						</p>
 					</div>
@@ -58,8 +58,8 @@ export default function AboutPage() {
 							<CardTitle className="text-base">Why it was created</CardTitle>
 						</CardHeader>
 						<CardContent className="text-sm text-muted-foreground">
-							Learning sticks when questions drive it. This project removes friction so you can quickly capture
-							what you don’t know, review deliberately, and make steady, measurable progress.
+							Learning sticks when questions drive it. This project removes difficulty so you can quickly capture
+							what you don't know, review carefully, and make steady, measurable progress.
 						</CardContent>
 					</Card>
 
@@ -68,8 +68,8 @@ export default function AboutPage() {
 							<CardTitle className="text-base">Inspiration</CardTitle>
 						</CardHeader>
 						<CardContent className="text-sm text-muted-foreground">
-							Inspired by spaced repetition, the Zettelkasten mindset of atomic notes, and a desire for calm,
-							beautiful interfaces that keep focus on the work—not the tool.
+							Inspired by spaced repetition, the idea of simple notes with one idea each, and a desire for calm,
+							beautiful interfaces that keep focus on the work, not the tool.
 						</CardContent>
 					</Card>
 				</div>
@@ -83,9 +83,9 @@ export default function AboutPage() {
 						<CardContent className="text-sm text-muted-foreground space-y-2">
 							<ul className="list-disc pl-5 space-y-1">
 								<li>Fast note capture with structured fields</li>
-								<li>Understanding levels to quantify progress</li>
+								<li>Understanding levels to measure progress</li>
 								<li>Daily tracking for time and mood</li>
-								<li>Clean charts to visualize learning</li>
+								<li>Clean charts to see your learning</li>
 							</ul>
 						</CardContent>
 					</Card>
@@ -97,7 +97,7 @@ export default function AboutPage() {
 						<CardContent className="text-sm text-muted-foreground space-y-2">
 							<ul className="list-disc pl-5 space-y-1">
 								<li>Symmetry and balance for a calm UI</li>
-								<li>Minimalism without sacrificing clarity</li>
+								<li>Simplicity without losing clarity</li>
 								<li>Accessibility and keyboard-friendly flows</li>
 							</ul>
 						</CardContent>
