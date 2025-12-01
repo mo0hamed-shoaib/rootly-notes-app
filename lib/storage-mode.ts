@@ -19,8 +19,14 @@ export async function isAuthenticated(): Promise<boolean> {
 
   try {
     const { supabase } = await import("@/lib/supabase/client")
-    // Use getUser() instead of getSession() for more reliable session detection
-    // getSession() can be stale, getUser() refreshes from the server
+    // Try getSession() first (faster, uses cached session)
+    const { data: { session } } = await supabase.auth.getSession()
+    if (session?.user) {
+      return true
+    }
+    
+    // If no session, try getUser() which refreshes from server
+    // This is important after OAuth redirect when cookies might not be immediately available
     const {
       data: { user },
       error,

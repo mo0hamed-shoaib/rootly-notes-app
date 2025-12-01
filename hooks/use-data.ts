@@ -23,12 +23,11 @@ export function useCourses() {
     try {
       setIsLoading(true)
       // Wait for storage mode to be determined
-      if (storageModeLoading) {
+      if (storageModeLoading || !storageMode) {
         return
       }
-      const mode = storageMode || await getStorageMode()
 
-      if (mode === "localStorage") {
+      if (storageMode === "localStorage") {
         const data = localStorage.getCourses()
         setCourses(data)
       } else {
@@ -45,27 +44,30 @@ export function useCourses() {
     } finally {
       setIsLoading(false)
     }
-  }, [])
+  }, [storageMode, storageModeLoading])
 
   useEffect(() => {
+    // Don't fetch if storage mode is still loading
+    if (storageModeLoading || !storageMode) {
+      return
+    }
+
     fetchCourses()
 
     // Subscribe to changes in Supabase mode
     let cleanup: (() => void) | undefined
-    getStorageMode().then((m) => {
-      if (m === "supabase") {
-        const channel = supabase
-          .channel("courses-changes")
-          .on("postgres_changes", { event: "*", schema: "public", table: "courses" }, () => {
-            fetchCourses()
-          })
-          .subscribe()
+    if (storageMode === "supabase") {
+      const channel = supabase
+        .channel("courses-changes")
+        .on("postgres_changes", { event: "*", schema: "public", table: "courses" }, () => {
+          fetchCourses()
+        })
+        .subscribe()
 
-        cleanup = () => {
-          supabase.removeChannel(channel)
-        }
+      cleanup = () => {
+        supabase.removeChannel(channel)
       }
-    })
+    }
 
     return () => {
       if (cleanup) cleanup()
@@ -96,12 +98,11 @@ export function useNotes(filters?: NoteFilters) {
     try {
       setIsLoading(true)
       // Wait for storage mode to be determined
-      if (storageModeLoading) {
+      if (storageModeLoading || !storageMode) {
         return
       }
-      const mode = storageMode || await getStorageMode()
 
-      if (mode === "localStorage") {
+      if (storageMode === "localStorage") {
         let data = localStorage.getNotes()
 
         // Apply filters
@@ -132,7 +133,7 @@ export function useNotes(filters?: NoteFilters) {
         }))
 
         setNotes(data)
-      } else {
+      } else if (storageMode === "supabase") {
         let query = supabase
           .from("notes")
           .select(
@@ -171,27 +172,30 @@ export function useNotes(filters?: NoteFilters) {
     } finally {
       setIsLoading(false)
     }
-  }, [filters])
+  }, [filters, storageMode, storageModeLoading])
 
   useEffect(() => {
+    // Don't fetch if storage mode is still loading
+    if (storageModeLoading || !storageMode) {
+      return
+    }
+
     fetchNotes()
 
     // Subscribe to changes in Supabase mode
     let cleanup: (() => void) | undefined
-    getStorageMode().then((m) => {
-      if (m === "supabase") {
-        const channel = supabase
-          .channel("notes-changes")
-          .on("postgres_changes", { event: "*", schema: "public", table: "notes" }, () => {
-            fetchNotes()
-          })
-          .subscribe()
+    if (storageMode === "supabase") {
+      const channel = supabase
+        .channel("notes-changes")
+        .on("postgres_changes", { event: "*", schema: "public", table: "notes" }, () => {
+          fetchNotes()
+        })
+        .subscribe()
 
-        cleanup = () => {
-          supabase.removeChannel(channel)
-        }
+      cleanup = () => {
+        supabase.removeChannel(channel)
       }
-    })
+    }
 
     return () => {
       if (cleanup) cleanup()
@@ -215,15 +219,14 @@ export function useDailyEntries() {
     try {
       setIsLoading(true)
       // Wait for storage mode to be determined
-      if (storageModeLoading) {
+      if (storageModeLoading || !storageMode) {
         return
       }
-      const mode = storageMode || await getStorageMode()
 
-      if (mode === "localStorage") {
+      if (storageMode === "localStorage") {
         const data = localStorage.getDailyEntries()
         setEntries(data)
-      } else {
+      } else if (storageMode === "supabase") {
         const { data, error: supabaseError } = await supabase
           .from("daily_entries")
           .select("*")
@@ -240,27 +243,30 @@ export function useDailyEntries() {
     } finally {
       setIsLoading(false)
     }
-  }, [])
+  }, [storageMode, storageModeLoading])
 
   useEffect(() => {
+    // Don't fetch if storage mode is still loading
+    if (storageModeLoading || !storageMode) {
+      return
+    }
+
     fetchEntries()
 
     // Subscribe to changes in Supabase mode
     let cleanup: (() => void) | undefined
-    getStorageMode().then((m) => {
-      if (m === "supabase") {
-        const channel = supabase
-          .channel("daily-entries-changes")
-          .on("postgres_changes", { event: "*", schema: "public", table: "daily_entries" }, () => {
-            fetchEntries()
-          })
-          .subscribe()
+    if (storageMode === "supabase") {
+      const channel = supabase
+        .channel("daily-entries-changes")
+        .on("postgres_changes", { event: "*", schema: "public", table: "daily_entries" }, () => {
+          fetchEntries()
+        })
+        .subscribe()
 
-        cleanup = () => {
-          supabase.removeChannel(channel)
-        }
+      cleanup = () => {
+        supabase.removeChannel(channel)
       }
-    })
+    }
 
     return () => {
       if (cleanup) cleanup()

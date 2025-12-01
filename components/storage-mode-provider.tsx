@@ -53,11 +53,36 @@ export function StorageModeProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     async function initialize() {
-      // Add a small delay to ensure session cookies are available after OAuth redirect
+      // Add a delay to ensure session cookies are available after OAuth redirect
       // This helps with the race condition where session might not be immediately available
-      await new Promise((resolve) => setTimeout(resolve, 100))
+      await new Promise((resolve) => setTimeout(resolve, 500))
       
-      const currentMode = await getStorageMode()
+      // Check session multiple times to ensure it's established
+      let attempts = 0
+      let currentMode: StorageMode | null = null
+      while (attempts < 3 && !currentMode) {
+        currentMode = await getStorageMode()
+        if (!currentMode || currentMode === "localStorage") {
+          // Double-check authentication status
+          const { supabase } = await import("@/lib/supabase/client")
+          const { data: { user } } = await supabase.auth.getUser()
+          if (user) {
+            currentMode = "supabase"
+            break
+          }
+        }
+        if (!currentMode || currentMode === "localStorage") {
+          attempts++
+          if (attempts < 3) {
+            await new Promise((resolve) => setTimeout(resolve, 200))
+          }
+        }
+      }
+      
+      if (!currentMode) {
+        currentMode = await getStorageMode()
+      }
+      
       setMode(currentMode)
 
       // Only seed localStorage - Supabase will get data via migration when user logs in
@@ -81,8 +106,29 @@ export function StorageModeProvider({ children }: { children: ReactNode }) {
         // Mark that user is now authenticated (for future reference)
         markPreviouslyAuthenticated()
         
-        // Wait a bit to ensure session is fully established and cookies are set
-        await new Promise((resolve) => setTimeout(resolve, 300))
+        // Wait longer to ensure session is fully established and cookies are set
+        // This is critical after OAuth redirect
+        await new Promise((resolve) => setTimeout(resolve, 800))
+        
+        // Verify session is actually established by checking getUser()
+        let user = null
+        let attempts = 0
+        while (attempts < 5 && !user) {
+          const { data: { user: currentUser }, error } = await supabase.auth.getUser()
+          if (currentUser && !error) {
+            user = currentUser
+            break
+          }
+          attempts++
+          if (attempts < 5) {
+            await new Promise((resolve) => setTimeout(resolve, 200))
+          }
+        }
+        
+        if (!user) {
+          console.error("Failed to get user after SIGNED_IN event")
+          return
+        }
         
         // User just signed in - automatically migrate localStorage data if it exists
         const localData = getAllData()
@@ -118,19 +164,25 @@ export function StorageModeProvider({ children }: { children: ReactNode }) {
           localStorage.removeItem("rootly_local_storage_warning_dismissed")
         }
         
-        // Force refresh storage mode after session is established
-        // Use getUser() to ensure we get the latest session state
-        const { data: { user } } = await supabase.auth.getUser()
-        if (user) {
-          setMode("supabase")
-          // Reload to ensure all hooks pick up the new mode and fetch from Supabase
-          setTimeout(() => {
+        // Force set mode to supabase
+        // The hooks will automatically re-fetch when mode changes
+        setMode("supabase")
+        
+        // Wait longer to ensure session cookies are fully available before reload
+        // This is critical - if we reload too early, cookies might not be available
+        // and we'll be stuck in localStorage mode
+        setTimeout(async () => {
+          // Double-check session is still valid before reloading
+          const { data: { user: verifyUser } } = await supabase.auth.getUser()
+          if (verifyUser) {
             window.location.reload()
-          }, 500)
-        } else {
-          const newMode = await getStorageMode()
-          setMode(newMode)
-        }
+          } else {
+            // If session is lost, try one more time after a delay
+            setTimeout(() => {
+              window.location.reload()
+            }, 500)
+          }
+        }, 1000)
       } else if (event === "SIGNED_OUT") {
         const newMode = await getStorageMode()
         setMode(newMode)
