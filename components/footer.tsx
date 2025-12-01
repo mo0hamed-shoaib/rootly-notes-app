@@ -16,7 +16,7 @@ export function Footer() {
   ]
 
   const resourceLinks = [
-    { name: "How Rootly Works", href: "/how-rootly-works" },
+    { name: "Learn Rootly", href: "/learn-rootly" },
     { name: "About", href: "/about" },
   ]
 

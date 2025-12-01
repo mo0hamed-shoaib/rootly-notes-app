@@ -41,10 +41,10 @@ export default async function HomePage() {
             </Link>
           )}
           <Link
-            href="/how-rootly-works"
+            href="/learn-rootly"
             className="bg-accent text-accent-foreground inline-flex items-center rounded-md px-6 py-3 text-sm font-medium hover:bg-accent/80"
           >
-            How Rootly works
+            Learn Rootly
           </Link>
         </div>
       </section>

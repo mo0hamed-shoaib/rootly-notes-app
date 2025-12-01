@@ -5,11 +5,11 @@ import { Separator } from "@/components/ui/separator"
 import { BookOpen, GraduationCap, Calendar, RefreshCw, Sparkles, ArrowRight } from "lucide-react"
 
 export const metadata: Metadata = {
-  title: "How Rootly Works",
+  title: "Learn Rootly",
   description: "A quick visual guide to using Rootly Notes in four simple steps.",
 }
 
-export default function HowItWorksPage() {
+export default function LearnRootlyPage() {
   const steps = [
     {
       id: 1,
@@ -50,7 +50,7 @@ export default function HowItWorksPage() {
             <span>Quick visual guide</span>
           </div>
           <h1 className="mt-4 text-balance text-3xl font-semibold tracking-tight md:text-4xl">
-            How Rootly Works — in 4 clear steps
+            Learn Rootly — in 4 clear steps
           </h1>
           <p className="mt-3 text-muted-foreground">
             Learn the flow, stay in control, and make steady progress. Everything is designed to be simple,
@@ -178,5 +178,4 @@ export default function HowItWorksPage() {
     </main>
   )
 }
-
 
