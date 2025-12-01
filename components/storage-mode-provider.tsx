@@ -53,6 +53,10 @@ export function StorageModeProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     async function initialize() {
+      // Add a small delay to ensure session cookies are available after OAuth redirect
+      // This helps with the race condition where session might not be immediately available
+      await new Promise((resolve) => setTimeout(resolve, 100))
+      
       const currentMode = await getStorageMode()
       setMode(currentMode)
 
@@ -76,6 +80,9 @@ export function StorageModeProvider({ children }: { children: ReactNode }) {
       if (event === "SIGNED_IN" && session) {
         // Mark that user is now authenticated (for future reference)
         markPreviouslyAuthenticated()
+        
+        // Wait a bit to ensure session is fully established and cookies are set
+        await new Promise((resolve) => setTimeout(resolve, 300))
         
         // User just signed in - automatically migrate localStorage data if it exists
         const localData = getAllData()
@@ -111,8 +118,19 @@ export function StorageModeProvider({ children }: { children: ReactNode }) {
           localStorage.removeItem("rootly_local_storage_warning_dismissed")
         }
         
-        const newMode = await getStorageMode()
-        setMode(newMode)
+        // Force refresh storage mode after session is established
+        // Use getUser() to ensure we get the latest session state
+        const { data: { user } } = await supabase.auth.getUser()
+        if (user) {
+          setMode("supabase")
+          // Reload to ensure all hooks pick up the new mode and fetch from Supabase
+          setTimeout(() => {
+            window.location.reload()
+          }, 500)
+        } else {
+          const newMode = await getStorageMode()
+          setMode(newMode)
+        }
       } else if (event === "SIGNED_OUT") {
         const newMode = await getStorageMode()
         setMode(newMode)

@@ -19,10 +19,17 @@ export async function isAuthenticated(): Promise<boolean> {
 
   try {
     const { supabase } = await import("@/lib/supabase/client")
+    // Use getUser() instead of getSession() for more reliable session detection
+    // getSession() can be stale, getUser() refreshes from the server
     const {
-      data: { session },
-    } = await supabase.auth.getSession()
-    return !!session
+      data: { user },
+      error,
+    } = await supabase.auth.getUser()
+    // If there's an error or no user, not authenticated
+    if (error || !user) {
+      return false
+    }
+    return true
   } catch {
     return false
   }

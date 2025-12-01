@@ -7,6 +7,7 @@
 
 import { useEffect, useState, useCallback } from "react"
 import { getStorageMode } from "@/lib/storage-mode"
+import { useStorageMode } from "@/components/storage-mode-provider"
 import * as localStorage from "@/lib/data/local-storage"
 import { supabase } from "@/lib/supabase/client"
 import type { Course, Note, DailyEntry } from "@/lib/types"
@@ -16,11 +17,16 @@ export function useCourses() {
   const [courses, setCourses] = useState<Course[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<Error | null>(null)
+  const { mode: storageMode, isLoading: storageModeLoading } = useStorageMode()
 
   const fetchCourses = useCallback(async () => {
     try {
       setIsLoading(true)
-      const mode = await getStorageMode()
+      // Wait for storage mode to be determined
+      if (storageModeLoading) {
+        return
+      }
+      const mode = storageMode || await getStorageMode()
 
       if (mode === "localStorage") {
         const data = localStorage.getCourses()
@@ -64,9 +70,12 @@ export function useCourses() {
     return () => {
       if (cleanup) cleanup()
     }
-  }, [fetchCourses])
+  }, [fetchCourses, storageMode, storageModeLoading])
 
-  return { courses, isLoading, error, refetch: fetchCourses }
+  // Don't show loading if storage mode is still loading
+  const effectiveLoading = storageModeLoading || isLoading
+
+  return { courses, isLoading: effectiveLoading, error, refetch: fetchCourses }
 }
 
 // Notes
@@ -81,11 +90,16 @@ export function useNotes(filters?: NoteFilters) {
   const [notes, setNotes] = useState<Note[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<Error | null>(null)
+  const { mode: storageMode, isLoading: storageModeLoading } = useStorageMode()
 
   const fetchNotes = useCallback(async () => {
     try {
       setIsLoading(true)
-      const mode = await getStorageMode()
+      // Wait for storage mode to be determined
+      if (storageModeLoading) {
+        return
+      }
+      const mode = storageMode || await getStorageMode()
 
       if (mode === "localStorage") {
         let data = localStorage.getNotes()
@@ -182,9 +196,12 @@ export function useNotes(filters?: NoteFilters) {
     return () => {
       if (cleanup) cleanup()
     }
-  }, [fetchNotes])
+  }, [fetchNotes, storageMode, storageModeLoading])
 
-  return { notes, isLoading, error, refetch: fetchNotes }
+  // Don't show loading if storage mode is still loading
+  const effectiveLoading = storageModeLoading || isLoading
+
+  return { notes, isLoading: effectiveLoading, error, refetch: fetchNotes }
 }
 
 // Daily Entries
@@ -192,11 +209,16 @@ export function useDailyEntries() {
   const [entries, setEntries] = useState<DailyEntry[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<Error | null>(null)
+  const { mode: storageMode, isLoading: storageModeLoading } = useStorageMode()
 
   const fetchEntries = useCallback(async () => {
     try {
       setIsLoading(true)
-      const mode = await getStorageMode()
+      // Wait for storage mode to be determined
+      if (storageModeLoading) {
+        return
+      }
+      const mode = storageMode || await getStorageMode()
 
       if (mode === "localStorage") {
         const data = localStorage.getDailyEntries()
@@ -243,8 +265,11 @@ export function useDailyEntries() {
     return () => {
       if (cleanup) cleanup()
     }
-  }, [fetchEntries])
+  }, [fetchEntries, storageMode, storageModeLoading])
 
-  return { entries, isLoading, error, refetch: fetchEntries }
+  // Don't show loading if storage mode is still loading
+  const effectiveLoading = storageModeLoading || isLoading
+
+  return { entries, isLoading: effectiveLoading, error, refetch: fetchEntries }
 }
 
