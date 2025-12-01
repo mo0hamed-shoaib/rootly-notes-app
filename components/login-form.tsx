@@ -95,10 +95,13 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
           </div>
           <div className="bg-muted relative hidden md:block">
             <Image
-              src="/login-banner.png"
+              src="/login-banner.jpg"
               alt="Login banner"
               fill
               className="object-cover"
+              priority
+              sizes="(max-width: 768px) 0vw, 50vw"
+              fetchPriority="high"
             />
           </div>
         </CardContent>
