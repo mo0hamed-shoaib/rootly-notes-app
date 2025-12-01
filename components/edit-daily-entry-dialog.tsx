@@ -12,13 +12,12 @@ import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { TimeInput } from "@/components/ui/time-input"
-import { supabase } from "@/lib/supabase/client"
 import { Loader2, Calendar as CalendarIcon } from "lucide-react"
 import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { format } from "date-fns"
-import { toast } from "sonner"
 import type { DailyEntry } from "@/lib/types"
+import { useDailyEntryMutations } from "@/hooks/use-mutations"
 
 const editDailyEntrySchema = z.object({
   date: z.string().min(1, "Date is required"),
@@ -50,7 +49,7 @@ interface EditDailyEntryDialogProps {
 
 export function EditDailyEntryDialog({ entry, open, onOpenChange }: EditDailyEntryDialogProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const router = useRouter()
+  const { updateDailyEntry } = useDailyEntryMutations()
 
   const form = useForm<z.input<typeof editDailyEntrySchema>, any, EditDailyEntryFormData>({
     resolver: zodResolver(editDailyEntrySchema),
@@ -76,29 +75,17 @@ export function EditDailyEntryDialog({ entry, open, onOpenChange }: EditDailyEnt
   const onSubmit = async (data: EditDailyEntryFormData) => {
     setIsSubmitting(true)
     try {
-      const { error } = await supabase
-        .from("daily_entries")
-        .update({
-          date: data.date,
-          study_time: data.study_time,
-          mood: data.mood,
-          notes: data.notes || "",
-        })
-        .eq("id", entry.id)
-
-      if (error) throw error
-
-      toast.success("Daily entry updated successfully", {
-        description: "Your changes have been saved.",
+      await updateDailyEntry(entry.id, {
+        date: data.date,
+        study_time: data.study_time,
+        mood: data.mood,
+        notes: data.notes || "",
       })
 
       onOpenChange(false)
-      router.refresh()
     } catch (error) {
+      // Error is handled by the mutation hook
       console.error("Error updating daily entry:", error)
-      toast.error("Error updating daily entry", {
-        description: "Please try again.",
-      })
     } finally {
       setIsSubmitting(false)
     }
@@ -175,7 +162,7 @@ export function EditDailyEntryDialog({ entry, open, onOpenChange }: EditDailyEnt
                     value={field.value.toString()}
                   >
                     <FormControl>
-                      <SelectTrigger>
+                      <SelectTrigger aria-label="Select mood">
                         <SelectValue />
                       </SelectTrigger>
                     </FormControl>

@@ -8,11 +8,11 @@ interface UnderstandingBadgeProps {
 }
 
 const levelConfig = {
-  1: { label: "Confused", color: "bg-red-500 text-white" },
-  2: { label: "Unclear", color: "bg-orange-500 text-white" },
-  3: { label: "Getting It", color: "bg-yellow-500 text-black" },
-  4: { label: "Clear", color: "bg-blue-500 text-white" },
-  5: { label: "Crystal Clear", color: "bg-green-500 text-white" },
+  1: { label: "Confused", color: "bg-red-600 text-white" },
+  2: { label: "Unclear", color: "bg-orange-600 text-white" },
+  3: { label: "Getting It", color: "bg-yellow-600 text-white" },
+  4: { label: "Clear", color: "bg-blue-600 text-white" },
+  5: { label: "Crystal Clear", color: "bg-green-600 text-white" },
 }
 
 export function UnderstandingBadge({ level, className }: UnderstandingBadgeProps) {

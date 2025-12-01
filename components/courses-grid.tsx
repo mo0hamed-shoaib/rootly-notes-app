@@ -32,7 +32,7 @@ export function CoursesGrid({ courses }: CoursesGridProps) {
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1 min-w-0">
                   {/* Course Title */}
-                  <h3 className="text-lg font-semibold leading-tight mb-2">{course.title}</h3>
+                  <h2 className="text-lg font-semibold leading-tight mb-2">{course.title}</h2>
 
                   {/* Instructor */}
                   <div className="flex items-center gap-2 text-sm text-muted-foreground mb-3">

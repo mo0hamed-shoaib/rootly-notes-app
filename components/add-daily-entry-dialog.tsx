@@ -24,10 +24,9 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { DialogFooter } from "@/components/ui/dialog"
 import { TimeInput } from "@/components/ui/time-input"
 import { format } from "date-fns"
-import { supabase } from "@/lib/supabase/client"
 import { Plus, Loader2 } from "lucide-react"
-import { toast } from "sonner"
 import { useEditingGuard } from "@/hooks/use-editing-guard"
+import { useDailyEntryMutations } from "@/hooks/use-mutations"
 
 const dailyEntrySchema = z.object({
   date: z.string().min(1, "Date is required"),
@@ -54,8 +53,8 @@ type DailyEntryFormData = z.infer<typeof dailyEntrySchema>
 export function AddDailyEntryDialog() {
   const [open, setOpen] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const router = useRouter()
   const { guardAction } = useEditingGuard()
+  const { createDailyEntry } = useDailyEntryMutations()
 
   const form = useForm<z.input<typeof dailyEntrySchema>, any, DailyEntryFormData>({
     resolver: zodResolver(dailyEntrySchema),
@@ -70,29 +69,18 @@ export function AddDailyEntryDialog() {
   const onSubmit = async (data: DailyEntryFormData) => {
     setIsSubmitting(true)
     try {
-      const { error } = await supabase.from("daily_entries").insert([
-        {
-          date: data.date,
-          study_time: data.study_time,
-          mood: data.mood,
-          notes: data.notes || "",
-        },
-      ])
-
-      if (error) throw error
-
-      toast.success("Daily entry added successfully", {
-        description: "Your study progress has been recorded.",
+      await createDailyEntry({
+        date: data.date,
+        study_time: data.study_time,
+        mood: data.mood,
+        notes: data.notes || "",
       })
 
       form.reset()
       setOpen(false)
-      router.refresh()
     } catch (error) {
+      // Error is handled by the mutation hook
       console.error("Error adding daily entry:", error)
-      toast.error("Error adding daily entry", {
-        description: "Please try again.",
-      })
     } finally {
       setIsSubmitting(false)
     }
@@ -183,7 +171,7 @@ export function AddDailyEntryDialog() {
                     defaultValue={field.value.toString()}
                   >
                     <FormControl>
-                      <SelectTrigger>
+                      <SelectTrigger aria-label="Select mood">
                         <SelectValue />
                       </SelectTrigger>
                     </FormControl>

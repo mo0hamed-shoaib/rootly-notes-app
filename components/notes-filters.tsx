@@ -78,7 +78,7 @@ export function NotesFilters({ courses }: NotesFiltersProps) {
       {/* Filters */}
       <div className="grid grid-cols-1 sm:flex sm:flex-wrap gap-3">
         <Select value={currentCourse} onValueChange={(value) => updateFilter("course", value)}>
-          <SelectTrigger className="w-full sm:w-[200px] h-9">
+          <SelectTrigger className="w-full sm:w-[200px] h-9" aria-label="Filter by course">
             <SelectValue placeholder="All courses" />
           </SelectTrigger>
           <SelectContent className="w-[calc(100vw-2rem)] max-w-[300px] sm:max-w-[300px]">
@@ -94,7 +94,7 @@ export function NotesFilters({ courses }: NotesFiltersProps) {
         </Select>
 
         <Select value={currentUnderstanding} onValueChange={(value) => updateFilter("understanding", value)}>
-          <SelectTrigger className="w-full sm:w-[180px] h-9">
+          <SelectTrigger className="w-full sm:w-[180px] h-9" aria-label="Filter by understanding level">
             <SelectValue placeholder="Understanding level" />
           </SelectTrigger>
           <SelectContent>
@@ -108,7 +108,7 @@ export function NotesFilters({ courses }: NotesFiltersProps) {
         </Select>
 
         <Select value={currentFlagged} onValueChange={(value) => updateFilter("flagged", value)}>
-          <SelectTrigger className="w-full sm:w-[140px] h-9">
+          <SelectTrigger className="w-full sm:w-[140px] h-9" aria-label="Filter by flagged status">
             <SelectValue placeholder="All notes" />
           </SelectTrigger>
           <SelectContent>

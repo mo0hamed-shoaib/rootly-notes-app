@@ -116,9 +116,9 @@ export function NotesGrid({ notes, highlight }: NotesGridProps) {
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1 min-w-0">
                   {/* Question */}
-                  <h3 className="text-lg font-semibold leading-tight mb-2">
+                  <h2 className="text-lg font-semibold leading-tight mb-2">
                     {renderWithHighlight(note.question, highlight)}
-                  </h3>
+                  </h2>
 
                   {/* Course info */}
                   {note.course && (
@@ -219,7 +219,7 @@ export function NotesGrid({ notes, highlight }: NotesGridProps) {
                   <TooltipProvider>
                     <Tooltip>
                       <TooltipTrigger asChild>
-                        <Badge variant="outline" className="text-violet-600 border-violet-600">
+                        <Badge variant="outline" className="text-violet-700 border-violet-700 dark:text-violet-400 dark:border-violet-400">
                           <CodeXml className="h-3 w-3 mr-1" />
                           Has Snippet
                         </Badge>

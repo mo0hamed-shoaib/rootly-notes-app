@@ -8,7 +8,6 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { Badge } from "@/components/ui/badge"
 import { UnderstandingBadge } from "@/components/understanding-badge"
 import { Progress } from "@/components/ui/progress"
-import { supabase } from "@/lib/supabase/client"
 import { Eye, EyeOff, RotateCcw, CheckCircle, Flag, Play, CircleStop } from "lucide-react"
 import {
   AlertDialog,
@@ -21,9 +20,9 @@ import {
   AlertDialogCancel,
   AlertDialogAction,
 } from "@/components/ui/alert-dialog"
-import { toast } from "sonner"
 import type { Note } from "@/lib/types"
 import { useEditingGuard } from "@/hooks/use-editing-guard"
+import { useNoteMutations } from "@/hooks/use-mutations"
 
 interface ReviewSessionProps {
   notes: (Note & { course?: { title: string; instructor: string } })[]
@@ -40,9 +39,9 @@ export function ReviewSession({ notes }: ReviewSessionProps) {
   const [responses, setResponses] = useState<{ noteId: string; previous: number; next: number }[]>([])
   const [ended, setEnded] = useState(false)
   const startedAtRef = useRef<number | null>(null)
-  const router = useRouter()
   const STORAGE_KEY = "rootly_review_session_v1"
   const { guardAction } = useEditingGuard()
+  const { updateNote } = useNoteMutations()
 
   const idToNote = useMemo(() => {
     const map = new Map<string, Note>()
@@ -141,15 +140,10 @@ export function ReviewSession({ notes }: ReviewSessionProps) {
 
     setIsUpdating(true)
     try {
-      const { error } = await supabase
-        .from("notes")
-        .update({
-          understanding_level: newLevel,
-          updated_at: new Date().toISOString(),
-        })
-        .eq("id", currentNote.id)
-
-      if (error) throw error
+      await updateNote(currentNote.id, {
+        understanding_level: newLevel,
+        updated_at: new Date().toISOString(),
+      })
 
       setCompletedNotes((prev) => [...prev, currentNote.id])
       setResponses((prev) => [
@@ -298,7 +292,7 @@ export function ReviewSession({ notes }: ReviewSessionProps) {
           {/* Answer Section */}
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="text-lg font-medium">Answer</h3>
+              <h2 className="text-lg font-medium">Answer</h2>
               <Button variant="outline" size="sm" onClick={() => setShowAnswer(!showAnswer)}>
                 {showAnswer ? (
                   <>

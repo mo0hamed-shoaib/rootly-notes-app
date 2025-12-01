@@ -52,9 +52,9 @@ export function Footer() {
               © {currentYear} Rootly Notes. All rights reserved.
             </p>
           </div>
-          <nav className="flex flex-col sm:flex-row gap-8">
+          <nav className="flex flex-col sm:flex-row gap-8" aria-label="Footer navigation">
             <div className="flex flex-col gap-2">
-              <h3 className="text-sm font-semibold text-foreground mb-1">App</h3>
+              <h2 className="text-sm font-semibold text-foreground mb-1">App</h2>
               {appLinks.map((link) => (
                 <Link
                   key={link.href}
@@ -66,7 +66,7 @@ export function Footer() {
               ))}
             </div>
             <div className="flex flex-col gap-2">
-              <h3 className="text-sm font-semibold text-foreground mb-1">Resources</h3>
+              <h2 className="text-sm font-semibold text-foreground mb-1">Resources</h2>
               {resourceLinks.map((link) => (
                 <Link
                   key={link.href}
@@ -78,7 +78,7 @@ export function Footer() {
               ))}
             </div>
             <div className="flex flex-col gap-2">
-              <h3 className="text-sm font-semibold text-foreground mb-1">Social</h3>
+              <h2 className="text-sm font-semibold text-foreground mb-1">Social</h2>
               <a
                 href={githubUrl}
                 target="_blank"

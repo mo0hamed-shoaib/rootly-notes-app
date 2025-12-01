@@ -31,14 +31,14 @@ export function DailyEntriesGrid({ entries }: DailyEntriesGridProps) {
             <CardHeader className="pb-3">
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1">
-                  <div className="flex items-center gap-2 text-lg font-semibold mb-2">
+                  <h2 className="flex items-center gap-2 text-lg font-semibold mb-2">
                     <Calendar className="h-5 w-5" />
                     {new Date(entry.date).toLocaleDateString("en-US", {
                       weekday: "long",
                       month: "short",
                       day: "numeric",
                     })}
-                  </div>
+                  </h2>
 
                   <div className="flex items-center gap-4 mb-3">
                     <div className="flex items-center gap-2">

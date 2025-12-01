@@ -21,12 +21,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import { supabase } from "@/lib/supabase/client"
 import { Plus, Loader2 } from "lucide-react"
-import { toast } from "sonner"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import { LanguageCombobox } from "@/components/language-combobox"
 import { useEditingGuard } from "@/hooks/use-editing-guard"
+import { useNoteMutations } from "@/hooks/use-mutations"
  
 
 const noteSchema = z.object({
@@ -48,8 +47,8 @@ interface AddNoteDialogProps {
 export function AddNoteDialog({ courses }: AddNoteDialogProps) {
   const [open, setOpen] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const router = useRouter()
   const { guardAction } = useEditingGuard()
+  const { createNote } = useNoteMutations()
 
   const form = useForm<NoteFormData>({
     resolver: zodResolver(noteSchema),
@@ -67,32 +66,21 @@ export function AddNoteDialog({ courses }: AddNoteDialogProps) {
   const onSubmit = async (data: NoteFormData) => {
     setIsSubmitting(true)
     try {
-      const { error } = await supabase.from("notes").insert([
-        {
-          course_id: data.course_id,
-          question: data.question,
-          answer: data.answer || "",
-          code_snippet: data.code_snippet || null,
-          code_language: data.code_language || "plaintext",
-          understanding_level: data.understanding_level,
-          flag: data.flag,
-        },
-      ])
-
-      if (error) throw error
-
-      toast.success("Note added successfully", {
-        description: "Your learning question has been saved.",
+      await createNote({
+        course_id: data.course_id,
+        question: data.question,
+        answer: data.answer || "",
+        code_snippet: data.code_snippet || null,
+        code_language: data.code_language || "plaintext",
+        understanding_level: data.understanding_level,
+        flag: data.flag,
       })
 
       form.reset()
       setOpen(false)
-      router.refresh()
     } catch (error) {
+      // Error is handled by the mutation hook
       console.error("Error adding note:", error)
-      toast.error("Error adding note", {
-        description: "Please try again.",
-      })
     } finally {
       setIsSubmitting(false)
     }
@@ -138,7 +126,7 @@ export function AddNoteDialog({ courses }: AddNoteDialogProps) {
                   <FormLabel>Course</FormLabel>
                   <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl>
-                      <SelectTrigger>
+                      <SelectTrigger aria-label="Select course">
                         <SelectValue placeholder="Select a course" />
                       </SelectTrigger>
                     </FormControl>
@@ -244,7 +232,7 @@ export function AddNoteDialog({ courses }: AddNoteDialogProps) {
                       defaultValue={field.value.toString()}
                     >
                       <FormControl>
-                        <SelectTrigger>
+                        <SelectTrigger aria-label="Select understanding level">
                           <SelectValue />
                         </SelectTrigger>
                       </FormControl>

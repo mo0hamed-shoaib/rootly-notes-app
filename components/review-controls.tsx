@@ -33,8 +33,8 @@ export function ReviewControls({ courses }: ReviewControlsProps) {
   return (
     <div className="grid grid-cols-1 sm:flex sm:flex-wrap items-center gap-3">
       <Select value={course} onValueChange={(v) => updateParam("course", v)}>
-        <SelectTrigger className="w-full sm:w-[200px] h-9">
-          <SelectValue placeholder="All courses" />
+        <SelectTrigger className="w-full sm:w-[200px] h-9" aria-label={`Course filter: ${course === "all" ? "All courses" : courses.find(c => c.id === course)?.title || "All courses"}`}>
+          <SelectValue placeholder="All courses" aria-label="Filter by course" />
         </SelectTrigger>
         <SelectContent className="w-[calc(100vw-2rem)] max-w-[300px] sm:max-w-[300px]">
           <SelectItem value="all">All courses</SelectItem>
@@ -49,8 +49,8 @@ export function ReviewControls({ courses }: ReviewControlsProps) {
       </Select>
 
       <Select value={limit} onValueChange={(v) => updateParam("limit", v === "all" ? "100" : v)}>
-        <SelectTrigger className="w-full sm:w-[120px] h-9">
-          <SelectValue placeholder="Limit" />
+        <SelectTrigger className="w-full sm:w-[120px] h-9" aria-label={`Limit: ${limit === "all" ? "All" : limit} notes`}>
+          <SelectValue placeholder="Limit" aria-label="Limit number of notes" />
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="10">10</SelectItem>

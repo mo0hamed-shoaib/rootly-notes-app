@@ -12,12 +12,11 @@ import { Select as UiSelect, SelectContent as UiSelectContent, SelectItem as UiS
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Switch } from "@/components/ui/switch"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
-import { supabase } from "@/lib/supabase/client"
 import { Loader2 } from "lucide-react"
-import { toast } from "sonner"
 import type { Note, CodeLanguage } from "@/lib/types"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import { LanguageCombobox } from "@/components/language-combobox"
+import { useNoteMutations } from "@/hooks/use-mutations"
  
 
 const editNoteSchema = z.object({
@@ -39,7 +38,7 @@ interface EditNoteDialogProps {
 
 export function EditNoteDialog({ note, open, onOpenChange }: EditNoteDialogProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const router = useRouter()
+  const { updateNote } = useNoteMutations()
 
   const form = useForm<EditNoteFormData>({
     resolver: zodResolver(editNoteSchema),
@@ -69,31 +68,19 @@ export function EditNoteDialog({ note, open, onOpenChange }: EditNoteDialogProps
   const onSubmit = async (data: EditNoteFormData) => {
     setIsSubmitting(true)
     try {
-      const { error } = await supabase
-        .from("notes")
-        .update({
-          question: data.question,
-          answer: data.answer || "",
-          code_snippet: data.code_snippet || null,
-          code_language: data.code_language || "plaintext",
-          understanding_level: data.understanding_level,
-          flag: data.flag,
-        })
-        .eq("id", note.id)
-
-      if (error) throw error
-
-      toast.success("Note updated successfully", {
-        description: "Your changes have been saved.",
+      await updateNote(note.id, {
+        question: data.question,
+        answer: data.answer || "",
+        code_snippet: data.code_snippet || null,
+        code_language: data.code_language || "plaintext",
+        understanding_level: data.understanding_level,
+        flag: data.flag,
       })
 
       onOpenChange(false)
-      router.refresh()
     } catch (error) {
+      // Error is handled by the mutation hook
       console.error("Error updating note:", error)
-      toast.error("Error updating note", {
-        description: "Please try again.",
-      })
     } finally {
       setIsSubmitting(false)
     }
@@ -196,7 +183,7 @@ export function EditNoteDialog({ note, open, onOpenChange }: EditNoteDialogProps
                       value={field.value.toString()}
                     >
                       <FormControl>
-                        <SelectTrigger>
+                        <SelectTrigger aria-label="Select understanding level">
                           <SelectValue />
                         </SelectTrigger>
                       </FormControl>
