@@ -23,7 +23,7 @@ export default async function HomePage() {
         <div className="h-full w-full bg-[radial-gradient(circle_at_center,theme(colors.primary/35),transparent_50%)]" />
         <div className="absolute inset-0 bg-[linear-gradient(0deg,rgba(0,0,0,0.16)_1px,transparent_1px),linear-gradient(90deg,rgba(0,0,0,0.16)_1px,transparent_1px)] bg-[size:60px_60px] dark:bg-[linear-gradient(0deg,rgba(255,255,255,0.18)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.18)_1px,transparent_1px)]" />
       </div>
-      <section className="container mx-auto max-w-6xl px-4 py-16 text-center">
+      <section className="container mx-auto max-w-6xl px-4 py-16 md:py-20 text-center">
         <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight leading-tight">
           Master your learning journey
         </h1>
@@ -56,14 +56,11 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="container mx-auto max-w-6xl px-4 py-16">
-        <h2 className="text-5xl font-bold mb-8 text-center">
+      <section className="container mx-auto max-w-6xl px-4 py-12">
+        <h2 className="text-4xl md:text-5xl font-bold mb-6 text-center">
           Philosophy Behind
         </h2>
         <div className="max-w-4xl mx-auto">
-          <p className="text-lg text-muted-foreground text-center mb-12 leading-relaxed">
-            Learning is about building a sustainable system that grows with you. It goes beyond consuming information. Rootly believes in the power of consistent, structured learning that transforms knowledge into lasting understanding.
-          </p>
           <Card className="bg-muted/50 border-0 shadow-lg">
             <CardContent className="p-6">
               <div className="flex gap-4">
@@ -84,8 +81,8 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="container mx-auto max-w-6xl px-4 py-16">
-        <h2 className="text-5xl font-bold mb-8 text-center">Features</h2>
+      <section className="container mx-auto max-w-6xl px-4 py-12">
+        <h2 className="text-4xl md:text-5xl font-bold mb-6 text-center">Features</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {[
             {
@@ -134,17 +131,17 @@ export default async function HomePage() {
                 </div>
               </div>
               <CardContent className="px-5 py-4">
-                <h3 className="text-base font-semibold leading-tight">
+                <h3 className="text-lg font-semibold leading-tight">
                   {f.title}
                 </h3>
-                <p className="text-sm text-muted-foreground mt-1">{f.desc}</p>
+                <p className="text-sm text-muted-foreground mt-1.5">{f.desc}</p>
               </CardContent>
             </Card>
           ))}
         </div>
       </section>
-      <section className="container mx-auto max-w-6xl px-4 py-16">
-        <h2 className="text-5xl font-bold mb-8 text-center">FAQ</h2>
+      <section className="container mx-auto max-w-6xl px-4 py-12">
+        <h2 className="text-4xl md:text-5xl font-bold mb-6 text-center">FAQ</h2>
         <Accordion
           type="single"
           collapsible

@@ -1,12 +1,13 @@
 "use client"
 
+import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import { UnderstandingBadge } from "@/components/understanding-badge"
 import { MoodIndicator } from "@/components/mood-indicator"
-import { BookOpen, Calendar, User, Clock, Flag, CodeXml, Eye, CheckCircle, RotateCcw } from "lucide-react"
+import { BookOpen, Calendar, User, Clock, Flag, CodeXml, Eye, CheckCircle, RotateCcw, EyeOff } from "lucide-react"
 import { formatStudyTime } from "@/lib/time-utils"
 import { seedCourses, seedNotes, getSeedDailyEntries } from "@/lib/data/seed-data"
 import { UnderstandingChart } from "@/components/understanding-chart"
@@ -24,7 +25,7 @@ const previewCourses = seedCourses.map((course, idx) => ({
   note_count: idx === 0 ? 4 : 2,
 }))
 
-const previewNotes = seedNotes("preview-course-0", "preview-course-1").slice(0, 2).map((note, idx) => ({
+const previewNotes = seedNotes("preview-course-0", "preview-course-1").slice(0, 3).map((note, idx) => ({
   ...note,
   id: `preview-note-${idx}`,
   created_at: new Date().toISOString(),
@@ -185,89 +186,94 @@ export function DailyPreview() {
 }
 
 export function ReviewPreview() {
-  const note = previewNotes[0]
-  const currentIndex = 2
-  const totalNotes = 5
+  const totalNotes = previewNotes.length
+  const [currentIndex, setCurrentIndex] = useState(0)
+  const [showAnswer, setShowAnswer] = useState(false)
+  const [isTransitioning, setIsTransitioning] = useState(false)
+
+  // Cycle through notes
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setIsTransitioning(true)
+      setTimeout(() => {
+        setCurrentIndex((prev) => (prev + 1) % previewNotes.length)
+        setShowAnswer(false)
+        setIsTransitioning(false)
+      }, 300)
+    }, 5000) // Change note every 5 seconds
+
+    return () => clearInterval(interval)
+  }, [])
+
+  // Auto-show answer after 1.5s
+  useEffect(() => {
+    if (!isTransitioning) {
+      const timer = setTimeout(() => {
+        setShowAnswer(true)
+      }, 1500)
+      return () => clearTimeout(timer)
+    }
+  }, [currentIndex, isTransitioning])
+
+  const note = previewNotes[currentIndex]
   const progress = ((currentIndex + 1) / totalNotes) * 100
-  
+
   return (
-    <div className="px-3 py-2 pointer-events-none h-full flex flex-col gap-2 overflow-hidden [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+    <div className="px-4 py-3 pointer-events-none h-full w-full flex flex-col gap-3 overflow-hidden [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
       {/* Progress */}
-      <div className="space-y-1">
+      <div className="space-y-1 flex-shrink-0">
         <div className="flex items-center justify-between">
           <span className="text-[10px] text-muted-foreground">{currentIndex + 1} of {totalNotes}</span>
         </div>
         <Progress value={progress} className="h-1" />
       </div>
 
-      {/* Review Card */}
-      <Card className="border shadow-sm flex-1 flex flex-col">
-        <CardHeader className="pb-2 pt-2.5 px-2.5">
-          <div className="flex items-start justify-between gap-4">
-            <div className="flex-1">
-              <CardTitle className="text-xs leading-tight mb-1.5 line-clamp-2">{note.question}</CardTitle>
-              <div className="flex items-center gap-1.5 flex-wrap mb-1">
-                <span className="text-[10px] text-muted-foreground">
-                  Current understanding: <span className="font-medium text-foreground">{note.understanding_level}/5</span>
-                </span>
-                {note.flag && (
-                  <Badge variant="outline" className="text-orange-600 border-orange-600 text-[10px] px-1.5 py-0">
-                    <Flag className="h-2.5 w-2.5 mr-0.5" />
-                    Flagged
-                  </Badge>
-                )}
-              </div>
-            </div>
-          </div>
-        </CardHeader>
+      {/* Question */}
+      <div className="flex-shrink-0">
+        <h3 
+          className={`text-sm font-semibold leading-tight transition-opacity duration-300 ${
+            isTransitioning ? "opacity-0" : "opacity-100"
+          }`}
+        >
+          {note.question}
+        </h3>
+      </div>
 
-        <CardContent className="px-2.5 pb-2.5 flex-1 flex flex-col space-y-2">
-          {/* Answer Section */}
-          <div className="space-y-1.5">
-            <div className="flex items-center justify-end">
-              <Button variant="outline" size="sm" className="h-5 px-2 text-[9px] pointer-events-none">
-                <Eye className="h-3 w-3 mr-1" />
-                Show Answer
-              </Button>
-            </div>
-            <div className="bg-muted/30 p-2 rounded text-center text-[9px] text-muted-foreground">
-              Click "Show Answer" to reveal
-            </div>
-          </div>
+      {/* Show/Hide Answer Button */}
+      <div className="flex items-center justify-end flex-shrink-0">
+        <Button 
+          variant={showAnswer ? "secondary" : "outline"} 
+          size="sm" 
+          className={`h-7 px-3 text-[10px] pointer-events-none transition-all duration-300 ${
+            showAnswer ? "opacity-70" : ""
+          }`}
+        >
+          {showAnswer ? (
+            <>
+              <EyeOff className="h-3.5 w-3.5 mr-1.5" />
+              Hide Answer
+            </>
+          ) : (
+            <>
+              <Eye className="h-3.5 w-3.5 mr-1.5" />
+              Show Answer
+            </>
+          )}
+        </Button>
+      </div>
 
-          {/* Understanding Selection */}
-          <div className="space-y-1.5">
-            <h4 className="text-[9px] font-medium">How well do you understand this?</h4>
-            <div className="grid grid-cols-5 gap-1">
-              {[1, 2, 3, 4, 5].map((level) => (
-                <Button
-                  key={level}
-                  variant={level === 4 ? "default" : "outline"}
-                  size="sm"
-                  className="h-auto py-1.5 px-1 flex flex-col gap-0.5 text-[9px] pointer-events-none"
-                >
-                  <span className="font-semibold text-[10px]">{level}</span>
-                  <span className="text-[8px] leading-tight">
-                    {level === 1 ? "Confused" : level === 2 ? "Unclear" : level === 3 ? "Getting It" : level === 4 ? "Clear" : "Crystal"}
-                  </span>
-                </Button>
-              ))}
-            </div>
+      {/* Answer */}
+      <div className="flex-1 min-h-0 overflow-hidden">
+        {!showAnswer ? (
+          <div className="bg-muted/30 p-3 rounded-md text-center text-[10px] text-muted-foreground flex items-center justify-center h-full">
+            Click "Show Answer" to reveal
           </div>
-
-          {/* Action Buttons */}
-          <div className="flex justify-between pt-1">
-            <Button variant="outline" size="sm" className="h-6 px-2 text-[9px] pointer-events-none">
-              <RotateCcw className="h-3 w-3 mr-1" />
-              Skip
-            </Button>
-            <Button size="sm" className="h-6 px-2 text-[9px] pointer-events-none">
-              <CheckCircle className="h-3 w-3 mr-1" />
-              Next
-            </Button>
+        ) : (
+          <div className="bg-muted/50 p-3 rounded-md text-[10px] text-foreground leading-relaxed overflow-y-auto break-words whitespace-normal h-full">
+            {note.answer}
           </div>
-        </CardContent>
-      </Card>
+        )}
+      </div>
     </div>
   )
 }
