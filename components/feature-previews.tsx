@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -290,10 +290,47 @@ export function ReviewPreview() {
 }
 
 export function ChartsPreview() {
+  const [chartIndex, setChartIndex] = useState(0)
+  const [isTransitioning, setIsTransitioning] = useState(false)
+
+  // Different chart types to cycle through
+  const charts = useMemo(() => [
+    {
+      name: "Understanding",
+      component: <UnderstandingChart data={previewChartNotes} />,
+    },
+    {
+      name: "Study Time",
+      component: <StudyTimeChart data={previewChartDailyEntries} />,
+    },
+    {
+      name: "Mood",
+      component: <MoodChart data={previewChartDailyEntries} />,
+    },
+  ], [])
+
+  // Cycle through different charts
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setIsTransitioning(true)
+      setTimeout(() => {
+        setChartIndex((prev) => (prev + 1) % charts.length)
+        setIsTransitioning(false)
+      }, 300)
+    }, 4000) // Change every 4 seconds
+
+    return () => clearInterval(interval)
+  }, [charts.length])
+
   return (
     <div className="px-4 pt-2 pb-3 pointer-events-none overflow-hidden h-full flex items-start [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-      <div className="w-full h-[180px] scale-70 origin-top animate-fade-in">
-        <UnderstandingChart data={previewChartNotes} />
+      <div 
+        className={`w-full h-[180px] scale-70 origin-top transition-opacity duration-500 ease-in-out ${
+          isTransitioning ? "opacity-0" : "opacity-100"
+        }`}
+        key={chartIndex}
+      >
+        {charts[chartIndex].component}
       </div>
     </div>
   )

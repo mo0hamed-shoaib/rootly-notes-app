@@ -30,7 +30,7 @@ export function UnderstandingChart({ data }: UnderstandingChartProps) {
 
     const total = Object.values(counts).reduce((s, n) => s + n, 0)
     const chartData = [1, 2, 3, 4, 5].map((lvl) => ({
-      level: `Level ${lvl}`,
+      level: `${lvl}`,
       numeric: lvl,
       count: counts[lvl] || 0,
       percent: total ? Number(((counts[lvl] / total) * 100).toFixed(1)) : 0,
@@ -92,6 +92,12 @@ export function UnderstandingChart({ data }: UnderstandingChartProps) {
               axisLine={false}
               tickLine={false}
               tickMargin={10}
+              label={{ 
+                value: 'Understanding Level', 
+                angle: -90, 
+                position: 'insideLeft',
+                style: { textAnchor: 'middle', fill: 'hsl(var(--muted-foreground))' }
+              }}
             />
             <ChartTooltip 
               content={<ChartTooltipContent 
