@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/pagination"
 import { useCourses } from "@/hooks/use-data"
 import { useNotes } from "@/hooks/use-data"
+import { CoursesGridSkeleton } from "@/components/loading-skeletons"
 import type React from "react"
 
 const PAGE_SIZE = 12
@@ -78,15 +79,7 @@ function CoursesPageContent() {
   }
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen bg-background">
-        <div className="container mx-auto px-4 py-6 max-w-6xl">
-          <div className="flex items-center justify-center min-h-[400px]">
-            <p className="text-muted-foreground">Loading...</p>
-          </div>
-        </div>
-      </div>
-    )
+    return <CoursesGridSkeleton />
   }
 
   return (
@@ -148,15 +141,7 @@ function CoursesPageContent() {
 export default function CoursesPage() {
   return (
     <Suspense
-      fallback={
-        <div className="min-h-screen bg-background">
-          <div className="container mx-auto px-4 py-6 max-w-6xl">
-            <div className="flex items-center justify-center min-h-[400px]">
-              <p className="text-muted-foreground">Loading...</p>
-            </div>
-          </div>
-        </div>
-      }
+      fallback={<CoursesGridSkeleton />}
     >
       <CoursesPageContent />
     </Suspense>

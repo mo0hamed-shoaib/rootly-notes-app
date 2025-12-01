@@ -11,6 +11,7 @@ import { FileQuestion } from "lucide-react"
 import { Brain, Flag, Shuffle } from "lucide-react"
 import { useNotes } from "@/hooks/use-data"
 import { useCourses } from "@/hooks/use-data"
+import { ReviewSkeleton } from "@/components/loading-skeletons"
 
 function ReviewPageContent() {
   const searchParams = useSearchParams()
@@ -40,15 +41,7 @@ function ReviewPageContent() {
   const flaggedInSession = sessionNotes.filter((n) => n.flag).length
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen bg-background">
-        <div className="container mx-auto px-4 py-6 max-w-6xl">
-          <div className="flex items-center justify-center min-h-[400px]">
-            <p className="text-muted-foreground">Loading...</p>
-          </div>
-        </div>
-      </div>
-    )
+    return <ReviewSkeleton />
   }
 
   return (
@@ -123,15 +116,7 @@ function ReviewPageContent() {
 export default function ReviewPage() {
   return (
     <Suspense
-      fallback={
-        <div className="min-h-screen bg-background">
-          <div className="container mx-auto px-4 py-6 max-w-6xl">
-            <div className="flex items-center justify-center min-h-[400px]">
-              <p className="text-muted-foreground">Loading...</p>
-            </div>
-          </div>
-        </div>
-      }
+      fallback={<ReviewSkeleton />}
     >
       <ReviewPageContent />
     </Suspense>

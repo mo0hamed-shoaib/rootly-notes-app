@@ -23,6 +23,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination"
+import { NotesGridSkeleton } from "@/components/loading-skeletons"
 import type React from "react"
 
 const PAGE_SIZE = 12
@@ -96,11 +97,7 @@ function NotesPageContent() {
     return (
       <div className="notes-page min-h-screen bg-background">
         <NotesPrintStyles />
-        <div className="container mx-auto px-4 py-6 max-w-6xl">
-          <div className="flex items-center justify-center min-h-[400px]">
-            <p className="text-muted-foreground">Loading...</p>
-          </div>
-        </div>
+        <NotesGridSkeleton />
       </div>
     )
   }

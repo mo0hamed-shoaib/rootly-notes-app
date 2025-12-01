@@ -7,6 +7,7 @@ import { BookOpen, Brain, Calendar, TrendingUp, Target, BarChart3 } from "lucide
 import { useCourses } from "@/hooks/use-data"
 import { useNotes } from "@/hooks/use-data"
 import { useDailyEntries } from "@/hooks/use-data"
+import { OverviewSkeleton } from "@/components/loading-skeletons"
 
 // Lazy load chart components - they're heavy and not needed for initial render
 const UnderstandingChart = dynamic(() => import("@/components/understanding-chart").then((mod) => ({ default: mod.UnderstandingChart })), {
@@ -81,15 +82,7 @@ export default function OverviewPage() {
   }, [entries])
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen bg-background">
-        <div className="container mx-auto px-4 py-6 max-w-6xl">
-          <div className="flex items-center justify-center min-h-[400px]">
-            <p className="text-muted-foreground">Loading...</p>
-          </div>
-        </div>
-      </div>
-    )
+    return <OverviewSkeleton />
   }
 
   return (
