@@ -292,7 +292,7 @@ export function ReviewPreview() {
 export function ChartsPreview() {
   return (
     <div className="px-4 pt-2 pb-3 pointer-events-none overflow-hidden h-full flex items-start [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-      <div className="w-full h-[180px] scale-70 origin-top">
+      <div className="w-full h-[180px] scale-70 origin-top animate-fade-in">
         <UnderstandingChart data={previewChartNotes} />
       </div>
     </div>
@@ -300,6 +300,9 @@ export function ChartsPreview() {
 }
 
 export function ThemesPreview() {
+  const [currentTheme, setCurrentTheme] = useState<"light" | "dark">("light")
+  const [highlightedColor, setHighlightedColor] = useState(0)
+
   // Actual accent colors from theme-toggle.tsx (using oklch format)
   const accentColors = [
     { name: "Rose", value: "oklch(0.645 0.246 16.439)" },
@@ -310,36 +313,98 @@ export function ThemesPreview() {
     { name: "Blue", value: "oklch(0.72 0.16 240)" },
     { name: "Violet", value: "oklch(0.65 0.2 300)" },
   ]
+
+  // Toggle between light and dark themes
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTheme((prev) => (prev === "light" ? "dark" : "light"))
+    }, 3000) // Switch every 3 seconds
+
+    return () => clearInterval(interval)
+  }, [])
+
+  // Cycle through accent colors
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setHighlightedColor((prev) => (prev + 1) % accentColors.length)
+    }, 800) // Highlight each color for 800ms
+
+    return () => clearInterval(interval)
+  }, [accentColors.length])
   
+  const currentAccentColor = accentColors[highlightedColor].value
+
   return (
     <div className="px-4 py-3 pointer-events-none h-full flex flex-col items-center justify-center gap-4">
       {/* Theme modes */}
       <div className="flex items-center justify-center gap-4">
         <div className="flex flex-col items-center gap-1.5">
           <div 
-            className="w-16 h-16 rounded-lg border-2 shadow-sm flex items-center justify-center relative overflow-hidden"
+            className={`w-16 h-16 rounded-lg border-2 shadow-sm flex items-center justify-center relative overflow-hidden transition-all duration-500 ${
+              currentTheme === "light" ? "scale-110 ring-2 ring-primary/30" : "scale-100"
+            }`}
             style={{ 
               backgroundColor: "oklch(1 0 0)",
               borderColor: "oklch(0.922 0 0)"
             }}
           >
             <div className="absolute inset-0 bg-gradient-to-br from-transparent to-oklch(0.97 0 0) opacity-30"></div>
-            <div className="absolute top-1 right-1 w-2 h-2 rounded-full" style={{ backgroundColor: "oklch(0.922 0 0)" }}></div>
-            <div className="absolute bottom-1 left-1 w-2 h-2 rounded-full" style={{ backgroundColor: "oklch(0.97 0 0)" }}></div>
+            {/* Skeleton shapes */}
+            <div className="flex flex-col gap-1.5 w-full px-2">
+              <div 
+                className="h-1.5 rounded transition-colors duration-500"
+                style={{ backgroundColor: currentAccentColor, width: "60%" }}
+              />
+              <div 
+                className="h-1 rounded transition-colors duration-500"
+                style={{ backgroundColor: currentAccentColor, width: "80%", opacity: 0.6 }}
+              />
+              <div className="flex gap-1 mt-0.5">
+                <div 
+                  className="w-2 h-2 rounded transition-colors duration-500"
+                  style={{ backgroundColor: currentAccentColor }}
+                />
+                <div 
+                  className="w-2 h-2 rounded transition-colors duration-500"
+                  style={{ backgroundColor: currentAccentColor, opacity: 0.5 }}
+                />
+              </div>
+            </div>
           </div>
           <span className="text-[10px] font-medium text-muted-foreground">Light</span>
         </div>
         <div className="flex flex-col items-center gap-1.5">
           <div 
-            className="w-16 h-16 rounded-lg border-2 shadow-sm flex items-center justify-center relative overflow-hidden"
+            className={`w-16 h-16 rounded-lg border-2 shadow-sm flex items-center justify-center relative overflow-hidden transition-all duration-500 ${
+              currentTheme === "dark" ? "scale-110 ring-2 ring-primary/30" : "scale-100"
+            }`}
             style={{ 
               backgroundColor: "oklch(0.145 0 0)",
               borderColor: "oklch(0.269 0 0)"
             }}
           >
             <div className="absolute inset-0 bg-gradient-to-br from-oklch(0.145 0 0) to-oklch(0.21 0 0) opacity-50"></div>
-            <div className="absolute top-1 right-1 w-2 h-2 rounded-full" style={{ backgroundColor: "oklch(0.269 0 0)" }}></div>
-            <div className="absolute bottom-1 left-1 w-2 h-2 rounded-full" style={{ backgroundColor: "oklch(0.21 0 0)" }}></div>
+            {/* Skeleton shapes */}
+            <div className="flex flex-col gap-1.5 w-full px-2">
+              <div 
+                className="h-1.5 rounded transition-colors duration-500"
+                style={{ backgroundColor: currentAccentColor, width: "60%" }}
+              />
+              <div 
+                className="h-1 rounded transition-colors duration-500"
+                style={{ backgroundColor: currentAccentColor, width: "80%", opacity: 0.6 }}
+              />
+              <div className="flex gap-1 mt-0.5">
+                <div 
+                  className="w-2 h-2 rounded transition-colors duration-500"
+                  style={{ backgroundColor: currentAccentColor }}
+                />
+                <div 
+                  className="w-2 h-2 rounded transition-colors duration-500"
+                  style={{ backgroundColor: currentAccentColor, opacity: 0.5 }}
+                />
+              </div>
+            </div>
           </div>
           <span className="text-[10px] font-medium text-muted-foreground">Dark</span>
         </div>
@@ -350,7 +415,11 @@ export function ThemesPreview() {
         {accentColors.map((color, idx) => (
           <div
             key={idx}
-            className="w-6 h-6 rounded-full border-2 border-border shadow-sm"
+            className={`w-6 h-6 rounded-full border-2 shadow-sm transition-all duration-500 ${
+              highlightedColor === idx 
+                ? "scale-125 ring-2 ring-primary/40 border-primary/50" 
+                : "scale-100 border-border"
+            }`}
             style={{ backgroundColor: color.value }}
             title={color.name}
           />

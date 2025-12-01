@@ -700,3 +700,17 @@ html:is(.red, .orange, .yellow, .green, .blue, .violet)
     transform: translateY(0);
   }
 }
+
+/* Fade in animation for charts */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 1s ease-out;
+}
