@@ -75,9 +75,21 @@ export function StorageModeProvider({ children }: { children: ReactNode }) {
         setMode(currentMode)
 
         // Only seed localStorage - Supabase will get data via migration when user logs in
-        // BUT: Don't seed if user was previously authenticated (they had Supabase data before)
+        // BUT: Don't seed if user was previously authenticated AND is currently authenticated
+        // (if they logged out, they should get fresh data)
         if (currentMode === "localStorage") {
-          if (!isStorageInitialized() && !wasPreviouslyAuthenticated()) {
+          // Check if user is currently authenticated - if not, clear the flag and allow seeding
+          const { supabase } = await import("@/lib/supabase/client")
+          const { data: { user } } = await supabase.auth.getUser()
+          
+          // If not authenticated now, clear the previously authenticated flag
+          if (!user && wasPreviouslyAuthenticated()) {
+            const { clearPreviouslyAuthenticated } = await import("@/lib/storage-mode")
+            clearPreviouslyAuthenticated()
+          }
+          
+          // Seed if storage is not initialized and user is not currently authenticated
+          if (!isStorageInitialized() && !user) {
             await seedLocalStorageData()
           }
         }
@@ -178,6 +190,10 @@ export function StorageModeProvider({ children }: { children: ReactNode }) {
           }
         }, 1000)
       } else if (event === "SIGNED_OUT") {
+        // Clear the previously authenticated flag when user signs out
+        const { clearPreviouslyAuthenticated } = await import("@/lib/storage-mode")
+        clearPreviouslyAuthenticated()
+        
         const newMode = await getStorageMode()
         setMode(newMode)
       }
