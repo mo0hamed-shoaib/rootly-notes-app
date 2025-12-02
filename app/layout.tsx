@@ -142,7 +142,7 @@ html {
               </header>
               {children}
               <Footer />
-              <Toaster richColors closeButton />
+              <Toaster richColors closeButton dir="ltr" />
               <LocalStorageWarning />
             </EditingProvider>
           </StorageModeProvider>
