@@ -21,6 +21,14 @@ import {
   Flag,
   Play,
   CircleStop,
+  Target,
+  Timer,
+  TrendingDown,
+  TrendingUp,
+  Minus,
+  ArrowRight,
+  AlertCircle,
+  CheckCircle2,
 } from "lucide-react";
 import {
   AlertDialog,
@@ -33,6 +41,7 @@ import {
   AlertDialogCancel,
   AlertDialogAction,
 } from "@/components/ui/alert-dialog";
+import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 import type { Note } from "@/lib/types";
 import { useEditingGuard } from "@/hooks/use-editing-guard";
@@ -175,10 +184,14 @@ export function ReviewSession({ notes }: ReviewSessionProps) {
 
     setIsUpdating(true);
     try {
-      await updateNote(currentNote.id, {
-        understanding_level: newLevel as 1 | 2 | 3 | 4 | 5,
-        updated_at: new Date().toISOString(),
-      });
+      await updateNote(
+        currentNote.id,
+        {
+          understanding_level: newLevel as 1 | 2 | 3 | 4 | 5,
+          updated_at: new Date().toISOString(),
+        },
+        { silent: true }
+      );
 
       setCompletedNotes((prev) => [...prev, currentNote.id]);
       setResponses((prev) => [
@@ -536,61 +549,117 @@ function SessionSummary({
           </div>
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-6">
-        <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-          <div>
-            <div className="text-sm text-muted-foreground">Time spent</div>
+      <CardContent className="space-y-8">
+        {/* Key Metrics */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="flex flex-col gap-1 p-4 rounded-lg bg-muted/30 border">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <Target className="h-4 w-4" />
+              <span>Accuracy</span>
+            </div>
+            <div className="text-2xl font-bold">{accuracyPct}%</div>
+            <div className="text-xs text-muted-foreground">
+              {correctCount} correct responses
+            </div>
+          </div>
+          <div className="flex flex-col gap-1 p-4 rounded-lg bg-muted/30 border">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <Timer className="h-4 w-4" />
+              <span>Time Spent</span>
+            </div>
             <div className="text-2xl font-bold">
               {minutes}m {seconds}s
             </div>
+            <div className="text-xs text-muted-foreground">
+              Session duration
+            </div>
           </div>
-          <div>
-            <div className="text-sm text-muted-foreground">Responses</div>
+          <div className="flex flex-col gap-1 p-4 rounded-lg bg-muted/30 border">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <CheckCircle2 className="h-4 w-4" />
+              <span>Total Reviewed</span>
+            </div>
             <div className="text-2xl font-bold">{responses.length}</div>
-          </div>
-          <div>
-            <div className="text-sm text-muted-foreground">Improved</div>
-            <div className="text-2xl font-bold">{improved}</div>
-          </div>
-          <div>
-            <div className="text-sm text-muted-foreground">Accuracy</div>
-            <div className="text-2xl font-bold">{accuracyPct}%</div>
+            <div className="text-xs text-muted-foreground">Notes processed</div>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm text-muted-foreground">
-          <div>Unchanged: {unchanged}</div>
-          <div>Regressed: {regressed}</div>
-          <div>Total notes: {notes.length}</div>
+        <Separator />
+
+        {/* Performance Overview */}
+        <div className="space-y-4">
+          <h4 className="font-medium flex items-center gap-2">
+            Performance Overview
+          </h4>
+          <div className="grid grid-cols-3 gap-4">
+            <div className="flex flex-col items-center justify-center p-3 rounded-lg bg-green-500/10 border border-green-500/20">
+              <div className="flex items-center gap-1 text-green-600 mb-1">
+                <TrendingUp className="h-4 w-4" />
+                <span className="text-sm font-medium">Improved</span>
+              </div>
+              <span className="text-xl font-bold text-green-700 dark:text-green-400">
+                {improved}
+              </span>
+            </div>
+            <div className="flex flex-col items-center justify-center p-3 rounded-lg bg-muted/50 border">
+              <div className="flex items-center gap-1 text-muted-foreground mb-1">
+                <Minus className="h-4 w-4" />
+                <span className="text-sm font-medium">Unchanged</span>
+              </div>
+              <span className="text-xl font-bold">{unchanged}</span>
+            </div>
+            <div className="flex flex-col items-center justify-center p-3 rounded-lg bg-red-500/10 border border-red-500/20">
+              <div className="flex items-center gap-1 text-red-600 mb-1">
+                <TrendingDown className="h-4 w-4" />
+                <span className="text-sm font-medium">Regressed</span>
+              </div>
+              <span className="text-xl font-bold text-red-700 dark:text-red-400">
+                {regressed}
+              </span>
+            </div>
+          </div>
         </div>
 
-        <div className="space-y-3">
-          <h4 className="font-medium">Weakest notes</h4>
-          <ul className="space-y-2">
-            {weakest.length === 0 && (
-              <li className="text-sm text-muted-foreground">
-                No responses recorded.
-              </li>
-            )}
-            {weakest.map((w) => (
-              <li
-                key={w.noteId}
-                className="flex items-center justify-between gap-2"
-              >
-                <a
-                  className="text-sm underline underline-offset-2"
-                  href={`/notes#note-${w.noteId}`}
+        <Separator />
+
+        {/* Review Activity */}
+        <div className="space-y-4">
+          <h4 className="font-medium">Review Activity</h4>
+          <div className="space-y-2">
+            {weakest.length === 0 ? (
+              <div className="text-sm text-muted-foreground italic pl-6">
+                No notes reviewed in this session.
+              </div>
+            ) : (
+              weakest.map((w) => (
+                <div
+                  key={w.noteId}
+                  className="flex items-center justify-between p-3 rounded-lg border bg-card/50"
                 >
-                  {w.note.question}
-                </a>
-                <div className="flex items-center gap-2 text-xs">
-                  <span>
-                    Level {w.previous} → {w.next}
+                  <span className="text-sm font-medium truncate mr-4 flex-1">
+                    {w.note.question}
                   </span>
+                  <div className="flex items-center gap-2 text-sm shrink-0">
+                    <span className="text-muted-foreground">
+                      Lvl {w.previous}
+                    </span>
+                    <ArrowRight className="h-3 w-3 text-muted-foreground" />
+                    <span
+                      className={
+                        w.next > w.previous
+                          ? "font-semibold text-green-600"
+                          : w.next < w.previous
+                          ? "font-semibold text-red-600"
+                          : "font-semibold"
+                      }
+                    >
+                      Lvl {w.next}
+                    </span>
+                  </div>
                 </div>
-              </li>
-            ))}
-          </ul>
+              ))
+            )}
+          </div>
         </div>
       </CardContent>
     </Card>
