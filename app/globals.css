@@ -630,15 +630,6 @@ html:is(.red, .orange, .yellow, .green, .blue, .violet)
   background: var(--muted) !important;
 }
 
-[data-sonner-toast] [data-close-button]::before,
-[data-sonner-toast] button[data-close-button]::before {
-  content: "I understand" !important;
-  font-size: 0.75rem !important;
-  line-height: 1 !important;
-  color: var(--foreground) !important;
-  white-space: nowrap !important;
-}
-
 [data-sonner-toast] [data-close-button] svg,
 [data-sonner-toast] [data-close-button] > svg,
 [data-sonner-toast] button[data-close-button] svg,
