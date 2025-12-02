@@ -136,6 +136,9 @@ export function StorageModeProvider({ children }: { children: ReactNode }) {
           return
         }
         
+        // Force set mode to supabase IMMEDIATELY so hooks start fetching from Supabase
+        setMode("supabase")
+        
         // User just signed in - automatically migrate localStorage data if it exists
         const localData = getAllData()
         const hasLocalData = localData.courses.length > 0 || localData.notes.length > 0 || localData.dailyEntries.length > 0
@@ -146,12 +149,13 @@ export function StorageModeProvider({ children }: { children: ReactNode }) {
           if (result.success) {
             // Check if migration was skipped (user already had Supabase data)
             if (result.skipped) {
-              // Migration was skipped because user already has data - just clear localStorage
+              // Migration was skipped because user already has data - localStorage already cleared
               const { toast } = await import("sonner")
               toast.info("Using your saved data", {
                 description: "Your account data has been restored. Local data was cleared.",
               })
             } else {
+              // Migration successful - localStorage already cleared by migration function
               const { toast } = await import("sonner")
               toast.success("Data migrated successfully", {
                 description: "Your local data has been synced to your account.",
@@ -170,25 +174,11 @@ export function StorageModeProvider({ children }: { children: ReactNode }) {
           localStorage.removeItem("rootly_local_storage_warning_dismissed")
         }
         
-        // Force set mode to supabase
-        // The hooks will automatically re-fetch when mode changes
-        setMode("supabase")
-        
-        // Wait longer to ensure session cookies are fully available before reload
-        // This is critical - if we reload too early, cookies might not be available
-        // and we'll be stuck in localStorage mode
-        setTimeout(async () => {
-          // Double-check session is still valid before reloading
-          const { data: { user: verifyUser } } = await supabase.auth.getUser()
-          if (verifyUser) {
-            window.location.reload()
-          } else {
-            // If session is lost, try one more time after a delay
-            setTimeout(() => {
-              window.location.reload()
-            }, 500)
-          }
-        }, 1000)
+        // Reload after a short delay to ensure all hooks pick up the new mode
+        // and fetch from Supabase instead of localStorage
+        setTimeout(() => {
+          window.location.reload()
+        }, 500)
       } else if (event === "SIGNED_OUT") {
         // Clear the previously authenticated flag when user signs out
         const { clearPreviouslyAuthenticated } = await import("@/lib/storage-mode")

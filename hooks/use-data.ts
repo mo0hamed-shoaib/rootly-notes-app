@@ -56,25 +56,31 @@ export function useCourses() {
       return
     }
 
-    fetchCourses()
+    // Determine the actual mode to use
+    const actualMode = storageMode || "localStorage" // Fallback to localStorage if null
+    
+    // Only fetch if we have a valid mode
+    if (actualMode) {
+      fetchCourses()
 
-    // Subscribe to changes in Supabase mode
-    let cleanup: (() => void) | undefined
-    if (storageMode === "supabase") {
-      const channel = supabase
-        .channel("courses-changes")
-        .on("postgres_changes", { event: "*", schema: "public", table: "courses" }, () => {
-          fetchCourses()
-        })
-        .subscribe()
+      // Subscribe to changes in Supabase mode
+      let cleanup: (() => void) | undefined
+      if (actualMode === "supabase") {
+        const channel = supabase
+          .channel("courses-changes")
+          .on("postgres_changes", { event: "*", schema: "public", table: "courses" }, () => {
+            fetchCourses()
+          })
+          .subscribe()
 
-      cleanup = () => {
-        supabase.removeChannel(channel)
+        cleanup = () => {
+          supabase.removeChannel(channel)
+        }
       }
-    }
 
-    return () => {
-      if (cleanup) cleanup()
+      return () => {
+        if (cleanup) cleanup()
+      }
     }
   }, [fetchCourses, storageMode, storageModeLoading])
 
@@ -188,25 +194,31 @@ export function useNotes(filters?: NoteFilters) {
       return
     }
 
-    fetchNotes()
+    // Determine the actual mode to use
+    const actualMode = storageMode || "localStorage" // Fallback to localStorage if null
+    
+    // Only fetch if we have a valid mode
+    if (actualMode) {
+      fetchNotes()
 
-    // Subscribe to changes in Supabase mode
-    let cleanup: (() => void) | undefined
-    if (storageMode === "supabase") {
-      const channel = supabase
-        .channel("notes-changes")
-        .on("postgres_changes", { event: "*", schema: "public", table: "notes" }, () => {
-          fetchNotes()
-        })
-        .subscribe()
+      // Subscribe to changes in Supabase mode
+      let cleanup: (() => void) | undefined
+      if (actualMode === "supabase") {
+        const channel = supabase
+          .channel("notes-changes")
+          .on("postgres_changes", { event: "*", schema: "public", table: "notes" }, () => {
+            fetchNotes()
+          })
+          .subscribe()
 
-      cleanup = () => {
-        supabase.removeChannel(channel)
+        cleanup = () => {
+          supabase.removeChannel(channel)
+        }
       }
-    }
 
-    return () => {
-      if (cleanup) cleanup()
+      return () => {
+        if (cleanup) cleanup()
+      }
     }
   }, [fetchNotes, storageMode, storageModeLoading])
 
@@ -263,25 +275,31 @@ export function useDailyEntries() {
       return
     }
 
-    fetchEntries()
+    // Determine the actual mode to use
+    const actualMode = storageMode || "localStorage" // Fallback to localStorage if null
+    
+    // Only fetch if we have a valid mode
+    if (actualMode) {
+      fetchEntries()
 
-    // Subscribe to changes in Supabase mode
-    let cleanup: (() => void) | undefined
-    if (storageMode === "supabase") {
-      const channel = supabase
-        .channel("daily-entries-changes")
-        .on("postgres_changes", { event: "*", schema: "public", table: "daily_entries" }, () => {
-          fetchEntries()
-        })
-        .subscribe()
+      // Subscribe to changes in Supabase mode
+      let cleanup: (() => void) | undefined
+      if (actualMode === "supabase") {
+        const channel = supabase
+          .channel("daily-entries-changes")
+          .on("postgres_changes", { event: "*", schema: "public", table: "daily_entries" }, () => {
+            fetchEntries()
+          })
+          .subscribe()
 
-      cleanup = () => {
-        supabase.removeChannel(channel)
+        cleanup = () => {
+          supabase.removeChannel(channel)
+        }
       }
-    }
 
-    return () => {
-      if (cleanup) cleanup()
+      return () => {
+        if (cleanup) cleanup()
+      }
     }
   }, [fetchEntries, storageMode, storageModeLoading])
 

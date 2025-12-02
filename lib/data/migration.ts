@@ -11,11 +11,12 @@ export async function migrateLocalStorageToSupabase(): Promise<{ success: boolea
     const { createClient } = await import("@/lib/supabase/client")
     const supabase = createClient()
 
-    // Verify user is authenticated
+    // Verify user is authenticated - use getUser() for more reliable session detection
     const {
-      data: { session },
-    } = await supabase.auth.getSession()
-    if (!session) {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser()
+    if (!user || authError) {
       return { success: false, error: "User not authenticated" }
     }
 
