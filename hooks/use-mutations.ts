@@ -124,17 +124,25 @@ export function useNoteMutations() {
   );
 
   const updateNote = useCallback(
-    async (id: string, updates: Partial<Omit<Note, "course">>) => {
+    async (
+      id: string,
+      updates: Partial<Omit<Note, "course">>,
+      options?: { silent?: boolean }
+    ) => {
       try {
         if (mode === "localStorage") {
           localStorage.updateNote(id, updates);
-          toast.success("Note updated");
+          if (!options?.silent) {
+            toast.success("Note updated");
+          }
           dispatchStorageUpdate();
           return;
         }
 
         await serverActions.updateNoteServer(id, updates);
-        toast.success("Note updated");
+        if (!options?.silent) {
+          toast.success("Note updated");
+        }
         dispatchStorageUpdate();
       } catch (error) {
         toast.error(

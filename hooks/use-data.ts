@@ -84,8 +84,16 @@ export function useCourses() {
           )
           .subscribe();
 
+        // Also listen to manual storage update events for immediate refetch
+        const handleStorageUpdate = () => fetchCourses();
+        window.addEventListener("rootly-storage-update", handleStorageUpdate);
+
         cleanup = () => {
           supabase.removeChannel(channel);
+          window.removeEventListener(
+            "rootly-storage-update",
+            handleStorageUpdate
+          );
         };
       } else {
         // localStorage custom event listener
@@ -242,8 +250,16 @@ export function useNotes(filters?: NoteFilters) {
           )
           .subscribe();
 
+        // Also listen to manual storage update events for immediate refetch
+        const handleStorageUpdate = () => fetchNotes();
+        window.addEventListener("rootly-storage-update", handleStorageUpdate);
+
         cleanup = () => {
           supabase.removeChannel(channel);
+          window.removeEventListener(
+            "rootly-storage-update",
+            handleStorageUpdate
+          );
         };
       } else {
         // localStorage custom event listener
@@ -342,8 +358,16 @@ export function useDailyEntries() {
           )
           .subscribe();
 
+        // Also listen to manual storage update events for immediate refetch
+        const handleStorageUpdate = () => fetchEntries();
+        window.addEventListener("rootly-storage-update", handleStorageUpdate);
+
         cleanup = () => {
           supabase.removeChannel(channel);
+          window.removeEventListener(
+            "rootly-storage-update",
+            handleStorageUpdate
+          );
         };
       } else {
         // localStorage custom event listener
