@@ -1,152 +1,177 @@
-"use client"
+"use client";
 
 /**
  * Unified data fetching hooks that work with both Supabase and localStorage
  * Uses React 19 patterns with proper client-side data management
  */
 
-import { useEffect, useState, useCallback } from "react"
-import { getStorageMode } from "@/lib/storage-mode"
-import { useStorageMode } from "@/components/storage-mode-provider"
-import * as localStorage from "@/lib/data/local-storage"
-import { supabase } from "@/lib/supabase/client"
-import type { Course, Note, DailyEntry } from "@/lib/types"
+import { useEffect, useState, useCallback } from "react";
+import { getStorageMode } from "@/lib/storage-mode";
+import { useStorageMode } from "@/components/storage-mode-provider";
+import * as localStorage from "@/lib/data/local-storage";
+import { supabase } from "@/lib/supabase/client";
+import type { Course, Note, DailyEntry } from "@/lib/types";
 
 // Courses
 export function useCourses() {
-  const [courses, setCourses] = useState<Course[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<Error | null>(null)
-  const { mode: storageMode, isLoading: storageModeLoading } = useStorageMode()
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+  const { mode: storageMode, isLoading: storageModeLoading } = useStorageMode();
 
   const fetchCourses = useCallback(async () => {
     // Wait for storage mode to be determined
     if (storageModeLoading) {
-      return
+      return;
     }
-    
+
     try {
-      setIsLoading(true)
-      
+      setIsLoading(true);
+
       // If storage mode is not set yet, try to determine it
-      const mode = storageMode || await getStorageMode()
+      const mode = storageMode || (await getStorageMode());
 
       if (mode === "localStorage") {
-        const data = localStorage.getCourses()
-        setCourses(data)
+        const data = localStorage.getCourses();
+        setCourses(data);
       } else {
-        const { data, error: supabaseError } = await supabase.from("courses").select("*").order("title")
+        const { data, error: supabaseError } = await supabase
+          .from("courses")
+          .select("*")
+          .order("title");
 
         if (supabaseError) {
-          throw new Error(supabaseError.message)
+          throw new Error(supabaseError.message);
         }
 
-        setCourses(data || [])
+        setCourses(data || []);
       }
     } catch (err) {
-      setError(err instanceof Error ? err : new Error("Failed to fetch courses"))
+      setError(
+        err instanceof Error ? err : new Error("Failed to fetch courses")
+      );
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }, [storageMode, storageModeLoading])
+  }, [storageMode, storageModeLoading]);
 
   useEffect(() => {
     // Don't fetch if storage mode is still loading
     if (storageModeLoading) {
-      return
+      return;
     }
 
     // Determine the actual mode to use
-    const actualMode = storageMode || "localStorage" // Fallback to localStorage if null
-    
+    const actualMode = storageMode || "localStorage"; // Fallback to localStorage if null
+
     // Only fetch if we have a valid mode
     if (actualMode) {
-      fetchCourses()
+      fetchCourses();
 
-      // Subscribe to changes in Supabase mode
-      let cleanup: (() => void) | undefined
+      // Subscribe to changes
+      let cleanup: (() => void) | undefined;
+
       if (actualMode === "supabase") {
+        // Supabase realtime subscription
         const channel = supabase
           .channel("courses-changes")
-          .on("postgres_changes", { event: "*", schema: "public", table: "courses" }, () => {
-            fetchCourses()
-          })
-          .subscribe()
+          .on(
+            "postgres_changes",
+            { event: "*", schema: "public", table: "courses" },
+            () => {
+              fetchCourses();
+            }
+          )
+          .subscribe();
 
         cleanup = () => {
-          supabase.removeChannel(channel)
-        }
+          supabase.removeChannel(channel);
+        };
+      } else {
+        // localStorage custom event listener
+        const handleStorageUpdate = () => fetchCourses();
+        window.addEventListener("rootly-storage-update", handleStorageUpdate);
+
+        cleanup = () => {
+          window.removeEventListener(
+            "rootly-storage-update",
+            handleStorageUpdate
+          );
+        };
       }
 
       return () => {
-        if (cleanup) cleanup()
-      }
+        if (cleanup) cleanup();
+      };
     }
-  }, [fetchCourses, storageMode, storageModeLoading])
+  }, [fetchCourses, storageMode, storageModeLoading]);
 
   // Don't show loading if storage mode is still loading
-  const effectiveLoading = storageModeLoading || isLoading
+  const effectiveLoading = storageModeLoading || isLoading;
 
-  return { courses, isLoading: effectiveLoading, error, refetch: fetchCourses }
+  return { courses, isLoading: effectiveLoading, error, refetch: fetchCourses };
 }
 
 // Notes
 interface NoteFilters {
-  courseId?: string
-  understandingLevel?: number
-  flagged?: boolean
-  search?: string
+  courseId?: string;
+  understandingLevel?: number;
+  flagged?: boolean;
+  search?: string;
 }
 
 export function useNotes(filters?: NoteFilters) {
-  const [notes, setNotes] = useState<Note[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<Error | null>(null)
-  const { mode: storageMode, isLoading: storageModeLoading } = useStorageMode()
+  const [notes, setNotes] = useState<Note[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+  const { mode: storageMode, isLoading: storageModeLoading } = useStorageMode();
 
   const fetchNotes = useCallback(async () => {
     // Wait for storage mode to be determined
     if (storageModeLoading) {
-      return
+      return;
     }
-    
+
     try {
-      setIsLoading(true)
-      
+      setIsLoading(true);
+
       // If storage mode is not set yet, try to determine it
-      const mode = storageMode || await getStorageMode()
+      const mode = storageMode || (await getStorageMode());
 
       if (mode === "localStorage") {
-        let data = localStorage.getNotes()
+        let data = localStorage.getNotes();
 
         // Apply filters
         if (filters?.courseId) {
-          data = data.filter((n) => n.course_id === filters.courseId)
+          data = data.filter((n) => n.course_id === filters.courseId);
         }
         if (filters?.understandingLevel) {
-          data = data.filter((n) => n.understanding_level === filters.understandingLevel)
+          data = data.filter(
+            (n) => n.understanding_level === filters.understandingLevel
+          );
         }
         if (filters?.flagged !== undefined) {
-          data = data.filter((n) => n.flag === filters.flagged)
+          data = data.filter((n) => n.flag === filters.flagged);
         }
         if (filters?.search) {
-          const searchLower = filters.search.toLowerCase()
+          const searchLower = filters.search.toLowerCase();
           data = data.filter(
             (n) =>
               n.question.toLowerCase().includes(searchLower) ||
               n.answer.toLowerCase().includes(searchLower) ||
-              (n.code_snippet && n.code_snippet.toLowerCase().includes(searchLower))
-          )
+              (n.code_snippet &&
+                n.code_snippet.toLowerCase().includes(searchLower))
+          );
         }
 
         // Attach course data
-        const courses = localStorage.getCourses()
+        const courses = localStorage.getCourses();
         data = data.map((note) => ({
           ...note,
           course: courses.find((c) => c.id === note.course_id),
-        }))
+        }));
 
-        setNotes(data)
+        setNotes(data);
       } else {
         let query = supabase
           .from("notes")
@@ -156,156 +181,191 @@ export function useNotes(filters?: NoteFilters) {
             course:courses(*)
           `
           )
-          .order("created_at", { ascending: false })
+          .order("created_at", { ascending: false });
 
         if (filters?.courseId) {
-          query = query.eq("course_id", filters.courseId)
+          query = query.eq("course_id", filters.courseId);
         }
         if (filters?.understandingLevel) {
-          query = query.eq("understanding_level", filters.understandingLevel)
+          query = query.eq("understanding_level", filters.understandingLevel);
         }
         if (filters?.flagged !== undefined) {
-          query = query.eq("flag", filters.flagged)
+          query = query.eq("flag", filters.flagged);
         }
         if (filters?.search) {
           query = query.or(
             `question.ilike.%${filters.search}%,answer.ilike.%${filters.search}%,code_snippet.ilike.%${filters.search}%`
-          )
+          );
         }
 
-        const { data, error: supabaseError } = await query
+        const { data, error: supabaseError } = await query;
 
         if (supabaseError) {
-          throw new Error(supabaseError.message)
+          throw new Error(supabaseError.message);
         }
 
-        setNotes(data || [])
+        setNotes(data || []);
       }
     } catch (err) {
-      setError(err instanceof Error ? err : new Error("Failed to fetch notes"))
+      setError(err instanceof Error ? err : new Error("Failed to fetch notes"));
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }, [filters, storageMode, storageModeLoading])
+  }, [filters, storageMode, storageModeLoading]);
 
   useEffect(() => {
     // Don't fetch if storage mode is still loading
     if (storageModeLoading) {
-      return
+      return;
     }
 
     // Determine the actual mode to use
-    const actualMode = storageMode || "localStorage" // Fallback to localStorage if null
-    
+    const actualMode = storageMode || "localStorage"; // Fallback to localStorage if null
+
     // Only fetch if we have a valid mode
     if (actualMode) {
-      fetchNotes()
+      fetchNotes();
 
-      // Subscribe to changes in Supabase mode
-      let cleanup: (() => void) | undefined
+      // Subscribe to changes
+      let cleanup: (() => void) | undefined;
+
       if (actualMode === "supabase") {
+        // Supabase realtime subscription
         const channel = supabase
           .channel("notes-changes")
-          .on("postgres_changes", { event: "*", schema: "public", table: "notes" }, () => {
-            fetchNotes()
-          })
-          .subscribe()
+          .on(
+            "postgres_changes",
+            { event: "*", schema: "public", table: "notes" },
+            () => {
+              fetchNotes();
+            }
+          )
+          .subscribe();
 
         cleanup = () => {
-          supabase.removeChannel(channel)
-        }
+          supabase.removeChannel(channel);
+        };
+      } else {
+        // localStorage custom event listener
+        const handleStorageUpdate = () => fetchNotes();
+        window.addEventListener("rootly-storage-update", handleStorageUpdate);
+
+        cleanup = () => {
+          window.removeEventListener(
+            "rootly-storage-update",
+            handleStorageUpdate
+          );
+        };
       }
 
       return () => {
-        if (cleanup) cleanup()
-      }
+        if (cleanup) cleanup();
+      };
     }
-  }, [fetchNotes, storageMode, storageModeLoading])
+  }, [fetchNotes, storageMode, storageModeLoading]);
 
   // Don't show loading if storage mode is still loading
-  const effectiveLoading = storageModeLoading || isLoading
+  const effectiveLoading = storageModeLoading || isLoading;
 
-  return { notes, isLoading: effectiveLoading, error, refetch: fetchNotes }
+  return { notes, isLoading: effectiveLoading, error, refetch: fetchNotes };
 }
 
 // Daily Entries
 export function useDailyEntries() {
-  const [entries, setEntries] = useState<DailyEntry[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<Error | null>(null)
-  const { mode: storageMode, isLoading: storageModeLoading } = useStorageMode()
+  const [entries, setEntries] = useState<DailyEntry[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+  const { mode: storageMode, isLoading: storageModeLoading } = useStorageMode();
 
   const fetchEntries = useCallback(async () => {
     // Wait for storage mode to be determined
     if (storageModeLoading) {
-      return
+      return;
     }
-    
+
     try {
-      setIsLoading(true)
-      
+      setIsLoading(true);
+
       // If storage mode is not set yet, try to determine it
-      const mode = storageMode || await getStorageMode()
+      const mode = storageMode || (await getStorageMode());
 
       if (mode === "localStorage") {
-        const data = localStorage.getDailyEntries()
-        setEntries(data)
+        const data = localStorage.getDailyEntries();
+        setEntries(data);
       } else {
         const { data, error: supabaseError } = await supabase
           .from("daily_entries")
           .select("*")
-          .order("date", { ascending: false })
+          .order("date", { ascending: false });
 
         if (supabaseError) {
-          throw new Error(supabaseError.message)
+          throw new Error(supabaseError.message);
         }
 
-        setEntries(data || [])
+        setEntries(data || []);
       }
     } catch (err) {
-      setError(err instanceof Error ? err : new Error("Failed to fetch daily entries"))
+      setError(
+        err instanceof Error ? err : new Error("Failed to fetch daily entries")
+      );
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }, [storageMode, storageModeLoading])
+  }, [storageMode, storageModeLoading]);
 
   useEffect(() => {
     // Don't fetch if storage mode is still loading
     if (storageModeLoading) {
-      return
+      return;
     }
 
     // Determine the actual mode to use
-    const actualMode = storageMode || "localStorage" // Fallback to localStorage if null
-    
+    const actualMode = storageMode || "localStorage"; // Fallback to localStorage if null
+
     // Only fetch if we have a valid mode
     if (actualMode) {
-      fetchEntries()
+      fetchEntries();
 
-      // Subscribe to changes in Supabase mode
-      let cleanup: (() => void) | undefined
+      // Subscribe to changes
+      let cleanup: (() => void) | undefined;
+
       if (actualMode === "supabase") {
+        // Supabase realtime subscription
         const channel = supabase
           .channel("daily-entries-changes")
-          .on("postgres_changes", { event: "*", schema: "public", table: "daily_entries" }, () => {
-            fetchEntries()
-          })
-          .subscribe()
+          .on(
+            "postgres_changes",
+            { event: "*", schema: "public", table: "daily_entries" },
+            () => {
+              fetchEntries();
+            }
+          )
+          .subscribe();
 
         cleanup = () => {
-          supabase.removeChannel(channel)
-        }
+          supabase.removeChannel(channel);
+        };
+      } else {
+        // localStorage custom event listener
+        const handleStorageUpdate = () => fetchEntries();
+        window.addEventListener("rootly-storage-update", handleStorageUpdate);
+
+        cleanup = () => {
+          window.removeEventListener(
+            "rootly-storage-update",
+            handleStorageUpdate
+          );
+        };
       }
 
       return () => {
-        if (cleanup) cleanup()
-      }
+        if (cleanup) cleanup();
+      };
     }
-  }, [fetchEntries, storageMode, storageModeLoading])
+  }, [fetchEntries, storageMode, storageModeLoading]);
 
   // Don't show loading if storage mode is still loading
-  const effectiveLoading = storageModeLoading || isLoading
+  const effectiveLoading = storageModeLoading || isLoading;
 
-  return { entries, isLoading: effectiveLoading, error, refetch: fetchEntries }
+  return { entries, isLoading: effectiveLoading, error, refetch: fetchEntries };
 }
-

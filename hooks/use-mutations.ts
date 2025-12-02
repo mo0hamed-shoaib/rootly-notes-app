@@ -1,243 +1,254 @@
-"use client"
+"use client";
 
 /**
  * Unified mutation hooks that work with both Supabase and localStorage
  * Uses Server Actions for Supabase, client functions for localStorage
  */
 
-import { useCallback } from "react"
-import { getStorageMode } from "@/lib/storage-mode"
-import * as localStorage from "@/lib/data/local-storage"
-import * as serverActions from "@/lib/data/server-actions"
-import { useRouter } from "next/navigation"
-import { toast } from "sonner"
-import type { Course, Note, DailyEntry } from "@/lib/types"
+import { useCallback } from "react";
+import { useStorageMode } from "@/components/storage-mode-provider";
+import * as localStorage from "@/lib/data/local-storage";
+import * as serverActions from "@/lib/data/server-actions";
+import { toast } from "sonner";
+import type { Course, Note, DailyEntry } from "@/lib/types";
+
+// Custom event for localStorage updates
+const dispatchStorageUpdate = () => {
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new CustomEvent("rootly-storage-update"));
+  }
+};
 
 // Courses
 export function useCourseMutations() {
-  const router = useRouter()
+  const { mode } = useStorageMode();
 
   const createCourse = useCallback(
     async (course: Omit<Course, "id" | "created_at" | "updated_at">) => {
       try {
-        const mode = await getStorageMode()
-
         if (mode === "localStorage") {
-          localStorage.saveCourse(course)
-          toast.success("Course created")
-          router.refresh()
-          return
+          localStorage.saveCourse(course);
+          toast.success("Course created");
+          dispatchStorageUpdate();
+          return;
         }
 
-        await serverActions.createCourseServer(course)
-        toast.success("Course created")
-        router.refresh()
+        await serverActions.createCourseServer(course);
+        toast.success("Course created");
+        // Supabase realtime will handle the update
       } catch (error) {
-        toast.error(error instanceof Error ? error.message : "Failed to create course")
-        throw error
+        toast.error(
+          error instanceof Error ? error.message : "Failed to create course"
+        );
+        throw error;
       }
     },
-    [router]
-  )
+    [mode]
+  );
 
   const updateCourse = useCallback(
     async (id: string, updates: Partial<Course>) => {
       try {
-        const mode = await getStorageMode()
-
         if (mode === "localStorage") {
-          localStorage.updateCourse(id, updates)
-          toast.success("Course updated")
-          router.refresh()
-          return
+          localStorage.updateCourse(id, updates);
+          toast.success("Course updated");
+          dispatchStorageUpdate();
+          return;
         }
 
-        await serverActions.updateCourseServer(id, updates)
-        toast.success("Course updated")
-        router.refresh()
+        await serverActions.updateCourseServer(id, updates);
+        toast.success("Course updated");
+        // Supabase realtime will handle the update
       } catch (error) {
-        toast.error(error instanceof Error ? error.message : "Failed to update course")
-        throw error
+        toast.error(
+          error instanceof Error ? error.message : "Failed to update course"
+        );
+        throw error;
       }
     },
-    [router]
-  )
+    [mode]
+  );
 
   const deleteCourse = useCallback(
     async (id: string) => {
       try {
-        const mode = await getStorageMode()
-
         if (mode === "localStorage") {
-          localStorage.deleteCourse(id)
-          toast.success("Course deleted")
-          router.refresh()
-          return
+          localStorage.deleteCourse(id);
+          toast.success("Course deleted");
+          dispatchStorageUpdate();
+          return;
         }
 
-        await serverActions.deleteCourseServer(id)
-        toast.success("Course deleted")
-        router.refresh()
+        await serverActions.deleteCourseServer(id);
+        toast.success("Course deleted");
+        // Supabase realtime will handle the update
       } catch (error) {
-        toast.error(error instanceof Error ? error.message : "Failed to delete course")
-        throw error
+        toast.error(
+          error instanceof Error ? error.message : "Failed to delete course"
+        );
+        throw error;
       }
     },
-    [router]
-  )
+    [mode]
+  );
 
-  return { createCourse, updateCourse, deleteCourse }
+  return { createCourse, updateCourse, deleteCourse };
 }
 
 // Notes
 export function useNoteMutations() {
-  const router = useRouter()
+  const { mode } = useStorageMode();
 
   const createNote = useCallback(
     async (note: Omit<Note, "id" | "created_at" | "updated_at" | "course">) => {
       try {
-        const mode = await getStorageMode()
-
         if (mode === "localStorage") {
-          localStorage.saveNote(note)
-          toast.success("Note created")
-          router.refresh()
-          return
+          localStorage.saveNote(note);
+          toast.success("Note created");
+          dispatchStorageUpdate();
+          return;
         }
 
-        await serverActions.createNoteServer(note)
-        toast.success("Note created")
-        router.refresh()
+        await serverActions.createNoteServer(note);
+        toast.success("Note created");
+        // Supabase realtime will handle the update
       } catch (error) {
-        toast.error(error instanceof Error ? error.message : "Failed to create note")
-        throw error
+        toast.error(
+          error instanceof Error ? error.message : "Failed to create note"
+        );
+        throw error;
       }
     },
-    [router]
-  )
+    [mode]
+  );
 
   const updateNote = useCallback(
     async (id: string, updates: Partial<Omit<Note, "course">>) => {
       try {
-        const mode = await getStorageMode()
-
         if (mode === "localStorage") {
-          localStorage.updateNote(id, updates)
-          toast.success("Note updated")
-          router.refresh()
-          return
+          localStorage.updateNote(id, updates);
+          toast.success("Note updated");
+          dispatchStorageUpdate();
+          return;
         }
 
-        await serverActions.updateNoteServer(id, updates)
-        toast.success("Note updated")
-        router.refresh()
+        await serverActions.updateNoteServer(id, updates);
+        toast.success("Note updated");
+        // Supabase realtime will handle the update
       } catch (error) {
-        toast.error(error instanceof Error ? error.message : "Failed to update note")
-        throw error
+        toast.error(
+          error instanceof Error ? error.message : "Failed to update note"
+        );
+        throw error;
       }
     },
-    [router]
-  )
+    [mode]
+  );
 
   const deleteNote = useCallback(
     async (id: string) => {
       try {
-        const mode = await getStorageMode()
-
         if (mode === "localStorage") {
-          localStorage.deleteNote(id)
-          toast.success("Note deleted")
-          router.refresh()
-          return
+          localStorage.deleteNote(id);
+          toast.success("Note deleted");
+          dispatchStorageUpdate();
+          return;
         }
 
-        await serverActions.deleteNoteServer(id)
-        toast.success("Note deleted")
-        router.refresh()
+        await serverActions.deleteNoteServer(id);
+        toast.success("Note deleted");
+        // Supabase realtime will handle the update
       } catch (error) {
-        toast.error(error instanceof Error ? error.message : "Failed to delete note")
-        throw error
+        toast.error(
+          error instanceof Error ? error.message : "Failed to delete note"
+        );
+        throw error;
       }
     },
-    [router]
-  )
+    [mode]
+  );
 
-  return { createNote, updateNote, deleteNote }
+  return { createNote, updateNote, deleteNote };
 }
 
 // Daily Entries
 export function useDailyEntryMutations() {
-  const router = useRouter()
+  const { mode } = useStorageMode();
 
   const createDailyEntry = useCallback(
     async (entry: Omit<DailyEntry, "id" | "created_at" | "updated_at">) => {
       try {
-        const mode = await getStorageMode()
-
         if (mode === "localStorage") {
-          localStorage.saveDailyEntry(entry)
-          toast.success("Daily tracking saved")
-          router.refresh()
-          return
+          localStorage.saveDailyEntry(entry);
+          toast.success("Daily tracking saved");
+          dispatchStorageUpdate();
+          return;
         }
 
-        await serverActions.createDailyEntryServer(entry)
-        toast.success("Daily tracking saved")
-        router.refresh()
+        await serverActions.createDailyEntryServer(entry);
+        toast.success("Daily tracking saved");
+        // Supabase realtime will handle the update
       } catch (error) {
-        toast.error(error instanceof Error ? error.message : "Failed to save daily tracking")
-        throw error
+        toast.error(
+          error instanceof Error
+            ? error.message
+            : "Failed to save daily tracking"
+        );
+        throw error;
       }
     },
-    [router]
-  )
+    [mode]
+  );
 
   const updateDailyEntry = useCallback(
     async (id: string, updates: Partial<DailyEntry>) => {
       try {
-        const mode = await getStorageMode()
-
         if (mode === "localStorage") {
-          localStorage.updateDailyEntry(id, updates)
-          toast.success("Daily tracking updated")
-          router.refresh()
-          return
+          localStorage.updateDailyEntry(id, updates);
+          toast.success("Daily tracking updated");
+          dispatchStorageUpdate();
+          return;
         }
 
-        await serverActions.updateDailyEntryServer(id, updates)
-        toast.success("Daily tracking updated")
-        router.refresh()
+        await serverActions.updateDailyEntryServer(id, updates);
+        toast.success("Daily tracking updated");
+        // Supabase realtime will handle the update
       } catch (error) {
-        toast.error(error instanceof Error ? error.message : "Failed to update daily tracking")
-        throw error
+        toast.error(
+          error instanceof Error
+            ? error.message
+            : "Failed to update daily tracking"
+        );
+        throw error;
       }
     },
-    [router]
-  )
+    [mode]
+  );
 
   const deleteDailyEntry = useCallback(
     async (id: string) => {
       try {
-        const mode = await getStorageMode()
-
         if (mode === "localStorage") {
-          localStorage.deleteDailyEntry(id)
-          toast.success("Daily tracking deleted")
-          router.refresh()
-          return
+          localStorage.deleteDailyEntry(id);
+          toast.success("Daily tracking deleted");
+          dispatchStorageUpdate();
+          return;
         }
 
-        await serverActions.deleteDailyEntryServer(id)
-        toast.success("Daily tracking deleted")
-        router.refresh()
+        await serverActions.deleteDailyEntryServer(id);
+        toast.success("Daily tracking deleted");
+        // Supabase realtime will handle the update
       } catch (error) {
-        toast.error(error instanceof Error ? error.message : "Failed to delete daily tracking")
-        throw error
+        toast.error(
+          error instanceof Error
+            ? error.message
+            : "Failed to delete daily tracking"
+        );
+        throw error;
       }
     },
-    [router]
-  )
+    [mode]
+  );
 
-  return { createDailyEntry, updateDailyEntry, deleteDailyEntry }
+  return { createDailyEntry, updateDailyEntry, deleteDailyEntry };
 }
-
