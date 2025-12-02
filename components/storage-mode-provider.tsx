@@ -13,10 +13,10 @@ import {
   isStorageInitialized,
   wasPreviouslyAuthenticated,
   markPreviouslyAuthenticated,
+  clearPreviouslyAuthenticated,
 } from "@/lib/storage-mode";
 import { seedLocalStorageData } from "@/lib/data/seed-data";
 import { migrateLocalStorageToSupabase } from "@/lib/data/migration";
-import { getAllData } from "@/lib/data/local-storage";
 import { supabase } from "@/lib/supabase/client";
 
 interface StorageModeContextType {
@@ -32,10 +32,8 @@ const StorageModeContext = createContext<StorageModeContextType | undefined>(
 export function StorageModeProvider({ children }: { children: ReactNode }) {
   const [mode, setMode] = useState<StorageMode | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [migrationInProgress, setMigrationInProgress] = useState(false);
 
   const handleMigrate = async () => {
-    setMigrationInProgress(true);
     try {
       const result = await migrateLocalStorageToSupabase();
       if (result.success) {
@@ -45,10 +43,14 @@ export function StorageModeProvider({ children }: { children: ReactNode }) {
         if (typeof window !== "undefined") {
           localStorage.removeItem("rootly_local_storage_warning_dismissed");
         }
-        // Reload to refresh data
+        // Show success message
+        const { toast } = await import("sonner");
+        toast.success("Data migrated successfully", {
+          description: "Your local data has been synced to your account.",
+        });
+        // Reload to refresh data from Supabase
         window.location.reload();
       } else {
-        // Show error toast
         const { toast } = await import("sonner");
         toast.error("Migration failed", {
           description: result.error || "Please try again.",
@@ -59,57 +61,32 @@ export function StorageModeProvider({ children }: { children: ReactNode }) {
       toast.error("Migration error", {
         description: error instanceof Error ? error.message : "Unknown error",
       });
-    } finally {
-      setMigrationInProgress(false);
     }
   };
 
   useEffect(() => {
     async function initialize() {
       try {
-        // Reduced delay for faster loading while still allowing session to be established
-        // React 19 best practice: minimize blocking operations
-        await new Promise((resolve) => setTimeout(resolve, 100));
-
-        // Check authentication status directly first
-        const { supabase } = await import("@/lib/supabase/client");
+        // Check authentication status - no artificial delays
         const {
           data: { user },
           error: userError,
         } = await supabase.auth.getUser();
 
-        let currentMode: StorageMode;
-
-        // If we have a user and no error, we're authenticated
-        if (user && !userError) {
-          currentMode = "supabase";
-        } else {
-          // Not authenticated, check storage mode (will default to localStorage)
-          currentMode = await getStorageMode();
-        }
-
+        // Determine storage mode based on auth status
+        const currentMode: StorageMode =
+          user && !userError ? "supabase" : "localStorage";
         setMode(currentMode);
 
-        // Only seed localStorage - Supabase will get data via migration when user logs in
-        // BUT: Don't seed if user was previously authenticated AND is currently authenticated
-        // (if they logged out, they should get fresh data)
+        // Seed localStorage if user is not authenticated and storage not initialized
         if (currentMode === "localStorage") {
-          // Check if user is currently authenticated - if not, clear the flag and allow seeding
-          const { supabase } = await import("@/lib/supabase/client");
-          const {
-            data: { user },
-          } = await supabase.auth.getUser();
-
           // If not authenticated now, clear the previously authenticated flag
-          if (!user && wasPreviouslyAuthenticated()) {
-            const { clearPreviouslyAuthenticated } = await import(
-              "@/lib/storage-mode"
-            );
+          if (wasPreviouslyAuthenticated()) {
             clearPreviouslyAuthenticated();
           }
 
-          // Seed if storage is not initialized and user is not currently authenticated
-          if (!isStorageInitialized() && !user) {
+          // Seed if storage is not initialized
+          if (!isStorageInitialized()) {
             await seedLocalStorageData();
           }
         }
@@ -129,96 +106,22 @@ export function StorageModeProvider({ children }: { children: ReactNode }) {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === "SIGNED_IN" && session) {
-        // Mark that user is now authenticated (for future reference)
+        // Mark that user is now authenticated
         markPreviouslyAuthenticated();
 
-        // Wait longer to ensure session is fully established and cookies are set
-        // This is critical after OAuth redirect
-        await new Promise((resolve) => setTimeout(resolve, 800));
-
-        // Verify session is actually established by checking getUser()
-        let user = null;
-        let attempts = 0;
-        while (attempts < 5 && !user) {
-          const {
-            data: { user: currentUser },
-            error,
-          } = await supabase.auth.getUser();
-          if (currentUser && !error) {
-            user = currentUser;
-            break;
-          }
-          attempts++;
-          if (attempts < 5) {
-            await new Promise((resolve) => setTimeout(resolve, 200));
-          }
-        }
-
-        if (!user) {
-          console.error("Failed to get user after SIGNED_IN event");
-          return;
-        }
-
-        // Force set mode to supabase IMMEDIATELY so hooks start fetching from Supabase
+        // Update mode immediately - data already seeded server-side
         setMode("supabase");
-
-        // Always call migration - it will handle all cases:
-        // 1. User has existing Supabase data -> skip migration, clear localStorage
-        // 2. User has localStorage data -> migrate it
-        // 3. User has no data -> seed demo data
-        const result = await migrateLocalStorageToSupabase();
-
-        if (result.success) {
-          const { toast } = await import("sonner");
-          // Check migration result and show appropriate message
-          if (result.skipped) {
-            // Migration was skipped because user already has data
-            toast.info("Using your saved data", {
-              description: "Your account data has been restored.",
-            });
-          } else if (result.seeded) {
-            // Demo data was seeded for first-time user
-            toast.success("Welcome to Rootly!", {
-              description: "Demo data has been added to help you get started.",
-            });
-          } else {
-            // Migration successful - localStorage data was migrated
-            toast.success("Data migrated successfully", {
-              description: "Your local data has been synced to your account.",
-            });
-          }
-        } else {
-          const { toast } = await import("sonner");
-          toast.error("Migration failed", {
-            description: result.error || "Please try again later.",
-          });
-        }
-
-        // Clear dismissal state
-        if (typeof window !== "undefined") {
-          localStorage.removeItem("rootly_local_storage_warning_dismissed");
-        }
-
-        // Reload after a short delay to ensure all hooks pick up the new mode
-        // and fetch from Supabase instead of localStorage
-        setTimeout(() => {
-          window.location.reload();
-        }, 500);
       } else if (event === "SIGNED_OUT") {
-        // Clear the previously authenticated flag when user signs out
-        const { clearPreviouslyAuthenticated } = await import(
-          "@/lib/storage-mode"
-        );
+        // Clear the previously authenticated flag
         clearPreviouslyAuthenticated();
 
-        const newMode = await getStorageMode();
-        setMode(newMode);
+        // Update mode to localStorage
+        setMode("localStorage");
 
-        // Reload page to show logged-out state and re-seed localStorage
-        // This ensures a clean state transition
-        setTimeout(() => {
-          window.location.reload();
-        }, 300);
+        // Re-seed localStorage for logged-out user
+        if (!isStorageInitialized()) {
+          await seedLocalStorageData();
+        }
       }
     });
 
