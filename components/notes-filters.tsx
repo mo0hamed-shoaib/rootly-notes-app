@@ -1,66 +1,75 @@
-"use client"
+"use client";
 
-import { useRouter, useSearchParams } from "next/navigation"
-import { useEffect, useMemo, useState } from "react"
-import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { X, Search } from "lucide-react"
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { X, Search } from "lucide-react";
 
 interface NotesFiltersProps {
-  courses: { id: string; title: string; instructor: string }[]
+  courses: { id: string; title: string; instructor: string }[];
 }
 
 export function NotesFilters({ courses }: NotesFiltersProps) {
-  const router = useRouter()
-  const searchParams = useSearchParams()
-  const [searchDraft, setSearchDraft] = useState("")
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const [searchDraft, setSearchDraft] = useState("");
 
-  const currentSearch = searchParams.get("search") || ""
-  const currentCourse = searchParams.get("course") || "all"
-  const currentUnderstanding = searchParams.get("understanding") || "all"
-  const currentFlagged = searchParams.get("flagged") || "all"
+  const currentSearch = searchParams.get("search") || "";
+  const currentCourse = searchParams.get("course") || "all";
+  const currentUnderstanding = searchParams.get("understanding") || "all";
+  const currentFlagged = searchParams.get("flagged") || "all";
 
   const updateFilter = (key: string, value: string) => {
-    const params = new URLSearchParams(searchParams.toString())
+    const params = new URLSearchParams(searchParams.toString());
     if (value !== "all") {
-      params.set(key, value)
+      params.set(key, value);
     } else {
-      params.delete(key)
+      params.delete(key);
     }
-    router.push(`/notes?${params.toString()}`)
-  }
+    router.push(`/notes?${params.toString()}`);
+  };
 
   const clearAllFilters = () => {
-    router.push("/notes")
-  }
+    router.push("/notes");
+  };
 
   const hasActiveFilters =
-    currentSearch || currentCourse !== "all" || currentUnderstanding !== "all" || currentFlagged !== "all"
+    currentSearch ||
+    currentCourse !== "all" ||
+    currentUnderstanding !== "all" ||
+    currentFlagged !== "all";
 
   // keep local draft in sync on param changes
   useEffect(() => {
-    setSearchDraft(currentSearch)
-  }, [currentSearch])
+    setSearchDraft(currentSearch);
+  }, [currentSearch]);
 
   // debounce search param updates
   useEffect(() => {
-    const controller = new AbortController()
+    const controller = new AbortController();
     const handle = setTimeout(() => {
       if (searchDraft !== currentSearch) {
-        const params = new URLSearchParams(searchParams.toString())
-        if (searchDraft) params.set("search", searchDraft)
-        else params.delete("search")
-        router.replace(`/notes?${params.toString()}`)
+        const params = new URLSearchParams(searchParams.toString());
+        if (searchDraft) params.set("search", searchDraft);
+        else params.delete("search");
+        router.replace(`/notes?${params.toString()}`);
       }
-    }, 300)
+    }, 300);
     return () => {
-      controller.abort()
-      clearTimeout(handle)
-    }
+      controller.abort();
+      clearTimeout(handle);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchDraft])
+  }, [searchDraft]);
 
   return (
     <div className="space-y-4">
@@ -77,8 +86,14 @@ export function NotesFilters({ courses }: NotesFiltersProps) {
 
       {/* Filters */}
       <div className="grid grid-cols-1 sm:flex sm:flex-wrap gap-3">
-        <Select value={currentCourse} onValueChange={(value) => updateFilter("course", value)}>
-          <SelectTrigger className="w-full sm:w-[200px] h-9" aria-label="Filter by course">
+        <Select
+          value={currentCourse}
+          onValueChange={(value) => updateFilter("course", value)}
+        >
+          <SelectTrigger
+            className="w-full sm:w-[200px] h-9"
+            aria-label="Filter by course"
+          >
             <SelectValue placeholder="All courses" />
           </SelectTrigger>
           <SelectContent className="w-[calc(100vw-2rem)] max-w-[300px] sm:max-w-[300px]">
@@ -93,8 +108,14 @@ export function NotesFilters({ courses }: NotesFiltersProps) {
           </SelectContent>
         </Select>
 
-        <Select value={currentUnderstanding} onValueChange={(value) => updateFilter("understanding", value)}>
-          <SelectTrigger className="w-full sm:w-[180px] h-9" aria-label="Filter by understanding level">
+        <Select
+          value={currentUnderstanding}
+          onValueChange={(value) => updateFilter("understanding", value)}
+        >
+          <SelectTrigger
+            className="w-full sm:w-[180px] h-9"
+            aria-label="Filter by understanding level"
+          >
             <SelectValue placeholder="Understanding level" />
           </SelectTrigger>
           <SelectContent>
@@ -107,8 +128,14 @@ export function NotesFilters({ courses }: NotesFiltersProps) {
           </SelectContent>
         </Select>
 
-        <Select value={currentFlagged} onValueChange={(value) => updateFilter("flagged", value)}>
-          <SelectTrigger className="w-full sm:w-[140px] h-9" aria-label="Filter by flagged status">
+        <Select
+          value={currentFlagged}
+          onValueChange={(value) => updateFilter("flagged", value)}
+        >
+          <SelectTrigger
+            className="w-full sm:w-[140px] h-9"
+            aria-label="Filter by flagged status"
+          >
             <SelectValue placeholder="All notes" />
           </SelectTrigger>
           <SelectContent>
@@ -118,7 +145,12 @@ export function NotesFilters({ courses }: NotesFiltersProps) {
         </Select>
 
         {hasActiveFilters && (
-          <Button variant="outline" size="sm" onClick={clearAllFilters} className="w-full sm:w-auto h-9 px-3">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={clearAllFilters}
+            className="w-full sm:w-auto h-9 px-3"
+          >
             <X className="h-4 w-4 mr-1" />
             Clear filters
           </Button>
@@ -175,5 +207,5 @@ export function NotesFilters({ courses }: NotesFiltersProps) {
         </div>
       )}
     </div>
-  )
+  );
 }
