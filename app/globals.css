@@ -120,18 +120,72 @@
   body {
     @apply bg-background text-foreground;
   }
+
+  /* Global cursor pointer for interactive elements */
+  button,
+  [role="button"],
+  select,
+  [type="submit"],
+  [type="reset"],
+  [type="button"],
+  [role="combobox"],
+  [role="listbox"],
+  [role="menuitem"],
+  label[for],
+  label[role="button"],
+  input[type="checkbox"],
+  input[type="radio"],
+  input[type="file"]::file-selector-button {
+    cursor: pointer;
+  }
+
+  /* Disabled state cursor overrides */
+  button:disabled,
+  [type="submit"]:disabled,
+  [type="reset"]:disabled,
+  [type="button"]:disabled,
+  [role="button"][aria-disabled="true"],
+  input:disabled,
+  select:disabled,
+  textarea:disabled {
+    cursor: not-allowed;
+  }
 }
 
-/* Global minimal, theme-aware scrollbars */
+/* Global unified, theme-aware scrollbars */
 html {
   scrollbar-gutter: stable both-edges;
+
+  /* Default Light Mode Scrollbar Colors */
+  --scrollbar-thumb: rgba(0, 0, 0, 0.8);
+  --scrollbar-thumb-hover: rgba(0, 0, 0, 0.95);
+  --scrollbar-thumb-active: rgb(0, 0, 0);
+}
+
+html.dark {
+  /* Default Dark Mode Scrollbar Colors */
+  --scrollbar-thumb: rgba(255, 255, 255, 0.9);
+  --scrollbar-thumb-hover: rgba(255, 255, 255, 0.95);
+  --scrollbar-thumb-active: rgb(255, 255, 255);
+}
+
+/* Accent Overrides */
+html.red,
+html.orange,
+html.yellow,
+html.green,
+html.blue,
+html.violet,
+html.rose {
+  --scrollbar-thumb: var(--primary);
+  --scrollbar-thumb-hover: color-mix(in oklch, var(--primary) 85%, white);
+  --scrollbar-thumb-active: color-mix(in oklch, var(--primary) 90%, white);
 }
 
 /* Firefox */
 * {
   scrollbar-width: thin;
-  scrollbar-color: color-mix(in oklch, var(--foreground) 20%, transparent)
-    transparent;
+  scrollbar-color: var(--scrollbar-thumb) transparent;
 }
 
 /* Chromium/WebKit */
@@ -139,35 +193,24 @@ html {
   width: 10px;
   height: 10px;
 }
+
 *::-webkit-scrollbar-track {
   background: transparent;
 }
+
 *::-webkit-scrollbar-thumb {
-  background-color: color-mix(in oklch, var(--foreground) 20%, transparent);
+  background-color: var(--scrollbar-thumb);
   border-radius: 9999px;
-  border: 2px solid transparent; /* inset look */
+  border: 2px solid transparent;
   background-clip: content-box;
 }
+
 *::-webkit-scrollbar-thumb:hover {
-  background-color: color-mix(in oklch, var(--foreground) 35%, transparent);
-}
-*::-webkit-scrollbar-thumb:active {
-  background-color: color-mix(in oklch, var(--foreground) 50%, transparent);
+  background-color: var(--scrollbar-thumb-hover);
 }
 
-/* Light mode: slightly higher contrast for better visibility */
-html:not(.dark) * {
-  scrollbar-color: color-mix(in oklch, var(--foreground) 35%, transparent)
-    transparent;
-}
-html:not(.dark) *::-webkit-scrollbar-thumb {
-  background-color: color-mix(in oklch, var(--foreground) 35%, transparent);
-}
-html:not(.dark) *::-webkit-scrollbar-thumb:hover {
-  background-color: color-mix(in oklch, var(--foreground) 50%, transparent);
-}
-html:not(.dark) *::-webkit-scrollbar-thumb:active {
-  background-color: color-mix(in oklch, var(--foreground) 60%, transparent);
+*::-webkit-scrollbar-thumb:active {
+  background-color: var(--scrollbar-thumb-active);
 }
 
 /* Ensure viewport (page) scrollbar picks up styles */
@@ -176,57 +219,10 @@ body::-webkit-scrollbar {
   width: 10px;
   height: 10px;
 }
+
 html::-webkit-scrollbar-track,
 body::-webkit-scrollbar-track {
   background: transparent;
-}
-html::-webkit-scrollbar-thumb,
-body::-webkit-scrollbar-thumb {
-  background-color: color-mix(in oklch, var(--foreground) 20%, transparent);
-  border-radius: 9999px;
-  border: 2px solid transparent;
-  background-clip: content-box;
-}
-html:not(.dark)::-webkit-scrollbar-thumb,
-body:not(.dark)::-webkit-scrollbar-thumb {
-  /* note: body may not have .dark; html selector covers main case */
-  background-color: color-mix(in oklch, var(--foreground) 35%, transparent);
-}
-html:is(
-    .red,
-    .orange,
-    .yellow,
-    .green,
-    .blue,
-    .violet
-  )::-webkit-scrollbar-thumb,
-body:is(
-    .red,
-    .orange,
-    .yellow,
-    .green,
-    .blue,
-    .violet
-  )::-webkit-scrollbar-thumb {
-  background-color: color-mix(in oklch, var(--primary) 60%, transparent);
-}
-
-/* Accent-aware scrollbar: when an accent preset class is applied on <html> */
-html:is(.red, .orange, .yellow, .green, .blue, .violet) * {
-  scrollbar-color: color-mix(in oklch, var(--primary) 60%, transparent)
-    transparent;
-}
-html:is(.red, .orange, .yellow, .green, .blue, .violet)
-  *::-webkit-scrollbar-thumb {
-  background-color: color-mix(in oklch, var(--primary) 60%, transparent);
-}
-html:is(.red, .orange, .yellow, .green, .blue, .violet)
-  *::-webkit-scrollbar-thumb:hover {
-  background-color: color-mix(in oklch, var(--primary) 75%, transparent);
-}
-html:is(.red, .orange, .yellow, .green, .blue, .violet)
-  *::-webkit-scrollbar-thumb:active {
-  background-color: color-mix(in oklch, var(--primary) 85%, transparent);
 }
 
 /* Additional shadcn theme preset: rose (light + dark) */
