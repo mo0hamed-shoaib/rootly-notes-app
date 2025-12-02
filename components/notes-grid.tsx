@@ -1,33 +1,48 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { UnderstandingBadge } from "@/components/understanding-badge"
-import { EditNoteDialog } from "@/components/edit-note-dialog"
-import { DeleteNoteDialog } from "@/components/delete-note-dialog"
-import { Edit, Trash2, Flag, Calendar, CodeXml, Eye, EyeOff } from "lucide-react"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import { CodeSnippetDialog } from "@/components/code-snippet-dialog"
-import type { Note } from "@/lib/types"
-import { useEditingGuard } from "@/hooks/use-editing-guard"
+import { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { UnderstandingBadge } from "@/components/understanding-badge";
+import { EditNoteDialog } from "@/components/edit-note-dialog";
+import { DeleteNoteDialog } from "@/components/delete-note-dialog";
+import {
+  Edit,
+  Trash2,
+  Flag,
+  Calendar,
+  CodeXml,
+  Eye,
+  EyeOff,
+} from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { CodeSnippetDialog } from "@/components/code-snippet-dialog";
+import type { Note } from "@/lib/types";
+import { useEditingGuard } from "@/hooks/use-editing-guard";
 
 interface NotesGridProps {
-  notes: (Note & { course?: { id: string; title: string; instructor: string } })[]
-  highlight?: string
+  notes: (Note & {
+    course?: { id: string; title: string; instructor: string };
+  })[];
+  highlight?: string;
 }
 
 function escapeRegExp(input: string) {
-  return input.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
+  return input.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
 function renderWithHighlight(text: string, query?: string) {
-  if (!query) return text
-  const trimmed = query.trim()
-  if (!trimmed) return text
-  const regex = new RegExp(`(${escapeRegExp(trimmed)})`, "ig")
-  const parts = text.split(regex)
+  if (!query) return text;
+  const trimmed = query.trim();
+  if (!trimmed) return text;
+  const regex = new RegExp(`(${escapeRegExp(trimmed)})`, "ig");
+  const parts = text.split(regex);
   return parts.map((part, index) =>
     index % 2 === 1 ? (
       <mark
@@ -39,77 +54,81 @@ function renderWithHighlight(text: string, query?: string) {
     ) : (
       <span key={index}>{part}</span>
     )
-  )
+  );
 }
 
 export function NotesGrid({ notes, highlight }: NotesGridProps) {
-  const [editingNote, setEditingNote] = useState<Note | null>(null)
-  const [deletingNote, setDeletingNote] = useState<Note | null>(null)
-  const [snippetNote, setSnippetNote] = useState<Note | null>(null)
-  const [isEditOpen, setIsEditOpen] = useState(false)
-  const [isDeleteOpen, setIsDeleteOpen] = useState(false)
-  const [isSnippetOpen, setIsSnippetOpen] = useState(false)
-  const { guardAction } = useEditingGuard()
-  
+  const [editingNote, setEditingNote] = useState<Note | null>(null);
+  const [deletingNote, setDeletingNote] = useState<Note | null>(null);
+  const [snippetNote, setSnippetNote] = useState<Note | null>(null);
+  const [isEditOpen, setIsEditOpen] = useState(false);
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [isSnippetOpen, setIsSnippetOpen] = useState(false);
+  const { guardAction } = useEditingGuard();
+
   // Answer visibility state
-  const [showAnswersByDefault, setShowAnswersByDefault] = useState(false)
-  const [expandedNotes, setExpandedNotes] = useState<Set<string>>(new Set())
+  const [showAnswersByDefault, setShowAnswersByDefault] = useState(false);
+  const [expandedNotes, setExpandedNotes] = useState<Set<string>>(new Set());
 
   // Listen for global toggle changes
   useEffect(() => {
     const handleGlobalToggle = () => {
-      const toggleBtn = document.getElementById('toggle-answers-btn')
+      const toggleBtn = document.getElementById("toggle-answers-btn");
       if (toggleBtn) {
-        const showAnswers = toggleBtn.getAttribute('data-show-answers') === 'true'
-        setShowAnswersByDefault(showAnswers)
-        
+        const showAnswers =
+          toggleBtn.getAttribute("data-show-answers") === "true";
+        setShowAnswersByDefault(showAnswers);
+
         if (showAnswers) {
           // Show all answers
-          setExpandedNotes(new Set(notes.map(note => note.id)))
+          setExpandedNotes(new Set(notes.map((note) => note.id)));
         } else {
           // Hide all answers (default state)
-          setExpandedNotes(new Set())
+          setExpandedNotes(new Set());
         }
       }
-    }
+    };
 
     // Initial state - ensure answers are hidden by default
-    handleGlobalToggle()
+    handleGlobalToggle();
 
     // Listen for attribute changes
-    const observer = new MutationObserver(handleGlobalToggle)
-    const toggleBtn = document.getElementById('toggle-answers-btn')
+    const observer = new MutationObserver(handleGlobalToggle);
+    const toggleBtn = document.getElementById("toggle-answers-btn");
     if (toggleBtn) {
-      observer.observe(toggleBtn, { attributes: true, attributeFilter: ['data-show-answers'] })
+      observer.observe(toggleBtn, {
+        attributes: true,
+        attributeFilter: ["data-show-answers"],
+      });
     }
 
-    return () => observer.disconnect()
-  }, [notes])
+    return () => observer.disconnect();
+  }, [notes]);
 
   const toggleAnswer = (noteId: string) => {
-    setExpandedNotes(prev => {
-      const newSet = new Set(prev)
+    setExpandedNotes((prev) => {
+      const newSet = new Set(prev);
       if (newSet.has(noteId)) {
-        newSet.delete(noteId)
+        newSet.delete(noteId);
       } else {
-        newSet.add(noteId)
+        newSet.add(noteId);
       }
-      return newSet
-    })
-  }
+      return newSet;
+    });
+  };
 
   const isAnswerVisible = (noteId: string) => {
-    return expandedNotes.has(noteId)
-  }
+    return expandedNotes.has(noteId);
+  };
 
   return (
     <>
       <div className="notes-grid grid grid-cols-1 lg:grid-cols-2 gap-6">
         {notes.map((note) => (
-          <Card 
-            data-print-card 
-            id={`note-${note.id}`} 
-            key={note.id} 
+          <Card
+            data-print-card
+            id={`note-${note.id}`}
+            key={note.id}
             className="relative flex flex-col h-full"
           >
             <CardHeader className="pb-3 flex-shrink-0">
@@ -140,7 +159,11 @@ export function NotesGrid({ notes, highlight }: NotesGridProps) {
                           size="sm"
                           onClick={() => toggleAnswer(note.id)}
                           className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground"
-                          aria-label={isAnswerVisible(note.id) ? "Hide answer" : "Show answer"}
+                          aria-label={
+                            isAnswerVisible(note.id)
+                              ? "Hide answer"
+                              : "Show answer"
+                          }
                         >
                           {isAnswerVisible(note.id) ? (
                             <EyeOff className="h-4 w-4" />
@@ -150,7 +173,9 @@ export function NotesGrid({ notes, highlight }: NotesGridProps) {
                         </Button>
                       </TooltipTrigger>
                       <TooltipContent>
-                        {isAnswerVisible(note.id) ? "Hide answer" : "Show answer"}
+                        {isAnswerVisible(note.id)
+                          ? "Hide answer"
+                          : "Show answer"}
                       </TooltipContent>
                     </Tooltip>
 
@@ -160,22 +185,32 @@ export function NotesGrid({ notes, highlight }: NotesGridProps) {
                           <Button
                             variant="ghost"
                             size="sm"
-                            className={`h-8 w-8 p-0 ${note.code_snippet ? "text-violet-600 hover:text-violet-700 dark:text-violet-400 dark:hover:text-violet-300" : "text-muted-foreground"}`}
+                            className={`h-8 w-8 p-0 ${
+                              note.code_snippet
+                                ? "text-violet-600 hover:text-violet-700 dark:text-violet-400 dark:hover:text-violet-300"
+                                : "text-muted-foreground"
+                            }`}
                             onClick={() => {
                               if (note.code_snippet) {
-                                setSnippetNote(note)
-                                setIsSnippetOpen(true)
+                                setSnippetNote(note);
+                                setIsSnippetOpen(true);
                               }
                             }}
                             disabled={!note.code_snippet}
-                            aria-label={note.code_snippet ? "View code snippet" : "No code snippet"}
+                            aria-label={
+                              note.code_snippet
+                                ? "View code snippet"
+                                : "No code snippet"
+                            }
                           >
                             <CodeXml className="h-4 w-4" />
                           </Button>
                         </span>
                       </TooltipTrigger>
                       <TooltipContent>
-                        {note.code_snippet ? "View code snippet" : "No code snippet"}
+                        {note.code_snippet
+                          ? "View code snippet"
+                          : "No code snippet"}
                       </TooltipContent>
                     </Tooltip>
 
@@ -184,7 +219,12 @@ export function NotesGrid({ notes, highlight }: NotesGridProps) {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => guardAction("edit note", () => { setEditingNote(note); setIsEditOpen(true) })}
+                          onClick={() =>
+                            guardAction("edit note", () => {
+                              setEditingNote(note);
+                              setIsEditOpen(true);
+                            })
+                          }
                           className="h-8 w-8 p-0"
                           aria-label="Edit note"
                         >
@@ -199,7 +239,12 @@ export function NotesGrid({ notes, highlight }: NotesGridProps) {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => guardAction("delete note", () => { setDeletingNote(note); setIsDeleteOpen(true) })}
+                          onClick={() =>
+                            guardAction("delete note", () => {
+                              setDeletingNote(note);
+                              setIsDeleteOpen(true);
+                            })
+                          }
                           className="h-8 w-8 p-0 text-destructive hover:text-destructive"
                           aria-label="Delete note"
                         >
@@ -214,12 +259,25 @@ export function NotesGrid({ notes, highlight }: NotesGridProps) {
 
               {/* Badges */}
               <div className="note-badges flex items-center gap-2 flex-wrap">
-                <UnderstandingBadge level={note.understanding_level} />
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <span>
+                        <UnderstandingBadge level={note.understanding_level} />
+                      </span>
+                    </TooltipTrigger>
+                    <TooltipContent>Level of Understanding</TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+
                 {note.code_snippet && (
                   <TooltipProvider>
                     <Tooltip>
                       <TooltipTrigger asChild>
-                        <Badge variant="outline" className="text-violet-700 border-violet-700 dark:text-violet-400 dark:border-violet-400">
+                        <Badge
+                          variant="outline"
+                          className="text-violet-700 border-violet-700 dark:text-violet-400 dark:border-violet-400"
+                        >
                           <CodeXml className="h-3 w-3 mr-1" />
                           Has Snippet
                         </Badge>
@@ -229,10 +287,20 @@ export function NotesGrid({ notes, highlight }: NotesGridProps) {
                   </TooltipProvider>
                 )}
                 {note.flag && (
-                  <Badge variant="outline" className="text-orange-600 border-orange-600">
-                    <Flag className="h-3 w-3 mr-1" />
-                    Flagged
-                  </Badge>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Badge
+                          variant="outline"
+                          className="text-orange-600 border-orange-600"
+                        >
+                          <Flag className="h-3 w-3 mr-1" />
+                          Flagged
+                        </Badge>
+                      </TooltipTrigger>
+                      <TooltipContent>Flagged for Review</TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
                 )}
                 <Badge variant="outline" className="text-muted-foreground">
                   <Calendar className="h-3 w-3 mr-1" />
@@ -245,11 +313,17 @@ export function NotesGrid({ notes, highlight }: NotesGridProps) {
               {/* Answer - Always rendered but conditionally visible */}
               {isAnswerVisible(note.id) ? (
                 <div className="space-y-2">
-                  <h4 className="text-sm font-medium text-muted-foreground">Answer:</h4>
+                  <h4 className="text-sm font-medium text-muted-foreground">
+                    Answer:
+                  </h4>
                   <p className="text-sm leading-relaxed">
-                    {note.answer
-                      ? renderWithHighlight(note.answer, highlight)
-                      : <span className="italic text-muted-foreground">No answer yet</span>}
+                    {note.answer ? (
+                      renderWithHighlight(note.answer, highlight)
+                    ) : (
+                      <span className="italic text-muted-foreground">
+                        No answer yet
+                      </span>
+                    )}
                   </p>
                 </div>
               ) : (
@@ -258,23 +332,32 @@ export function NotesGrid({ notes, highlight }: NotesGridProps) {
                   <div className="bg-muted/30 p-4 rounded-lg text-center text-muted-foreground text-sm print:hidden">
                     Click the eye icon to reveal answer
                   </div>
-                  
+
                   {/* Hidden answer content for print */}
                   <div className="hidden print:block space-y-2">
-                    <h4 className="text-sm font-medium text-muted-foreground">Answer:</h4>
+                    <h4 className="text-sm font-medium text-muted-foreground">
+                      Answer:
+                    </h4>
                     <p className="text-sm leading-relaxed">
-                      {note.answer
-                        ? renderWithHighlight(note.answer, highlight)
-                        : <span className="italic text-muted-foreground">No answer yet</span>}
+                      {note.answer ? (
+                        renderWithHighlight(note.answer, highlight)
+                      ) : (
+                        <span className="italic text-muted-foreground">
+                          No answer yet
+                        </span>
+                      )}
                     </p>
-                    
+
                     {/* Code snippet - only visible in print */}
                     {note.code_snippet && (
                       <div className="code-snippet-container">
                         <div className="code-snippet-label">Code Snippet:</div>
-                        {note.code_language && note.code_language !== "plaintext" && (
-                          <div className="code-language">Language: {note.code_language}</div>
-                        )}
+                        {note.code_language &&
+                          note.code_language !== "plaintext" && (
+                            <div className="code-language">
+                              Language: {note.code_language}
+                            </div>
+                          )}
                         <pre className="text-sm">
                           <code>{note.code_snippet}</code>
                         </pre>
@@ -316,5 +399,5 @@ export function NotesGrid({ notes, highlight }: NotesGridProps) {
         />
       )}
     </>
-  )
+  );
 }
