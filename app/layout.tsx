@@ -1,22 +1,22 @@
-import type React from "react"
-import type { Metadata, Viewport } from "next"
-import { GeistSans } from "geist/font/sans"
-import { GeistMono } from "geist/font/mono"
-import "./globals.css"
-import { ThemeProvider } from "@/components/theme-provider"
-import { EditingProvider } from "@/components/editing-context"
-import { StorageModeProvider } from "@/components/storage-mode-provider"
-import { LocalStorageWarning } from "@/components/local-storage-warning"
-import { Navigation } from "@/components/navigation"
-import { Footer } from "@/components/footer"
-import Link from "next/link"
-import Image from "next/image"
-import { Toaster } from "@/components/ui/sonner"
+import type React from "react";
+import type { Metadata, Viewport } from "next";
+import { GeistSans } from "geist/font/sans";
+import { GeistMono } from "geist/font/mono";
+import "./globals.css";
+import { ThemeProvider } from "@/components/theme-provider";
+import { EditingProvider } from "@/components/editing-context";
+import { StorageModeProvider } from "@/components/storage-mode-provider";
+import { LocalStorageWarning } from "@/components/local-storage-warning";
+import { Navigation } from "@/components/navigation";
+import { Footer } from "@/components/footer";
+import Link from "next/link";
+import Image from "next/image";
+import { Toaster } from "@/components/ui/sonner";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"
-  const title = "Rootly Notes"
-  const description = "Your learning journey tracker"
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+  const title = "Rootly Notes";
+  const description = "Your learning journey tracker";
 
   return {
     metadataBase: new URL(siteUrl),
@@ -60,8 +60,16 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     icons: {
       icon: [
-        { url: "/favicon-dark.svg", type: "image/svg+xml", media: "(prefers-color-scheme: light)" },
-        { url: "/favicon-light.svg", type: "image/svg+xml", media: "(prefers-color-scheme: dark)" },
+        {
+          url: "/favicon-dark.svg",
+          type: "image/svg+xml",
+          media: "(prefers-color-scheme: light)",
+        },
+        {
+          url: "/favicon-light.svg",
+          type: "image/svg+xml",
+          media: "(prefers-color-scheme: dark)",
+        },
       ],
       apple: "/apple-touch-icon.png",
     },
@@ -69,7 +77,7 @@ export async function generateMetadata(): Promise<Metadata> {
     alternates: {
       canonical: "/",
     },
-  }
+  };
 }
 
 export const viewport: Viewport = {
@@ -77,12 +85,12 @@ export const viewport: Viewport = {
     { media: "(prefers-color-scheme: light)", color: "#ffffff" },
     { media: "(prefers-color-scheme: dark)", color: "#0a0a0a" },
   ],
-}
+};
 
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode
+  children: React.ReactNode;
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
@@ -96,7 +104,12 @@ html {
         `}</style>
       </head>
       <body suppressHydrationWarning={true}>
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
           <StorageModeProvider>
             <EditingProvider>
               <header className="sticky top-0 z-50 bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b">
@@ -120,19 +133,21 @@ html {
                       className="block dark:hidden"
                       priority
                     />
-                    <span className="font-semibold tracking-tight text-lg md:text-xl hidden sm:inline">Rootly</span>
+                    <span className="font-semibold tracking-tight text-lg md:text-xl hidden sm:inline">
+                      Rootly
+                    </span>
                   </Link>
                   <Navigation />
                 </div>
               </header>
               {children}
               <Footer />
-              <LocalStorageWarning />
               <Toaster richColors closeButton />
+              <LocalStorageWarning />
             </EditingProvider>
           </StorageModeProvider>
         </ThemeProvider>
       </body>
     </html>
-  )
+  );
 }
