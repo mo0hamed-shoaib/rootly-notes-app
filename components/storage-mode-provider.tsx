@@ -53,35 +53,41 @@ export function StorageModeProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     async function initialize() {
-      // Add a delay to ensure session cookies are available after OAuth redirect
-      // This helps with the race condition where session might not be immediately available
-      await new Promise((resolve) => setTimeout(resolve, 300))
-      
-      // Check authentication status directly first
-      const { supabase } = await import("@/lib/supabase/client")
-      const { data: { user }, error: userError } = await supabase.auth.getUser()
-      
-      let currentMode: StorageMode
-      
-      // If we have a user and no error, we're authenticated
-      if (user && !userError) {
-        currentMode = "supabase"
-      } else {
-        // Not authenticated, check storage mode (will default to localStorage)
-        currentMode = await getStorageMode()
-      }
-      
-      setMode(currentMode)
-
-      // Only seed localStorage - Supabase will get data via migration when user logs in
-      // BUT: Don't seed if user was previously authenticated (they had Supabase data before)
-      if (currentMode === "localStorage") {
-        if (!isStorageInitialized() && !wasPreviouslyAuthenticated()) {
-          await seedLocalStorageData()
+      try {
+        // Add a delay to ensure session cookies are available after OAuth redirect
+        // This helps with the race condition where session might not be immediately available
+        await new Promise((resolve) => setTimeout(resolve, 300))
+        
+        // Check authentication status directly first
+        const { supabase } = await import("@/lib/supabase/client")
+        const { data: { user }, error: userError } = await supabase.auth.getUser()
+        
+        let currentMode: StorageMode
+        
+        // If we have a user and no error, we're authenticated
+        if (user && !userError) {
+          currentMode = "supabase"
+        } else {
+          // Not authenticated, check storage mode (will default to localStorage)
+          currentMode = await getStorageMode()
         }
-      }
+        
+        setMode(currentMode)
 
-      setIsLoading(false)
+        // Only seed localStorage - Supabase will get data via migration when user logs in
+        // BUT: Don't seed if user was previously authenticated (they had Supabase data before)
+        if (currentMode === "localStorage") {
+          if (!isStorageInitialized() && !wasPreviouslyAuthenticated()) {
+            await seedLocalStorageData()
+          }
+        }
+      } catch (error) {
+        console.error("Error initializing storage mode:", error)
+        // On error, default to localStorage
+        setMode("localStorage")
+      } finally {
+        setIsLoading(false)
+      }
     }
 
     initialize()

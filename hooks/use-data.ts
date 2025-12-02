@@ -20,12 +20,13 @@ export function useCourses() {
   const { mode: storageMode, isLoading: storageModeLoading } = useStorageMode()
 
   const fetchCourses = useCallback(async () => {
+    // Wait for storage mode to be determined
+    if (storageModeLoading) {
+      return
+    }
+    
     try {
       setIsLoading(true)
-      // Wait for storage mode to be determined
-      if (storageModeLoading) {
-        return
-      }
       
       // If storage mode is not set yet, try to determine it
       const mode = storageMode || await getStorageMode()
@@ -98,12 +99,13 @@ export function useNotes(filters?: NoteFilters) {
   const { mode: storageMode, isLoading: storageModeLoading } = useStorageMode()
 
   const fetchNotes = useCallback(async () => {
+    // Wait for storage mode to be determined
+    if (storageModeLoading) {
+      return
+    }
+    
     try {
       setIsLoading(true)
-      // Wait for storage mode to be determined
-      if (storageModeLoading) {
-        return
-      }
       
       // If storage mode is not set yet, try to determine it
       const mode = storageMode || await getStorageMode()
@@ -222,12 +224,13 @@ export function useDailyEntries() {
   const { mode: storageMode, isLoading: storageModeLoading } = useStorageMode()
 
   const fetchEntries = useCallback(async () => {
+    // Wait for storage mode to be determined
+    if (storageModeLoading) {
+      return
+    }
+    
     try {
       setIsLoading(true)
-      // Wait for storage mode to be determined
-      if (storageModeLoading) {
-        return
-      }
       
       // If storage mode is not set yet, try to determine it
       const mode = storageMode || await getStorageMode()
