@@ -35,7 +35,8 @@ export function useCourseMutations() {
 
         await serverActions.createCourseServer(course);
         toast.success("Course created");
-        // Supabase realtime will handle the update
+        // Trigger refetch for Supabase mode
+        dispatchStorageUpdate();
       } catch (error) {
         toast.error(
           error instanceof Error ? error.message : "Failed to create course"
@@ -58,7 +59,7 @@ export function useCourseMutations() {
 
         await serverActions.updateCourseServer(id, updates);
         toast.success("Course updated");
-        // Supabase realtime will handle the update
+        dispatchStorageUpdate();
       } catch (error) {
         toast.error(
           error instanceof Error ? error.message : "Failed to update course"
@@ -81,7 +82,7 @@ export function useCourseMutations() {
 
         await serverActions.deleteCourseServer(id);
         toast.success("Course deleted");
-        // Supabase realtime will handle the update
+        dispatchStorageUpdate();
       } catch (error) {
         toast.error(
           error instanceof Error ? error.message : "Failed to delete course"
@@ -111,7 +112,7 @@ export function useNoteMutations() {
 
         await serverActions.createNoteServer(note);
         toast.success("Note created");
-        // Supabase realtime will handle the update
+        dispatchStorageUpdate();
       } catch (error) {
         toast.error(
           error instanceof Error ? error.message : "Failed to create note"
@@ -134,7 +135,7 @@ export function useNoteMutations() {
 
         await serverActions.updateNoteServer(id, updates);
         toast.success("Note updated");
-        // Supabase realtime will handle the update
+        dispatchStorageUpdate();
       } catch (error) {
         toast.error(
           error instanceof Error ? error.message : "Failed to update note"
@@ -157,7 +158,7 @@ export function useNoteMutations() {
 
         await serverActions.deleteNoteServer(id);
         toast.success("Note deleted");
-        // Supabase realtime will handle the update
+        dispatchStorageUpdate();
       } catch (error) {
         toast.error(
           error instanceof Error ? error.message : "Failed to delete note"
@@ -187,7 +188,7 @@ export function useDailyEntryMutations() {
 
         await serverActions.createDailyEntryServer(entry);
         toast.success("Daily tracking saved");
-        // Supabase realtime will handle the update
+        dispatchStorageUpdate();
       } catch (error) {
         toast.error(
           error instanceof Error
@@ -212,7 +213,7 @@ export function useDailyEntryMutations() {
 
         await serverActions.updateDailyEntryServer(id, updates);
         toast.success("Daily tracking updated");
-        // Supabase realtime will handle the update
+        dispatchStorageUpdate();
       } catch (error) {
         toast.error(
           error instanceof Error
@@ -237,7 +238,7 @@ export function useDailyEntryMutations() {
 
         await serverActions.deleteDailyEntryServer(id);
         toast.success("Daily tracking deleted");
-        // Supabase realtime will handle the update
+        dispatchStorageUpdate();
       } catch (error) {
         toast.error(
           error instanceof Error
