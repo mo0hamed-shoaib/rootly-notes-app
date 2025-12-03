@@ -41,19 +41,8 @@ function ReviewPageContent() {
 
   // Prepare session notes
   const sessionNotes = useMemo(() => {
-    console.log("[ReviewPage] sessionNotes useMemo:", {
-      cachedLength: cachedSessionNotes.length,
-      notesLength: notes.length,
-      shuffle,
-      limit,
-    });
-
     // If we have cached notes, keep using them (session is active)
     if (cachedSessionNotes.length > 0) {
-      console.log(
-        "[ReviewPage] Using cached notes:",
-        cachedSessionNotes.length
-      );
       return cachedSessionNotes;
     }
 
@@ -63,11 +52,8 @@ function ReviewPageContent() {
       : notes;
     const sliced = filtered.slice(0, limit);
 
-    console.log("[ReviewPage] Calculating new notes:", sliced.length);
-
     // Cache them if we have notes
     if (sliced.length > 0) {
-      console.log("[ReviewPage] Setting cache:", sliced.length);
       setCachedSessionNotes(sliced);
     }
 

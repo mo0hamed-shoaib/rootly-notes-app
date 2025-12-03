@@ -218,14 +218,23 @@ export function ReviewSession({ notes }: ReviewSessionProps) {
       });
 
       if (isLastNote) {
+        console.log("[ReviewSession] Completing session:", {
+          sessionNotesLength: sessionNotes.length,
+          responsesLength: responses.length + 1,
+          completedNotesLength: completedNotes.length + 1,
+        });
+
         toast.success("Practice session completed!", {
           description: `You reviewed ${sessionNotes.length} notes.`,
         });
         clearSession();
+        setSnapshotNotes([]);
         setIsStarted(false);
         setEnded(true);
         setShowAnswer(false);
         setSelectedLevel(null);
+
+        console.log("[ReviewSession] Set ended=true");
       } else {
         setCurrentIndex((prev) => prev + 1);
         setShowAnswer(false);
@@ -259,8 +268,14 @@ export function ReviewSession({ notes }: ReviewSessionProps) {
     }
   };
 
-  // Not started state
+  // Session ended - show summary
   if (ended) {
+    console.log("[ReviewSession] Rendering SessionSummary:", {
+      ended,
+      snapshotNotesLength: snapshotNotes.length,
+      responsesLength: responses.length,
+    });
+
     return (
       <SessionSummary
         notes={snapshotNotes.length > 0 ? snapshotNotes : notes}
