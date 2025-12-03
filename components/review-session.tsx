@@ -100,6 +100,8 @@ export function ReviewSession({ notes, onComplete }: ReviewSessionProps) {
     currentIndex?: number;
     completed?: string[];
     isStarted?: boolean;
+    responses?: { noteId: string; previous: number; next: number }[];
+    startedAt?: number | null;
   }) {
     try {
       const payload = {
@@ -107,6 +109,8 @@ export function ReviewSession({ notes, onComplete }: ReviewSessionProps) {
         currentIndex: next.currentIndex ?? currentIndex,
         completed: next.completed ?? completedNotes,
         isStarted: next.isStarted ?? isStarted,
+        responses: next.responses ?? responses,
+        startedAt: next.startedAt ?? startedAtRef.current,
         savedAt: Date.now(),
       };
       localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
@@ -129,6 +133,8 @@ export function ReviewSession({ notes, onComplete }: ReviewSessionProps) {
         currentIndex: number;
         completed: string[];
         isStarted: boolean;
+        responses?: { noteId: string; previous: number; next: number }[];
+        startedAt?: number;
       };
       const noteMap = new Map<string, Note>();
       for (const n of notes) noteMap.set(n.id, n);
@@ -144,8 +150,9 @@ export function ReviewSession({ notes, onComplete }: ReviewSessionProps) {
         setCompletedNotes(
           (parsed.completed || []).filter((id) => noteMap.has(id))
         );
+        setResponses(parsed.responses || []);
         setIsStarted(true);
-        startedAtRef.current = Date.now();
+        startedAtRef.current = parsed.startedAt || Date.now();
       }
     } catch {}
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -167,6 +174,8 @@ export function ReviewSession({ notes, onComplete }: ReviewSessionProps) {
       currentIndex: 0,
       completed: [],
       isStarted: true,
+      responses: [],
+      startedAt: Date.now(),
     });
   };
 
@@ -204,20 +213,24 @@ export function ReviewSession({ notes, onComplete }: ReviewSessionProps) {
       );
 
       setCompletedNotes((prev) => [...prev, currentNote.id]);
-      setResponses((prev) => [
-        ...prev,
+
+      const newResponses = [
+        ...responses,
         {
           noteId: currentNote.id,
           previous: currentNote.understanding_level,
           next: newLevel,
         },
-      ]);
+      ];
+      setResponses(newResponses);
+
       saveSession({
         currentIndex: Math.min(
           currentIndex + 1,
           Math.max(sessionNotes.length - 1, 0)
         ),
         completed: [...completedNotes, currentNote.id],
+        responses: newResponses,
       });
 
       if (isLastNote) {
@@ -239,14 +252,7 @@ export function ReviewSession({ notes, onComplete }: ReviewSessionProps) {
 
         // Notify parent
         onComplete?.({
-          responses: [
-            ...responses,
-            {
-              noteId: currentNote.id,
-              previous: currentNote.understanding_level,
-              next: newLevel,
-            },
-          ],
+          responses: newResponses,
           startedAt: startedAtRef.current,
         });
 
