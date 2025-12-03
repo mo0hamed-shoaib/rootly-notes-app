@@ -48,10 +48,14 @@ import { useEditingGuard } from "@/hooks/use-editing-guard";
 import { useNoteMutations } from "@/hooks/use-mutations";
 
 interface ReviewSessionProps {
-  notes: (Note & { course?: { title: string; instructor: string } })[];
+  notes: Note[];
+  onComplete?: (data: {
+    responses: { noteId: string; previous: number; next: number }[];
+    startedAt: number | null;
+  }) => void;
 }
 
-export function ReviewSession({ notes }: ReviewSessionProps) {
+export function ReviewSession({ notes, onComplete }: ReviewSessionProps) {
   const [isStarted, setIsStarted] = useState(false);
   const [snapshotNotes, setSnapshotNotes] = useState<Note[]>([]);
   const [orderedNoteIds, setOrderedNoteIds] = useState<string[]>([]);
@@ -63,20 +67,11 @@ export function ReviewSession({ notes }: ReviewSessionProps) {
   const [responses, setResponses] = useState<
     { noteId: string; previous: number; next: number }[]
   >([]);
-  const [ended, setEnded] = useState(false);
+  // const [ended, setEnded] = useState(false); // Removed - state lifted to parent
   const startedAtRef = useRef<number | null>(null);
   const STORAGE_KEY = "rootly_review_session_v1";
   const { guardAction } = useEditingGuard();
   const { updateNote } = useNoteMutations();
-
-  // Log state on every render
-  console.log("[ReviewSession] Render:", {
-    isStarted,
-    ended,
-    snapshotNotesLength: snapshotNotes.length,
-    orderedIdsLength: orderedNoteIds.length,
-    responsesLength: responses.length,
-  });
 
   const idToNote = useMemo(() => {
     const map = new Map<string, Note>();
@@ -166,7 +161,6 @@ export function ReviewSession({ notes }: ReviewSessionProps) {
     setSelectedLevel(null);
     setIsStarted(true);
     setResponses([]);
-    setEnded(false);
     startedAtRef.current = Date.now();
     saveSession({
       orderedIds: order,
@@ -185,14 +179,13 @@ export function ReviewSession({ notes }: ReviewSessionProps) {
     setCompletedNotes([]);
     setShowAnswer(false);
     setSelectedLevel(null);
-    setEnded(true);
     toast.success("Practice session ended", {
       description: "You can start a new session anytime.",
     });
   };
 
   const closeSummary = () => {
-    setEnded(false);
+    // setEnded(false); // Removed
     setSnapshotNotes([]); // Clear snapshot when closing summary
   };
 
@@ -240,11 +233,24 @@ export function ReviewSession({ notes }: ReviewSessionProps) {
         clearSession();
         // DON'T clear snapshot here - we need it for the summary!
         setIsStarted(false);
-        setEnded(true);
+        // setEnded(true); // Removed - state lifted to parent
         setShowAnswer(false);
         setSelectedLevel(null);
 
-        console.log("[ReviewSession] Set ended=true");
+        // Notify parent
+        onComplete?.({
+          responses: [
+            ...responses,
+            {
+              noteId: currentNote.id,
+              previous: currentNote.understanding_level,
+              next: newLevel,
+            },
+          ],
+          startedAt: startedAtRef.current,
+        });
+
+        console.log("[ReviewSession] Called onComplete");
       } else {
         setCurrentIndex((prev) => prev + 1);
         setShowAnswer(false);
@@ -278,7 +284,8 @@ export function ReviewSession({ notes }: ReviewSessionProps) {
     }
   };
 
-  // Session ended - show summary
+  // Session ended - show summary logic moved to parent
+  /*
   if (ended) {
     console.log("[ReviewSession] Rendering SessionSummary:", {
       ended,
@@ -296,8 +303,9 @@ export function ReviewSession({ notes }: ReviewSessionProps) {
       />
     );
   }
+  */
 
-  if (!isStarted && !ended) {
+  if (!isStarted) {
     return (
       <Card className="relative overflow-hidden">
         <div
@@ -526,7 +534,7 @@ export function ReviewSession({ notes }: ReviewSessionProps) {
   );
 }
 
-function SessionSummary({
+export function SessionSummary({
   notes,
   responses,
   startedAt,

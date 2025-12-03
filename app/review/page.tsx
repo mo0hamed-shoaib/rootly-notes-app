@@ -4,6 +4,7 @@ import { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { useMemo, useState, useEffect } from "react";
 import { ReviewSession } from "@/components/review-session";
+import { SessionSummary } from "@/components/review-session";
 import { ReviewControls } from "@/components/review-controls";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { EmptyState } from "@/components/empty-state";
@@ -39,6 +40,13 @@ function ReviewPageContent() {
     []
   );
 
+  // Session completion state (persists across ReviewSession unmounts)
+  const [showSummary, setShowSummary] = useState(false);
+  const [sessionData, setSessionData] = useState<{
+    responses: { noteId: string; previous: number; next: number }[];
+    startedAt: number | null;
+  }>({ responses: [], startedAt: null });
+
   // Prepare session notes
   const sessionNotes = useMemo(() => {
     // If we have cached notes, keep using them (session is active)
@@ -63,6 +71,7 @@ function ReviewPageContent() {
   // Clear cache when filters change
   useEffect(() => {
     setCachedSessionNotes([]);
+    setShowSummary(false);
   }, [course, flagged, shuffle, limit]);
 
   const flaggedInSession = sessionNotes.filter((n) => n.flag).length;
@@ -131,8 +140,30 @@ function ReviewPageContent() {
         </div>
 
         {/* Practice Session */}
-        {sessionNotes.length > 0 ? (
-          <ReviewSession notes={sessionNotes} />
+        {showSummary ? (
+          <SessionSummary
+            notes={
+              cachedSessionNotes.length > 0 ? cachedSessionNotes : sessionNotes
+            }
+            responses={sessionData.responses}
+            startedAt={sessionData.startedAt}
+            onRestart={() => {
+              setShowSummary(false);
+              setCachedSessionNotes([]); // Clear cache to start fresh
+            }}
+            onClose={() => {
+              setShowSummary(false);
+              setCachedSessionNotes([]); // Clear cache to return to empty state
+            }}
+          />
+        ) : sessionNotes.length > 0 ? (
+          <ReviewSession
+            notes={sessionNotes}
+            onComplete={(data) => {
+              setSessionData(data);
+              setShowSummary(true);
+            }}
+          />
         ) : (
           <EmptyState
             title="No notes available"
