@@ -184,6 +184,7 @@ export function ReviewSession({ notes }: ReviewSessionProps) {
 
   const closeSummary = () => {
     setEnded(false);
+    setSnapshotNotes([]); // Clear snapshot when closing summary
   };
 
   const handleUpdateUnderstanding = async (newLevel: number) => {
@@ -228,7 +229,7 @@ export function ReviewSession({ notes }: ReviewSessionProps) {
           description: `You reviewed ${sessionNotes.length} notes.`,
         });
         clearSession();
-        setSnapshotNotes([]);
+        // DON'T clear snapshot here - we need it for the summary!
         setIsStarted(false);
         setEnded(true);
         setShowAnswer(false);
