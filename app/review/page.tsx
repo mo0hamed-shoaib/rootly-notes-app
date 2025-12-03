@@ -2,7 +2,7 @@
 
 import { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
-import { useMemo } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { ReviewSession } from "@/components/review-session";
 import { ReviewControls } from "@/components/review-controls";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -34,14 +34,50 @@ function ReviewPageContent() {
   const { notes, isLoading } = useNotes(filters);
   const { courses } = useCourses();
 
+  // Cache session notes to prevent unmounting during refetches
+  const [cachedSessionNotes, setCachedSessionNotes] = useState<typeof notes>(
+    []
+  );
+
   // Prepare session notes
   const sessionNotes = useMemo(() => {
-    // Don't return empty during refetches - keep component mounted with current notes
+    console.log("[ReviewPage] sessionNotes useMemo:", {
+      cachedLength: cachedSessionNotes.length,
+      notesLength: notes.length,
+      shuffle,
+      limit,
+    });
+
+    // If we have cached notes, keep using them (session is active)
+    if (cachedSessionNotes.length > 0) {
+      console.log(
+        "[ReviewPage] Using cached notes:",
+        cachedSessionNotes.length
+      );
+      return cachedSessionNotes;
+    }
+
+    // Calculate new session notes
     const filtered = shuffle
       ? [...notes].sort(() => Math.random() - 0.5)
       : notes;
-    return filtered.slice(0, limit);
-  }, [notes, shuffle, limit]);
+    const sliced = filtered.slice(0, limit);
+
+    console.log("[ReviewPage] Calculating new notes:", sliced.length);
+
+    // Cache them if we have notes
+    if (sliced.length > 0) {
+      console.log("[ReviewPage] Setting cache:", sliced.length);
+      setCachedSessionNotes(sliced);
+    }
+
+    return sliced;
+  }, [notes, shuffle, limit, cachedSessionNotes]);
+
+  // Clear cache when filters change
+  useEffect(() => {
+    setCachedSessionNotes([]);
+  }, [course, flagged, shuffle, limit]);
 
   const flaggedInSession = sessionNotes.filter((n) => n.flag).length;
 
