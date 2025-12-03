@@ -1,24 +1,27 @@
-"use client"
+"use client";
 
-import { Suspense } from "react"
-import { useSearchParams } from "next/navigation"
-import { useMemo } from "react"
-import { ReviewSession } from "@/components/review-session"
-import { ReviewControls } from "@/components/review-controls"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { EmptyState } from "@/components/empty-state"
-import { FileQuestion } from "lucide-react"
-import { Brain, Flag, Shuffle } from "lucide-react"
-import { useNotes } from "@/hooks/use-data"
-import { useCourses } from "@/hooks/use-data"
-import { ReviewSkeleton } from "@/components/loading-skeletons"
+import { Suspense } from "react";
+import { useSearchParams } from "next/navigation";
+import { useMemo } from "react";
+import { ReviewSession } from "@/components/review-session";
+import { ReviewControls } from "@/components/review-controls";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { EmptyState } from "@/components/empty-state";
+import { FileQuestion } from "lucide-react";
+import { Brain, Flag, Shuffle } from "lucide-react";
+import { useNotes } from "@/hooks/use-data";
+import { useCourses } from "@/hooks/use-data";
+import { ReviewSkeleton } from "@/components/loading-skeletons";
 
 function ReviewPageContent() {
-  const searchParams = useSearchParams()
-  const course = searchParams.get("course") || undefined
-  const flagged = searchParams.get("flagged")
-  const shuffle = (searchParams.get("shuffle") ?? "true") === "true"
-  const limit = Math.max(1, Math.min(100, Number.parseInt(searchParams.get("limit") || "20")))
+  const searchParams = useSearchParams();
+  const course = searchParams.get("course") || undefined;
+  const flagged = searchParams.get("flagged");
+  const shuffle = (searchParams.get("shuffle") ?? "true") === "true";
+  const limit = Math.max(
+    1,
+    Math.min(100, Number.parseInt(searchParams.get("limit") || "20"))
+  );
 
   const filters = useMemo(
     () => ({
@@ -26,22 +29,24 @@ function ReviewPageContent() {
       flagged: flagged === "true" ? true : undefined,
     }),
     [course, flagged]
-  )
+  );
 
-  const { notes, isLoading } = useNotes(filters)
-  const { courses } = useCourses()
+  const { notes, isLoading } = useNotes(filters);
+  const { courses } = useCourses();
 
   // Prepare session notes
   const sessionNotes = useMemo(() => {
-    if (isLoading) return []
-    const filtered = shuffle ? [...notes].sort(() => Math.random() - 0.5) : notes
-    return filtered.slice(0, limit)
-  }, [notes, shuffle, limit, isLoading])
+    // Don't return empty during refetches - keep component mounted with current notes
+    const filtered = shuffle
+      ? [...notes].sort(() => Math.random() - 0.5)
+      : notes;
+    return filtered.slice(0, limit);
+  }, [notes, shuffle, limit]);
 
-  const flaggedInSession = sessionNotes.filter((n) => n.flag).length
+  const flaggedInSession = sessionNotes.filter((n) => n.flag).length;
 
   if (isLoading) {
-    return <ReviewSkeleton />
+    return <ReviewSkeleton />;
   }
 
   return (
@@ -50,8 +55,12 @@ function ReviewPageContent() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">Practice Session</h1>
-            <p className="text-muted-foreground">Quick quiz on your notes. Start anytime.</p>
+            <h1 className="text-3xl font-bold tracking-tight">
+              Practice Session
+            </h1>
+            <p className="text-muted-foreground">
+              Quick quiz on your notes. Start anytime.
+            </p>
           </div>
           <div />
         </div>
@@ -91,7 +100,9 @@ function ReviewPageContent() {
               <Shuffle className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{shuffle ? "Shuffled" : "Fixed"}</div>
+              <div className="text-2xl font-bold">
+                {shuffle ? "Shuffled" : "Fixed"}
+              </div>
               <p className="text-xs text-muted-foreground">Practice order</p>
             </CardContent>
           </Card>
@@ -110,15 +121,13 @@ function ReviewPageContent() {
         )}
       </div>
     </div>
-  )
+  );
 }
 
 export default function ReviewPage() {
   return (
-    <Suspense
-      fallback={<ReviewSkeleton />}
-    >
+    <Suspense fallback={<ReviewSkeleton />}>
       <ReviewPageContent />
     </Suspense>
-  )
+  );
 }
