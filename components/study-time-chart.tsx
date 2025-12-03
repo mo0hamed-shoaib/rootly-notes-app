@@ -157,8 +157,10 @@ export function StudyTimeChart({ data, accentColor }: StudyTimeChartProps) {
               className="text-xs fill-muted-foreground"
               axisLine={false}
               tickLine={false}
-              height={60}
-              interval={0}
+              height={70}
+              angle={-45}
+              textAnchor="end"
+              interval={chartData.length > 50 ? "preserveStartEnd" : 0}
               tick={{ fontSize: 11 }}
             />
             <YAxis

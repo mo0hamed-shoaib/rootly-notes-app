@@ -199,7 +199,10 @@ export function MoodChart({ data }: MoodChartProps) {
               className="text-xs fill-muted-foreground"
               axisLine={false}
               tickLine={false}
-              height={60}
+              height={70}
+              angle={-45}
+              textAnchor="end"
+              interval={chartData.length > 50 ? "preserveStartEnd" : 0}
               tick={{ fontSize: 11 }}
               tickMargin={8}
             />
