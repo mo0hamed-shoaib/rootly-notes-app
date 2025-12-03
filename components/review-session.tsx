@@ -53,6 +53,7 @@ interface ReviewSessionProps {
 
 export function ReviewSession({ notes }: ReviewSessionProps) {
   const [isStarted, setIsStarted] = useState(false);
+  const [snapshotNotes, setSnapshotNotes] = useState<Note[]>([]);
   const [orderedNoteIds, setOrderedNoteIds] = useState<string[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showAnswer, setShowAnswer] = useState(false);
@@ -70,9 +71,10 @@ export function ReviewSession({ notes }: ReviewSessionProps) {
 
   const idToNote = useMemo(() => {
     const map = new Map<string, Note>();
-    for (const n of notes) map.set(n.id, n);
+    const sourceNotes = isStarted ? snapshotNotes : notes;
+    for (const n of sourceNotes) map.set(n.id, n);
     return map;
-  }, [notes]);
+  }, [notes, snapshotNotes, isStarted]);
 
   const sessionNotes: Note[] = useMemo(() => {
     if (orderedNoteIds.length === 0) return [];
@@ -124,16 +126,19 @@ export function ReviewSession({ notes }: ReviewSessionProps) {
         completed: string[];
         isStarted: boolean;
       };
+      const noteMap = new Map<string, Note>();
+      for (const n of notes) noteMap.set(n.id, n);
       const filteredIds = (parsed.orderedIds || []).filter((id) =>
-        idToNote.has(id)
+        noteMap.has(id)
       );
       if (filteredIds.length > 0 && parsed.isStarted) {
+        setSnapshotNotes(notes);
         setOrderedNoteIds(filteredIds);
         setCurrentIndex(
           Math.min(parsed.currentIndex ?? 0, filteredIds.length - 1)
         );
         setCompletedNotes(
-          (parsed.completed || []).filter((id) => idToNote.has(id))
+          (parsed.completed || []).filter((id) => noteMap.has(id))
         );
         setIsStarted(true);
         startedAtRef.current = Date.now();
@@ -144,6 +149,7 @@ export function ReviewSession({ notes }: ReviewSessionProps) {
 
   const startSession = () => {
     const order = notes.map((n) => n.id);
+    setSnapshotNotes(notes);
     setOrderedNoteIds(order);
     setCurrentIndex(0);
     setCompletedNotes([]);
@@ -163,6 +169,7 @@ export function ReviewSession({ notes }: ReviewSessionProps) {
 
   const endSession = () => {
     clearSession();
+    setSnapshotNotes([]);
     setIsStarted(false);
     setOrderedNoteIds([]);
     setCurrentIndex(0);
