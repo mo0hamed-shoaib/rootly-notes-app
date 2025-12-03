@@ -234,12 +234,6 @@ export function ReviewSession({ notes, onComplete }: ReviewSessionProps) {
       });
 
       if (isLastNote) {
-        console.log("[ReviewSession] Completing session:", {
-          sessionNotesLength: sessionNotes.length,
-          responsesLength: responses.length + 1,
-          completedNotesLength: completedNotes.length + 1,
-        });
-
         toast.success("Practice session completed!", {
           description: `You reviewed ${sessionNotes.length} notes.`,
         });
@@ -255,8 +249,6 @@ export function ReviewSession({ notes, onComplete }: ReviewSessionProps) {
           responses: newResponses,
           startedAt: startedAtRef.current,
         });
-
-        console.log("[ReviewSession] Called onComplete");
       } else {
         setCurrentIndex((prev) => prev + 1);
         setShowAnswer(false);
@@ -575,8 +567,7 @@ export function SessionSummary({
   const weakest = useMemo(() => {
     const list = [...responses]
       .map((r) => ({ ...r, note: byId.get(r.noteId)! }))
-      .sort((a, b) => a.next - b.next)
-      .slice(0, 5);
+      .sort((a, b) => a.next - b.next);
     return list;
   }, [responses, byId]);
 
