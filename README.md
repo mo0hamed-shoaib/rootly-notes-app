@@ -18,7 +18,7 @@
 </p>
 
 <p align="center">
-  <a href="https://rootly-notes.vercel.app/" target="_blank" rel="noopener noreferrer">
+  <a href="https://rootly-notes-app.vercel.app/" target="_blank" rel="noopener noreferrer">
     <img src="https://img.shields.io/badge/Live%20Website-View%20ROOTLY-389bbe?style=for-the-badge" alt="Live Website">
   </a>
 </p>
