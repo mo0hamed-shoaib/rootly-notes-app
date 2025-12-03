@@ -263,7 +263,7 @@ export function ReviewSession({ notes }: ReviewSessionProps) {
   if (ended) {
     return (
       <SessionSummary
-        notes={notes}
+        notes={snapshotNotes.length > 0 ? snapshotNotes : notes}
         responses={responses}
         startedAt={startedAtRef.current}
         onRestart={startSession}
