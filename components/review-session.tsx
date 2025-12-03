@@ -69,6 +69,15 @@ export function ReviewSession({ notes }: ReviewSessionProps) {
   const { guardAction } = useEditingGuard();
   const { updateNote } = useNoteMutations();
 
+  // Log state on every render
+  console.log("[ReviewSession] Render:", {
+    isStarted,
+    ended,
+    snapshotNotesLength: snapshotNotes.length,
+    orderedIdsLength: orderedNoteIds.length,
+    responsesLength: responses.length,
+  });
+
   const idToNote = useMemo(() => {
     const map = new Map<string, Note>();
     const sourceNotes = isStarted ? snapshotNotes : notes;
