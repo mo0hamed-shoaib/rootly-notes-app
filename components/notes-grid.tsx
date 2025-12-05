@@ -132,7 +132,7 @@ export function NotesGrid({ notes, highlight }: NotesGridProps) {
             className="relative flex flex-col h-full"
           >
             <CardHeader className="pb-3 flex-shrink-0">
-              <div className="flex items-start justify-between gap-4">
+              <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-3 lg:gap-4">
                 <div className="flex-1 min-w-0">
                   {/* Question */}
                   <h2 className="text-lg font-semibold leading-tight mb-2">
@@ -150,7 +150,7 @@ export function NotesGrid({ notes, highlight }: NotesGridProps) {
                 </div>
 
                 {/* Actions (hidden on print) */}
-                <div className="note-actions flex items-center gap-1 flex-shrink-0">
+                <div className="note-actions flex items-center gap-1 flex-shrink-0 lg:flex-shrink">
                   <TooltipProvider>
                     <Tooltip>
                       <TooltipTrigger asChild>
