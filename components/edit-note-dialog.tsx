@@ -1,44 +1,84 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { z } from "zod"
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { Textarea } from "@/components/ui/textarea"
-import { Select as UiSelect, SelectContent as UiSelectContent, SelectItem as UiSelectItem, SelectTrigger as UiSelectTrigger, SelectValue as UiSelectValue } from "@/components/ui/select"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Switch } from "@/components/ui/switch"
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
-import { Loader2 } from "lucide-react"
-import type { Note, CodeLanguage } from "@/lib/types"
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
-import { LanguageCombobox } from "@/components/language-combobox"
-import { useNoteMutations } from "@/hooks/use-mutations"
- 
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select as UiSelect,
+  SelectContent as UiSelectContent,
+  SelectItem as UiSelectItem,
+  SelectTrigger as UiSelectTrigger,
+  SelectValue as UiSelectValue,
+} from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Loader2 } from "lucide-react";
+import type { Note, CodeLanguage } from "@/lib/types";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { LanguageCombobox } from "@/components/language-combobox";
+import { useNoteMutations } from "@/hooks/use-mutations";
 
 const editNoteSchema = z.object({
-  question: z.string().min(1, "Question is required").max(1000, "Question must be less than 1000 characters"),
-  answer: z.string().max(2000, "Answer must be less than 2000 characters").optional(),
+  question: z
+    .string()
+    .min(1, "Question is required")
+    .max(1000, "Question must be less than 1000 characters"),
+  answer: z
+    .string()
+    .max(2000, "Answer must be less than 2000 characters")
+    .optional(),
   code_snippet: z.string().max(20000, "Snippet too long").optional(),
   code_language: z.custom<CodeLanguage>().optional(),
   understanding_level: z.coerce.number().min(1).max(5),
   flag: z.boolean(),
-})
+});
 
-type EditNoteFormData = z.infer<typeof editNoteSchema>
+type EditNoteFormData = z.infer<typeof editNoteSchema>;
 
 interface EditNoteDialogProps {
-  note: Note
-  open: boolean
-  onOpenChange: (open: boolean) => void
+  note: Note;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
 }
 
-export function EditNoteDialog({ note, open, onOpenChange }: EditNoteDialogProps) {
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const { updateNote } = useNoteMutations()
+export function EditNoteDialog({
+  note,
+  open,
+  onOpenChange,
+}: EditNoteDialogProps) {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { updateNote } = useNoteMutations();
 
   const form = useForm<EditNoteFormData>({
     resolver: zodResolver(editNoteSchema),
@@ -50,11 +90,11 @@ export function EditNoteDialog({ note, open, onOpenChange }: EditNoteDialogProps
       understanding_level: note.understanding_level,
       flag: note.flag,
     },
-  })
+  });
 
   // Reset form when note changes or when dialog opens, so reopening always shows fresh data
   useEffect(() => {
-    if (!open && form.formState.isDirty) return
+    if (!open && form.formState.isDirty) return;
     form.reset({
       question: note.question,
       answer: note.answer,
@@ -62,11 +102,11 @@ export function EditNoteDialog({ note, open, onOpenChange }: EditNoteDialogProps
       code_language: (note.code_language as CodeLanguage | null) ?? "plaintext",
       understanding_level: note.understanding_level,
       flag: note.flag,
-    })
-  }, [note, open, form])
+    });
+  }, [note, open, form]);
 
   const onSubmit = async (data: EditNoteFormData) => {
-    setIsSubmitting(true)
+    setIsSubmitting(true);
     try {
       await updateNote(note.id, {
         question: data.question,
@@ -75,23 +115,25 @@ export function EditNoteDialog({ note, open, onOpenChange }: EditNoteDialogProps
         code_language: data.code_language || "plaintext",
         understanding_level: data.understanding_level,
         flag: data.flag,
-      })
+      });
 
-      onOpenChange(false)
+      onOpenChange(false);
     } catch (error) {
       // Error is handled by the mutation hook
-      console.error("Error updating note:", error)
+      console.error("Error updating note:", error);
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[600px] max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Edit Note</DialogTitle>
-          <DialogDescription>Update your learning question and understanding level.</DialogDescription>
+          <DialogDescription>
+            Update your learning question and understanding level.
+          </DialogDescription>
         </DialogHeader>
 
         <Form {...form}>
@@ -134,7 +176,9 @@ export function EditNoteDialog({ note, open, onOpenChange }: EditNoteDialogProps
 
             <Accordion type="single" collapsible>
               <AccordionItem value="code">
-                <AccordionTrigger className="text-sm font-medium">Code snippet (Optional)</AccordionTrigger>
+                <AccordionTrigger className="text-sm font-medium">
+                  Code snippet (Optional)
+                </AccordionTrigger>
                 <AccordionContent>
                   <div className="space-y-3 max-h-[60vh] overflow-y-auto pr-1">
                     <FormField
@@ -143,7 +187,12 @@ export function EditNoteDialog({ note, open, onOpenChange }: EditNoteDialogProps
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Language</FormLabel>
-                          <LanguageCombobox value={(field.value as CodeLanguage) ?? "plaintext"} onChange={field.onChange as (v: CodeLanguage) => void} />
+                          <LanguageCombobox
+                            value={(field.value as CodeLanguage) ?? "plaintext"}
+                            onChange={
+                              field.onChange as (v: CodeLanguage) => void
+                            }
+                          />
                           <FormMessage />
                         </FormItem>
                       )}
@@ -165,13 +214,12 @@ export function EditNoteDialog({ note, open, onOpenChange }: EditNoteDialogProps
                         </FormItem>
                       )}
                     />
-                    
                   </div>
                 </AccordionContent>
               </AccordionItem>
             </Accordion>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4">
               <FormField
                 control={form.control}
                 name="understanding_level"
@@ -179,7 +227,9 @@ export function EditNoteDialog({ note, open, onOpenChange }: EditNoteDialogProps
                   <FormItem>
                     <FormLabel>Understanding Level</FormLabel>
                     <Select
-                      onValueChange={(value) => field.onChange(Number.parseInt(value))}
+                      onValueChange={(value) =>
+                        field.onChange(Number.parseInt(value))
+                      }
                       value={field.value.toString()}
                     >
                       <FormControl>
@@ -204,13 +254,18 @@ export function EditNoteDialog({ note, open, onOpenChange }: EditNoteDialogProps
                 control={form.control}
                 name="flag"
                 render={({ field }) => (
-                  <FormItem className="flex flex-row items-center justify-between p-2">
+                  <FormItem className="flex flex-row items-center gap-4 p-2">
                     <div className="space-y-1">
                       <FormLabel>Flag for review</FormLabel>
-                      <p className="text-sm text-muted-foreground">Adds more priority</p>
+                      <p className="text-sm text-muted-foreground">
+                        Adds more priority
+                      </p>
                     </div>
                     <FormControl>
-                      <Switch checked={field.value} onCheckedChange={field.onChange} />
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
                     </FormControl>
                   </FormItem>
                 )}
@@ -218,11 +273,17 @@ export function EditNoteDialog({ note, open, onOpenChange }: EditNoteDialogProps
             </div>
 
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => onOpenChange(false)}
+              >
                 Cancel
               </Button>
               <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+                {isSubmitting && (
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                )}
                 Save Changes
               </Button>
             </DialogFooter>
@@ -230,5 +291,5 @@ export function EditNoteDialog({ note, open, onOpenChange }: EditNoteDialogProps
         </Form>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

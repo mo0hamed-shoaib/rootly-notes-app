@@ -1,11 +1,11 @@
-import type { CodeLanguage } from "@/lib/types"
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { z } from "zod"
+import type { CodeLanguage } from "@/lib/types";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import {
   Dialog,
   DialogContent,
@@ -14,41 +14,69 @@ import {
   DialogTitle,
   DialogTrigger,
   DialogFooter,
-} from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Switch } from "@/components/ui/switch"
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import { Plus, Loader2 } from "lucide-react"
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
-import { LanguageCombobox } from "@/components/language-combobox"
-import { useEditingGuard } from "@/hooks/use-editing-guard"
-import { useNoteMutations } from "@/hooks/use-mutations"
- 
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { Plus, Loader2 } from "lucide-react";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { LanguageCombobox } from "@/components/language-combobox";
+import { useEditingGuard } from "@/hooks/use-editing-guard";
+import { useNoteMutations } from "@/hooks/use-mutations";
 
 const noteSchema = z.object({
   course_id: z.string().min(1, "Please select a course"),
-  question: z.string().min(1, "Question is required").max(1000, "Question must be less than 1000 characters"),
-  answer: z.string().max(2000, "Answer must be less than 2000 characters").optional(),
+  question: z
+    .string()
+    .min(1, "Question is required")
+    .max(1000, "Question must be less than 1000 characters"),
+  answer: z
+    .string()
+    .max(2000, "Answer must be less than 2000 characters")
+    .optional(),
   code_snippet: z.string().max(20000, "Snippet too long").optional(),
   code_language: z.custom<CodeLanguage>().optional(),
   understanding_level: z.coerce.number().min(1).max(5),
   flag: z.boolean(),
-})
+});
 
-type NoteFormData = z.infer<typeof noteSchema>
+type NoteFormData = z.infer<typeof noteSchema>;
 
 interface AddNoteDialogProps {
-  courses: { id: string; title: string; instructor: string }[]
+  courses: { id: string; title: string; instructor: string }[];
 }
 
 export function AddNoteDialog({ courses }: AddNoteDialogProps) {
-  const [open, setOpen] = useState(false)
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const { guardAction } = useEditingGuard()
-  const { createNote } = useNoteMutations()
+  const [open, setOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { guardAction } = useEditingGuard();
+  const { createNote } = useNoteMutations();
 
   const form = useForm<NoteFormData>({
     resolver: zodResolver(noteSchema),
@@ -61,10 +89,10 @@ export function AddNoteDialog({ courses }: AddNoteDialogProps) {
       understanding_level: 3,
       flag: false,
     },
-  })
+  });
 
   const onSubmit = async (data: NoteFormData) => {
-    setIsSubmitting(true)
+    setIsSubmitting(true);
     try {
       await createNote({
         course_id: data.course_id,
@@ -74,17 +102,17 @@ export function AddNoteDialog({ courses }: AddNoteDialogProps) {
         code_language: data.code_language || "plaintext",
         understanding_level: data.understanding_level,
         flag: data.flag,
-      })
+      });
 
-      form.reset()
-      setOpen(false)
+      form.reset();
+      setOpen(false);
     } catch (error) {
       // Error is handled by the mutation hook
-      console.error("Error adding note:", error)
+      console.error("Error adding note:", error);
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -92,13 +120,13 @@ export function AddNoteDialog({ courses }: AddNoteDialogProps) {
         <Tooltip>
           <DialogTrigger asChild>
             <TooltipTrigger asChild>
-              <Button 
-                size="sm" 
+              <Button
+                size="sm"
                 className="h-9 w-full sm:w-auto"
                 onClick={(e) => {
                   if (!open) {
-                    guardAction("add note", () => setOpen(true))
-                    e.preventDefault()
+                    guardAction("add note", () => setOpen(true));
+                    e.preventDefault();
                   }
                 }}
               >
@@ -113,7 +141,9 @@ export function AddNoteDialog({ courses }: AddNoteDialogProps) {
       <DialogContent className="sm:max-w-[600px] max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Add New Note</DialogTitle>
-          <DialogDescription>Capture a new learning question and track your understanding.</DialogDescription>
+          <DialogDescription>
+            Capture a new learning question and track your understanding.
+          </DialogDescription>
         </DialogHeader>
 
         <Form {...form}>
@@ -124,7 +154,10 @@ export function AddNoteDialog({ courses }: AddNoteDialogProps) {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Course</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
                     <FormControl>
                       <SelectTrigger aria-label="Select course">
                         <SelectValue placeholder="Select a course" />
@@ -132,8 +165,15 @@ export function AddNoteDialog({ courses }: AddNoteDialogProps) {
                     </FormControl>
                     <SelectContent className="w-[calc(100vw-2rem)] max-w-[400px] sm:max-w-[400px]">
                       {courses.map((course) => (
-                        <SelectItem key={course.id} value={course.id} className="w-full">
-                          <div className="truncate w-full text-left" title={`${course.title} - ${course.instructor}`}>
+                        <SelectItem
+                          key={course.id}
+                          value={course.id}
+                          className="w-full"
+                        >
+                          <div
+                            className="truncate w-full text-left"
+                            title={`${course.title} - ${course.instructor}`}
+                          >
                             {course.title} - {course.instructor}
                           </div>
                         </SelectItem>
@@ -183,7 +223,9 @@ export function AddNoteDialog({ courses }: AddNoteDialogProps) {
 
             <Accordion type="single" collapsible>
               <AccordionItem value="code">
-                <AccordionTrigger className="text-sm font-medium">Code snippet (Optional)</AccordionTrigger>
+                <AccordionTrigger className="text-sm font-medium">
+                  Code snippet (Optional)
+                </AccordionTrigger>
                 <AccordionContent>
                   <div className="space-y-3 max-h-[60vh] overflow-y-auto pr-1">
                     <FormField
@@ -192,7 +234,12 @@ export function AddNoteDialog({ courses }: AddNoteDialogProps) {
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Language</FormLabel>
-                          <LanguageCombobox value={(field.value as CodeLanguage) ?? "plaintext"} onChange={field.onChange as (v: CodeLanguage) => void} />
+                          <LanguageCombobox
+                            value={(field.value as CodeLanguage) ?? "plaintext"}
+                            onChange={
+                              field.onChange as (v: CodeLanguage) => void
+                            }
+                          />
                           <FormMessage />
                         </FormItem>
                       )}
@@ -214,13 +261,12 @@ export function AddNoteDialog({ courses }: AddNoteDialogProps) {
                         </FormItem>
                       )}
                     />
-                    
                   </div>
                 </AccordionContent>
               </AccordionItem>
             </Accordion>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4">
               <FormField
                 control={form.control}
                 name="understanding_level"
@@ -228,7 +274,9 @@ export function AddNoteDialog({ courses }: AddNoteDialogProps) {
                   <FormItem>
                     <FormLabel>Understanding Level</FormLabel>
                     <Select
-                      onValueChange={(value) => field.onChange(Number.parseInt(value))}
+                      onValueChange={(value) =>
+                        field.onChange(Number.parseInt(value))
+                      }
                       defaultValue={field.value.toString()}
                     >
                       <FormControl>
@@ -253,13 +301,18 @@ export function AddNoteDialog({ courses }: AddNoteDialogProps) {
                 control={form.control}
                 name="flag"
                 render={({ field }) => (
-                  <FormItem className="flex flex-row items-center justify-between p-2">
+                  <FormItem className="flex flex-row items-center gap-4 p-2">
                     <div className="space-y-1">
                       <FormLabel>Flag for review</FormLabel>
-                      <p className="text-sm text-muted-foreground">Adds more priority</p>
+                      <p className="text-sm text-muted-foreground">
+                        Adds more priority
+                      </p>
                     </div>
                     <FormControl>
-                      <Switch checked={field.value} onCheckedChange={field.onChange} />
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
                     </FormControl>
                   </FormItem>
                 )}
@@ -267,11 +320,17 @@ export function AddNoteDialog({ courses }: AddNoteDialogProps) {
             </div>
 
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setOpen(false)}
+              >
                 Cancel
               </Button>
               <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+                {isSubmitting && (
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                )}
                 Add Note
               </Button>
             </DialogFooter>
@@ -279,5 +338,5 @@ export function AddNoteDialog({ courses }: AddNoteDialogProps) {
         </Form>
       </DialogContent>
     </Dialog>
-  )
+  );
 }
