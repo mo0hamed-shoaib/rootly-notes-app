@@ -1,13 +1,27 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import { usePathname } from "next/navigation"
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import { BookOpen, PlusCircle, BarChart3, Calendar, RefreshCw, Menu } from "lucide-react"
-import { ThemeToggle } from "@/components/theme-toggle"
-import { AuthAvatar } from "@/components/auth-avatar"
-import { Drawer, DrawerContent, DrawerTrigger, DrawerHeader, DrawerTitle } from "@/components/ui/drawer"
+import * as React from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import {
+  BookOpen,
+  PlusCircle,
+  BarChart3,
+  Calendar,
+  RefreshCw,
+  Menu,
+} from "lucide-react";
+import { ThemeToggle } from "@/components/theme-toggle";
+import { AuthAvatar } from "@/components/auth-avatar";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerTrigger,
+  DrawerHeader,
+  DrawerTitle,
+} from "@/components/ui/drawer";
 
 const navigation = [
   { name: "Overview", href: "/overview", icon: BarChart3 },
@@ -15,17 +29,23 @@ const navigation = [
   { name: "Courses", href: "/courses", icon: PlusCircle },
   { name: "Daily Tracking", href: "/daily-tracking", icon: Calendar },
   { name: "Review", href: "/review", icon: RefreshCw },
-]
+];
 
 export function Navigation() {
-  const pathname = usePathname()
+  const pathname = usePathname();
+  const [open, setOpen] = React.useState(false);
 
   return (
     <div className="flex items-center gap-2">
       {/* Mobile: Drawer */}
-      <Drawer>
+      <Drawer open={open} onOpenChange={setOpen}>
         <DrawerTrigger asChild>
-          <Button className="sm:hidden" variant="outline" size="sm" aria-label="Open navigation">
+          <Button
+            className="sm:hidden"
+            variant="outline"
+            size="sm"
+            aria-label="Open navigation"
+          >
             <Menu className="h-4 w-4" />
             <span className="ml-2 text-sm">Menu</span>
           </Button>
@@ -37,21 +57,25 @@ export function Navigation() {
           <div className="p-4 pt-0">
             <div className="grid gap-2">
               {navigation.map((item) => {
-                const Icon = item.icon
-                const isActive = pathname === item.href
+                const Icon = item.icon;
+                const isActive = pathname === item.href;
                 return (
                   <Button
                     key={item.name}
                     asChild
                     variant={isActive ? "default" : "ghost"}
-                    className={cn("justify-start gap-2", isActive && "bg-primary text-primary-foreground")}
+                    className={cn(
+                      "justify-start gap-2",
+                      isActive && "bg-primary text-primary-foreground"
+                    )}
+                    onClick={() => setOpen(false)}
                   >
                     <Link href={item.href}>
                       <Icon className="h-4 w-4" />
                       <span>{item.name}</span>
                     </Link>
                   </Button>
-                )
+                );
               })}
             </div>
           </div>
@@ -67,8 +91,8 @@ export function Navigation() {
       {/* Desktop/Tablet: Inline nav */}
       <nav className="hidden sm:flex items-center space-x-1 bg-muted/50 p-1 rounded-lg">
         {navigation.map((item) => {
-          const Icon = item.icon
-          const isActive = pathname === item.href
+          const Icon = item.icon;
+          const isActive = pathname === item.href;
 
           return (
             <Button
@@ -76,14 +100,19 @@ export function Navigation() {
               asChild
               variant={isActive ? "default" : "ghost"}
               size="sm"
-              className={cn("flex items-center gap-2 px-3 py-2", isActive && "bg-primary text-primary-foreground")}
+              className={cn(
+                "flex items-center gap-2 px-3 py-2",
+                isActive && "bg-primary text-primary-foreground"
+              )}
             >
               <Link href={item.href}>
                 <Icon className="h-4 w-4" />
-                <span className="hidden [@media(min-width:870px)]:inline">{item.name}</span>
+                <span className="hidden [@media(min-width:870px)]:inline">
+                  {item.name}
+                </span>
               </Link>
             </Button>
-          )
+          );
         })}
         <div className="ml-1">
           <ThemeToggle />
@@ -93,5 +122,5 @@ export function Navigation() {
         </div>
       </nav>
     </div>
-  )
+  );
 }
