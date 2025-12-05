@@ -41,9 +41,8 @@ export function Navigation() {
       <Drawer open={open} onOpenChange={setOpen}>
         <DrawerTrigger asChild>
           <Button
-            className="sm:hidden"
+            className="sm:hidden h-9 px-4"
             variant="outline"
-            size="sm"
             aria-label="Open navigation"
           >
             <Menu className="h-4 w-4" />
