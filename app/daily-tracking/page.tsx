@@ -1,12 +1,12 @@
-"use client"
+"use client";
 
-import { Suspense } from "react"
-import { useSearchParams } from "next/navigation"
-import { useMemo } from "react"
-import { DailyEntriesGrid } from "@/components/daily-entries-grid"
-import { AddDailyEntryDialog } from "@/components/add-daily-entry-dialog"
-import { EmptyState } from "@/components/empty-state"
-import { CalendarX } from "lucide-react"
+import { Suspense } from "react";
+import { useSearchParams } from "next/navigation";
+import { useMemo } from "react";
+import { DailyEntriesGrid } from "@/components/daily-entries-grid";
+import { AddDailyEntryDialog } from "@/components/add-daily-entry-dialog";
+import { EmptyState } from "@/components/empty-state";
+import { CalendarX } from "lucide-react";
 import {
   Pagination,
   PaginationContent,
@@ -15,36 +15,36 @@ import {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
-} from "@/components/ui/pagination"
-import { useDailyEntries } from "@/hooks/use-data"
-import { DailyEntriesGridSkeleton } from "@/components/loading-skeletons"
-import type React from "react"
+} from "@/components/ui/pagination";
+import { useDailyEntries } from "@/hooks/use-data";
+import { DailyEntriesGridSkeleton } from "@/components/loading-skeletons";
+import type React from "react";
 
-const PAGE_SIZE = 12
+const PAGE_SIZE = 12;
 
 function DailyPageContent() {
-  const searchParams = useSearchParams()
-  const page = Math.max(1, Number.parseInt(searchParams.get("page") || "1"))
+  const searchParams = useSearchParams();
+  const page = Math.max(1, Number.parseInt(searchParams.get("page") || "1"));
 
-  const { entries, isLoading } = useDailyEntries()
+  const { entries, isLoading } = useDailyEntries();
 
   // Client-side pagination
   const paginatedEntries = useMemo(() => {
-    const start = (page - 1) * PAGE_SIZE
-    const end = start + PAGE_SIZE
-    return entries.slice(start, end)
-  }, [entries, page])
+    const start = (page - 1) * PAGE_SIZE;
+    const end = start + PAGE_SIZE;
+    return entries.slice(start, end);
+  }, [entries, page]);
 
-  const totalPages = Math.ceil(entries.length / PAGE_SIZE)
+  const totalPages = Math.ceil(entries.length / PAGE_SIZE);
 
   const buildPageHref = (targetPage: number) => {
-    const sp = new URLSearchParams()
-    sp.set("page", String(targetPage))
-    return `?${sp.toString()}`
-  }
+    const sp = new URLSearchParams();
+    sp.set("page", String(targetPage));
+    return `?${sp.toString()}`;
+  };
 
   const renderPageItems = () => {
-    const items: React.ReactNode[] = []
+    const items: React.ReactNode[] = [];
     const pushPage = (p: number) => {
       items.push(
         <PaginationItem key={p}>
@@ -52,24 +52,25 @@ function DailyPageContent() {
             {p}
           </PaginationLink>
         </PaginationItem>
-      )
-    }
+      );
+    };
     if (totalPages <= 7) {
-      for (let p = 1; p <= totalPages; p++) pushPage(p)
+      for (let p = 1; p <= totalPages; p++) pushPage(p);
     } else {
-      pushPage(1)
-      if (page > 3) items.push(<PaginationEllipsis key="start-ellipsis" />)
-      const start = Math.max(2, page - 1)
-      const end = Math.min(totalPages - 1, page + 1)
-      for (let p = start; p <= end; p++) pushPage(p)
-      if (page < totalPages - 2) items.push(<PaginationEllipsis key="end-ellipsis" />)
-      pushPage(totalPages)
+      pushPage(1);
+      if (page > 3) items.push(<PaginationEllipsis key="start-ellipsis" />);
+      const start = Math.max(2, page - 1);
+      const end = Math.min(totalPages - 1, page + 1);
+      for (let p = start; p <= end; p++) pushPage(p);
+      if (page < totalPages - 2)
+        items.push(<PaginationEllipsis key="end-ellipsis" />);
+      pushPage(totalPages);
     }
-    return items
-  }
+    return items;
+  };
 
   if (isLoading) {
-    return <DailyEntriesGridSkeleton />
+    return <DailyEntriesGridSkeleton />;
   }
 
   return (
@@ -78,8 +79,12 @@ function DailyPageContent() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">Daily Tracking</h1>
-            <p className="text-muted-foreground">Track your daily study progress and mood</p>
+            <h1 className="text-3xl font-bold tracking-tight">
+              Daily Tracking
+            </h1>
+            <p className="text-muted-foreground">
+              Track your daily study progress and mood
+            </p>
           </div>
           <div />
         </div>
@@ -125,15 +130,13 @@ function DailyPageContent() {
         )}
       </div>
     </div>
-  )
+  );
 }
 
 export default function DailyPage() {
   return (
-    <Suspense
-      fallback={<DailyEntriesGridSkeleton />}
-    >
+    <Suspense fallback={<DailyEntriesGridSkeleton />}>
       <DailyPageContent />
     </Suspense>
-  )
+  );
 }
