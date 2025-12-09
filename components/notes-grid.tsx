@@ -133,6 +133,7 @@ export function NotesGrid({ notes, highlight }: NotesGridProps) {
           >
             <CardHeader className="pb-3 flex-shrink-0">
               <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-3 lg:gap-4">
+                {/* Question and Course info section */}
                 <div className="flex-1 min-w-0">
                   {/* Question */}
                   <h2 className="text-lg font-semibold leading-tight mb-2">
@@ -141,7 +142,7 @@ export function NotesGrid({ notes, highlight }: NotesGridProps) {
 
                   {/* Course info */}
                   {note.course && (
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
                       <span>{note.course.title}</span>
                       <span>•</span>
                       <span>{note.course.instructor}</span>
@@ -150,7 +151,7 @@ export function NotesGrid({ notes, highlight }: NotesGridProps) {
                 </div>
 
                 {/* Actions (hidden on print) */}
-                <div className="note-actions flex items-center gap-1 flex-shrink-0 lg:flex-shrink">
+                <div className="note-actions flex items-center gap-1 flex-shrink-0">
                   <TooltipProvider>
                     <Tooltip>
                       <TooltipTrigger asChild>
@@ -258,7 +259,7 @@ export function NotesGrid({ notes, highlight }: NotesGridProps) {
               </div>
 
               {/* Badges */}
-              <div className="note-badges flex items-center gap-2 flex-wrap">
+              <div className="note-badges flex items-center gap-2 flex-wrap lg:mt-0 mt-3">
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
